@@ -17,6 +17,7 @@ using RotoMonster.Core;
 using RotoMonster.Core.Services;
 using RotoMonster.Data;
 using Newtonsoft.Json.Serialization;
+using RotoMonsterUI;
 
 namespace RotoMonster
 {
@@ -102,6 +103,9 @@ namespace RotoMonster
                     Configuration["EmailSender:UserName"],
                     Configuration["EmailSender:Password"]
                 ));
+            // RotoMonsterUI links to Basketball Monster by default.
+            RotoMonsterUIUrls.PlayerUrl = id => $"/Players?playerId={id}";
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

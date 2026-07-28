@@ -271,3 +271,12 @@ pbar-holder div a {
         font-size: 0.8em;
         margin-right: 1px;
     }
+
+/* RotoMonster's nav is light; the Monster stylesheet styles it dark. */
+.navbar-dark, .navbar {
+    background: #f8f9fa !important;
+    box-shadow: none !important;
+}
+.navbar .nav-link, .navbar-dark .nav-link {
+    color: #212529 !important;
+}
