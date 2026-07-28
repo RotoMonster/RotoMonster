@@ -13,7 +13,7 @@
         }
         @if (Model.PlayerGameState.PlayerGameStateType.ShowLockAfterStart & Model.PlayerGameState.Game.HasStarted)
         {
-            <i class="far fa-lock-alt"></i>
+            @Html.Raw(new Icon(new IconInput { Type = IconType.Lock, Size = 16 }).Render())
         }
     </span>
 }

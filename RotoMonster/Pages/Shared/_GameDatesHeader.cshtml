@@ -25,7 +25,7 @@
                 {
                     <div class="small">
                         <input type="checkbox" asp-for="@Model.StreamSelects[i].Selected" />
-                        <label asp-for="@Model.StreamSelects[i].Selected"><i class="fas fa-user"></i></label>
+                        <label asp-for="@Model.StreamSelects[i].Selected">@Html.Raw(new Icon(new IconInput { Type = IconType.PersonSimple, Size = 16 }).Render())</label>
                     </div>
                 }
             </div>

@@ -12,7 +12,7 @@
             @if (Model.IsAutomated)
             {
                 <span class="mr-1" data-toggle="tooltip" data-placement="top" title="Article is automated">
-                    <i class="far fa-wand-magic"></i>
+                    @Html.Raw(new Icon(new IconInput { Type = IconType.WandMagic, Size = 16 }).Render())
                 </span>
             }
             <a href="#@collapseId" data-toggle="collapse">@Model.Title</a>

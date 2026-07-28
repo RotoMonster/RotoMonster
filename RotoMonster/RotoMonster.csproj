@@ -46,6 +46,7 @@
     <ProjectReference Include="..\RotoMonster.NBA.Migrations\RotoMonster.NBA.Migrations.csproj" />
     <ProjectReference Include="..\RotoMonster.NFL.Migrations\RotoMonster.NFL.Migrations.csproj" />
     <ProjectReference Include="..\RotoMonster.NHL.Migrations\RotoMonster.NHL.Migrations.csproj" />
+    <ProjectReference Include="..\..\..\Desktop\RotoMonsterUI\RotoMonsterUI.csproj" />
   </ItemGroup>
 
 </Project>

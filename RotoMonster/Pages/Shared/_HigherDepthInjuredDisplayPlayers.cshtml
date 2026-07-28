@@ -15,6 +15,6 @@
         depthTT += "</div>";
     }
     <span data-toggle="tooltip" data-placement="top" data-html="true" title="@depthTT" class="text-primary">
-        <i class="fas fa-arrow-alt-circle-up"></i>
+        @Html.Raw(new Icon(new IconInput { Type = IconType.ArrowUp, Size = 16 }).Render())
     </span>
 }

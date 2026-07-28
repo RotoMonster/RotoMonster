@@ -21,7 +21,7 @@
     @inject IConfiguration Configuration
     string sport = ViewData["sport"].ToString().ToUpper();
     string[] codes = { "NBA", "MLB", "NFL", "NHL" };
-    string[] icons = { "fa-solid fa-basketball", "fa-solid fa-baseball", "fa-solid fa-football", "fa-solid fa-hockey-puck" };
+    IconType[] icons = { IconType.Basketball, IconType.Baseball, IconType.Football, IconType.HockeyPuck };
 }
 
 <body class="bg">
@@ -76,24 +76,24 @@
                         }
 
                         <li class="nav-item">
-                            <a class="nav-link text-dark" title="email support@rotomonster.com" href="mailto:support@rotomonster.com"><i class="far fa-envelope"></i></a>
+                            <a class="nav-link text-dark" title="email support@rotomonster.com" href="mailto:support@rotomonster.com">@Html.Raw(new Icon(new IconInput { Type = IconType.Envelope, Size = 22 }).Render())</a>
                         </li>
 
                         <li class="nav-item mr-2">
                             @{
                                 string t = "https://twitter.com/rotomonster";
                             }
-                            <a class="nav-link text-dark" target="_blank" href="@t"><i style="color:#1DA1F2;" class="fab fa-twitter"></i></a>
+                            <a class="nav-link text-dark" target="_blank" href="@t">@Html.Raw(new Icon(new IconInput { Type = IconType.Twitter, Size = 22 }).Render())</a>
                         </li>
 
                         @for (int i = 0; i < codes.Count(); i++)
                         {
                             string code = codes[i];
-                            string icon = icons[i];
+                            IconType icon = icons[i];
                             string cssCode = (sport == code) ? code.ToLower() + " text-white rounded" : code.ToLower() + "-txt";
 
                             <li class="nav-item">
-                                <a class="nav-link p-0" style="margin: 7px 0 0 4px;" href="/@code.ToLower()"><i class="p-1 @icon @cssCode"></i></a>
+                                <a class="nav-link p-0" style="margin: 2px 0 0 12px;" href="/@code.ToLower()"><span class="p-1 @cssCode" style="display:inline-flex;align-items:center;">@Html.Raw(new Icon(new IconInput { Type = icon, Size = 30 }).Render())</span></a>
                             </li>
                         }
 
@@ -101,7 +101,7 @@
                         {
                             <li class="nav-item ml-3">
                                 <a class="nav-link" asp-area="" asp-page="/Admin">
-                                    <i class="fa-solid fa-user-gear"></i>
+                                    @Html.Raw(new Icon(new IconInput { Type = IconType.Settings, Size = 16 }).Render())
                                     @if (ViewData["AdminErrors"] != null)
                                     {
                                         var logItems = (List<LogItem>)ViewData["AdminErrors"];

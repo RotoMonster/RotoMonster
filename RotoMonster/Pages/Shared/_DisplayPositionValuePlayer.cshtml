@@ -7,7 +7,7 @@
     @if (Model.IsStartable)
     {
         <span class="small" data-toggle="tooltip" data-placement="top" title="Top Player at @Model.MostValuablePosition.Abbreviation">
-            <i class="far fa-check-circle"></i>
+            @Html.Raw(new Icon(new IconInput { Type = IconType.Success, Size = 16 }).Render())
         </span>
     }
     <small><partial name="_ColoredPosition" model="Model.MostValuablePosition" /></small>

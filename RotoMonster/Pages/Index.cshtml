@@ -293,8 +293,8 @@
                                 <a href="@ulv.UserLeague.ProviderURL" target="_blank">@ulv.UserLeague.FantasyProvider.Name @ulv.UserLeague.ProviderLeagueId</a>
                             </div>
                             <div class="float-right ml-2">
-                                <a asp-page="./UserLeagues/Edit" asp-route-id="@ulv.UserLeague.Id" alt="Edit Settings" title="Edit Settings"><i class="far fa-cog"></i></a>
-                                <a class="ml-2" asp-page-handler="UpdateRosters" asp-route-id="@ulv.UserLeague.Id" alt="Refresh Rosters" title="Refresh Rosters"><i class="fas fa-sync-alt"></i></a>
+                                <a asp-page="./UserLeagues/Edit" asp-route-id="@ulv.UserLeague.Id" alt="Edit Settings" title="Edit Settings">@Html.Raw(new Icon(new IconInput { Type = IconType.Settings, Size = 16 }).Render())</a>
+                                <a class="ml-2" asp-page-handler="UpdateRosters" asp-route-id="@ulv.UserLeague.Id" alt="Refresh Rosters" title="Refresh Rosters">@Html.Raw(new Icon(new IconInput { Type = IconType.RefreshRosters, Size = 16 }).Render())</a>
                             </div>
                         </div>
 
