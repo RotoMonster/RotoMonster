@@ -1,19 +1,26 @@
-﻿@model RotoMonster.Core.DisplayPlayerGameState
+@model RotoMonster.Core.DisplayPlayerGameState
 @if (Model.PlayerGameState != null)
 {
+    var stateType = Model.PlayerGameState.PlayerGameStateType;
+    IconType stateIcon;
+    var hasIcon = Enum.TryParse(stateType.Icon, out stateIcon);
+
     <span class="me-1 badge"
           data-bs-toggle="tooltip"
           data-bs-placement="top"
-          title="@Model.PlayerGameState.PlayerGameStateType.Title"
-          style="color:white;background-color:#@Model.PlayerGameState.PlayerGameStateType.TextColor">
-        <i class="@Model.PlayerGameState.PlayerGameStateType.Icon"></i>
+          title="@stateType.Title"
+          style="color:white;background-color:#@stateType.TextColor">
+        @if (hasIcon)
+        {
+            @Html.Raw(new Icon(new IconInput { Type = stateIcon, Size = 13, Color = "#fff" }).Render())
+        }
         @if (Model.PlayerGameState.Details != null && Model.PlayerGameState.Details.Length > 0)
         {
             <span>@Model.PlayerGameState.Details</span>
         }
-        @if (Model.PlayerGameState.PlayerGameStateType.ShowLockAfterStart & Model.PlayerGameState.Game.HasStarted)
+        @if (stateType.ShowLockAfterStart & Model.PlayerGameState.Game.HasStarted)
         {
-            @Html.Raw(new Icon(new IconInput { Type = IconType.Lock, Size = 16 }).Render())
+            @Html.Raw(new Icon(new IconInput { Type = IconType.Lock, Size = 13, Color = "#fff" }).Render())
         }
     </span>
 }
