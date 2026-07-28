@@ -16,8 +16,8 @@
         txt += " - est. return " + Model.EstimatedReturnDate.GetValueOrDefault().Month.ToString() + "/" + Model.EstimatedReturnDate.GetValueOrDefault().Day.ToString();
 
     <span class="badge" style="margin-left: 3px; @colorLib.GetPlayerStatusTypeStyle(Model.PlayerStatusType)"
-      data-toggle="tooltip"
-      data-placement="top"
+      data-bs-toggle="tooltip"
+      data-bs-placement="top"
       title="@txt">
         @Model.PlayerStatusType.TextFormat.Replace("{t}", "")
         @if (Model.EstimatedGamesToMiss!=null && Model.EstimatedGamesToMiss.Count>1)

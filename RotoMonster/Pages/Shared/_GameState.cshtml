@@ -95,13 +95,13 @@
             <div aria-valuenow="@pct" class="progress-bar wlink @css" role="progressbar" style="width: @pct%" aria-valuemin="0" s aria-valuemax="100">
                 @if (pct > 0)
                 {
-                    <a class="ml-1 mr-1" asp-page="/Scores" asp-route-g="@Model.Game.Id">
+                    <a class="ms-1 me-1" asp-page="/Scores" asp-route-g="@Model.Game.Id">
                         @gameState
                     </a>
                 }
                 else
                 {
-                    <span class="ml-1 mr-1">
+                    <span class="ms-1 me-1">
                         @gameState
                     </span>
                 }

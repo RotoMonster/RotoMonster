@@ -6,14 +6,14 @@
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
 }
 
-<div class="ml-1 container">
+<div class="ms-1 container">
     <h1>Rankings</h1>
 
     <div>
-        <a href="#ShowSettings" data-toggle="collapse">Show Settings</a>
+        <a href="#ShowSettings" data-bs-toggle="collapse">Show Settings</a>
         @if (Model.UserLeagueTeamAnalyses != null)
         {
-            <a class="ml-3" href="#ShowAnalysis" data-toggle="collapse">Show Team Ownership Analysis</a>
+            <a class="ms-3" href="#ShowAnalysis" data-bs-toggle="collapse">Show Team Ownership Analysis</a>
         }
     </div>
 
@@ -22,7 +22,7 @@
         [
         @foreach (var cs in Model.PlayerTableModel.CategorySettings)
         {
-            <span class="pl-1 pr-1">
+            <span class="ps-1 pe-1">
                 @cs.Category.Abbreviation
                 @if (cs.PointsPerStat != 0)
                 {
@@ -37,7 +37,7 @@
         @if (Model.UserLeagueTeamAnalyses != null)
         {
             <h5 class="mt-2">Team Ownership Analysis</h5>
-            <div class="container ml-0 p-0">
+            <div class="container ms-0 p-0">
                 <table class="@RotoMonster.Core.RMCss.DataTable">
                     <thead class="@RotoMonster.Core.RMCss.DataTableTHead">
                         <tr>
@@ -66,12 +66,12 @@
 
                                     @foreach (var ptAnalysis in userLeagueTeamAnalysis.UserLeagueTeamAnalysisPlayerTypes)
                                     {
-                                        <td class="text-nowrap " style="background-color:#@colorLib.OwnershipGetPercentColor(ptAnalysis.AverageOwnershipPercent)">
+                                        <td class="text-nowrap" style="background-color:#@colorLib.OwnershipGetPercentColor(ptAnalysis.AverageOwnershipPercent)">
                                             @if (ptAnalysis.PlayerCount > 0)
                                             {
                                                 @String.Format("{0:##0.0}%", ptAnalysis.AverageOwnershipPercent)
                                             }
-                                            <span class="float-right mr-1">@ptAnalysis.PlayerCount</span>
+                                            <span class="float-end me-1">@ptAnalysis.PlayerCount</span>
                                         </td>
                                     }
 
@@ -94,22 +94,22 @@
         <div class="row p-2">
             @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
             {
-                <div class="col- p-1">
+                <div class="col-auto p-1">
                     <select asp-for="@Model.SelectedUserLeagueId" class="form-control" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
                 </div>
             }
-            <div class="col- p-1">
+            <div class="col-auto p-1">
                 <select asp-for="@Model.SelectedFilterId" class="form-control" asp-items="ViewBag.FilterList" onchange="this.form.submit()"></select>
             </div>
-            <div class="col- p-1">
+            <div class="col-auto p-1">
                 <select asp-for="@Model.SelectedPerValueId" class="form-control" asp-items="ViewBag.PerValues" onchange="this.form.submit()"></select>
             </div>
 
-            <div class="col- p-1">
+            <div class="col-auto p-1">
                 <select asp-for="@Model.SelectedTeamId" class="form-control" asp-items="ViewBag.TeamList" onchange="this.form.submit()"></select>
             </div>
 
-            <div class="col- p-1">
+            <div class="col-auto p-1">
                 <input type="date" asp-for="@Model.SelectedStartDate" />
                 <input type="date" asp-for="@Model.SelectedEndDate" />
                 <input type="submit" name="seasonbutton" value="Season" class="btn btn-sm btn-outline-dark" />
@@ -121,16 +121,16 @@
 
         </div>
 
-        <div class="row ml-0 container p-0">
+        <div class="row ms-0 container p-0">
             @foreach (var playerType in Model.ShowPlayerTypes)
             {
-                <div class="col- m-1 border border-secondary p-1 pl-3">
-                    <div class="ml-2 p-1 form-check">
+                <div class="col-auto m-1 border border-secondary p-1 ps-3">
+                    <div class="ms-2 p-1 form-check">
                         @foreach (var ars in Model.DisplayActiveRosterSpots)
                         {
                             if (ars.PlayerType.Id == playerType.Id)
                             {
-                                <label class="form-check-label mr-4 text-nowrap ml-2">
+                                <label class="form-check-label me-4 text-nowrap ms-2">
                                     <input class="form-check-input" asp-for="SelectedDisplayActiveRosterSpotId" value="@ars.Id" type="radio" onchange="this.form.submit()" />
                                     @foreach (var p in ars.Positions)
                                     {
@@ -145,14 +145,14 @@
         </div>
 
         <div class="p-2">
-            <span class="ml-2">
+            <span class="ms-2">
                 <label class="form-check-label">
                     <input asp-for="ColorStats" onchange="this.form.submit()">
                     @Html.DisplayNameFor(model => model.ColorStats)
                 </label>
             </span>
 
-            <span class="ml-2">
+            <span class="ms-2">
                 <label class="form-check-label">
                     <input asp-for="IncludeLive" onchange="this.form.submit()">
                     @Html.DisplayNameFor(model => model.IncludeLive)
@@ -161,14 +161,14 @@
 
             @if (isUser)
             {
-                <span class="ml-2">
+                <span class="ms-2">
                     <label class="form-check-label">
                         <input asp-for="ShowDraft" onchange="this.form.submit()">
                         @Html.DisplayNameFor(model => model.ShowDraft)
                     </label>
                 </span>
 
-                <span class="ml-2">
+                <span class="ms-2">
                     [Own# @Model.OwnershipLeagueCount]
                 </span>
             }
@@ -176,7 +176,7 @@
 
         @if (Model.PlayerTableModel.ShowAnalysisDates)
         {
-            <div id="AnalysisDates" class="row p-2 ml-1">
+            <div id="AnalysisDates" class="row p-2 ms-1">
                 <div class="col-">
                     <input type="date" asp-for="@Model.AnalysisStartDate" />
                     <input type="date" asp-for="@Model.AnalysisEndDate" />
@@ -184,7 +184,7 @@
                     <input type="submit" name="analysisnextweek" value="Next Week" class="btn btn-sm btn-primary" />
                     <input type="submit" name="analysis2weeks" value="Two Weeks" class="btn btn-sm btn-primary" />
                 </div>
-                <div class="col- ml-2">
+                <div class="col-auto ms-2">
                     <select asp-for="@Model.SelectedProjectionSourceId" class="form-control" asp-items="ViewBag.ProjectionSourceList"></select>
                 </div>
             </div>
@@ -203,7 +203,7 @@
                 <input type="submit" name="draftmodebutton" value="Draft Mode" class="btn btn-sm btn-outline-dark" />
             }
 
-            <span class="ml-2">
+            <span class="ms-2">
                 <a asp-page="./DisplaySettings">display options</a>
             </span>
         </div>
@@ -216,58 +216,58 @@
         @if (Model.ShowDraft)
         {
             <div class="row m-1 mt-0 mb-2 p-1 pt-2 border border-secondary">
-                <div class="col- pl-2">
+                <div class="col-auto ps-2">
                     <label asp-for="ProviderDraftId"></label>
                     <input asp-for="ProviderDraftId">
                 </div>
                 @if (Model.DraftedCount > 0)
                 {
-                    <div class="col- pl-3 pr-3 mt-1">
+                    <div class="col-auto ps-3 pe-3 mt-1">
                         <label asp-for="DraftedCount"></label>: @Model.DraftedCount
                     </div>
                 }
 
                 @if (ViewBag.DraftTeamList != null)
                 {
-                    <div class="col- pl-3">
+                    <div class="col-auto ps-3">
                         <select asp-for="@Model.SelectedDraftTeamId" class="form-control" asp-items="ViewBag.DraftTeamList"></select>
                     </div>
                 }
                 @if (Model.UpcomingDraftText.Length > 0)
                 {
-                    <div class="col- pl-3 pr-3 mt-1">
+                    <div class="col-auto ps-3 pe-3 mt-1">
                         @Model.UpcomingDraftText
                     </div>
                 }
 
-                <div class="col- pl-3 pr-3 mt-1">
+                <div class="col-auto ps-3 pe-3 mt-1">
                     <label class="form-check-label">
                         <input asp-for="HideDrafted">
                         @Html.DisplayNameFor(model => model.HideDrafted)
                     </label>
                 </div>
 
-                <div class="col- pl-2">
+                <div class="col-auto ps-2">
                     <label asp-for="AnalysisAdpLeagueCount"></label>
                     <input asp-for="AnalysisAdpLeagueCount">
                 </div>
 
-                <div class="col- pl-3 pr-3 mt-1">
+                <div class="col-auto ps-3 pe-3 mt-1">
                     [ADP# @Model.AdpLeagueCount]
                 </div>
 
                 @if (Model.PickList.Count() > 0)
                 {
-                    <div class="col- pl-3 pr-3 mt-1">
+                    <div class="col-auto ps-3 pe-3 mt-1">
                         @foreach (int pick in Model.PickList)
                         {
                             if (pick <= Model.DraftedCount)
                             {
-                                <span class="ml-1 font-weight-bold">@pick</span>
+                                <span class="ms-1 fw-bold">@pick</span>
                             }
                             else
                             {
-                                <span class="ml-1">@pick</span>
+                                <span class="ms-1">@pick</span>
                             }
                         }
                     </div>
@@ -275,7 +275,7 @@
 
                 @if (Model.ProviderDraftId != null)
                 {
-                    <div class="col- pl-3 pr-3 mt-1">
+                    <div class="col-auto ps-3 pe-3 mt-1">
                         <input type="submit" name="refreshdraft" value="Refresh Draft Results" class="btn btn-sm btn-secondary" />
                     </div>
                 }

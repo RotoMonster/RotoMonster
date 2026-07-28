@@ -12,12 +12,12 @@
             Box Scores for
             @Model.SelectedDate.DayOfWeek.ToString()
             <partial name="_SmallDate" model="Model.SelectedDate" />
-            <small class="ml-1">
+            <small class="ms-1">
                 (@Model.ScheduleGames.Count)
             </small>
         </h2>
 
-        <span class="ml-2">
+        <span class="ms-2">
             <label class="form-check-label">
                 <input asp-for="ShowTopToo">
                 @Html.DisplayNameFor(model => model.ShowTopToo)
@@ -27,29 +27,29 @@
         @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
         {
             <div class="row m-1 mb-1">
-                <div class="col- p-1">
+                <div class="col-auto p-1">
                     <select asp-for="@Model.SelectedUserLeagueId" class="form-control" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
                 </div>
             </div>
         }
 
-        <div class="row m-1 mb-3 ml-0">
-            <div class="col- p-1 pt-2">
+        <div class="row m-1 mb-3 ms-0">
+            <div class="col-auto p-1 pt-2">
                 <input type="submit" name="backbutton" value="Back" class="btn btn-sm btn-primary" />
                 <input type="submit" name="nextbutton" value="Next" class="btn btn-sm btn-primary" />
             </div>
-            <div class="col- p-1 pt-2">
+            <div class="col-auto p-1 pt-2">
                 <input type="date" asp-for="@Model.SelectedDate" onchange="this.form.submit()" />
             </div>
-            <div class="col- p-1 pt-2">
+            <div class="col-auto p-1 pt-2">
                 <button class="btn btn-success">Refresh</button>
             </div>
         </div>
 
-        <div class="container ml-2 p-0">
+        <div class="container ms-2 p-0">
 
             <div class="row">
-                <div class="col- border border-primary p-2 m-0 mb-3">
+                <div class="col-auto border border-primary p-2 m-0 mb-3">
                     @foreach (var game in Model.ScheduleGames)
                     {
                         <div class="clearfix small mb-1">
@@ -72,7 +72,7 @@
                     {
                         <h3 class="teamscore mb-2" style="@Model.BoxScoreModel.Game.GetTeamStyle(team)">
                             @team.Code
-                            <span class="ml-2 small">
+                            <span class="ms-2 small">
                                 @Model.BoxScoreModel.Game.GetTeamScore(team)
                             </span>
                         </h3>

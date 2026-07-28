@@ -14,98 +14,98 @@
     <div class="col-md-4">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.Title" class="control-label"></label>
                 <input asp-for="UserLeague.Title" class="form-control" />
                 <span asp-validation-for="UserLeague.Title" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.FantasyProviderId" class="control-label"></label>
                 <select asp-for="UserLeague.FantasyProviderId" class ="form-control" asp-items="ViewBag.FantasyProviderId"></select>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.ProviderLeagueId" class="control-label"></label>
                 <input asp-for="UserLeague.ProviderLeagueId" class="form-control" />
                 <span asp-validation-for="UserLeague.ProviderLeagueId" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
+            <div class="mb-3 form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="UserLeague.TrackLeague" /> @Html.DisplayNameFor(model => model.UserLeague.TrackLeague)
                 </label>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.MyTeamTitle" class="control-label"></label>
                 <input asp-for="UserLeague.MyTeamTitle" class="form-control" />
                 <span asp-validation-for="UserLeague.MyTeamTitle" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.ScoringSystem" class="control-label"></label>
                 <select asp-for="UserLeague.ScoringSystem" class="form-control" asp-items="ViewBag.ScoringSystemList"></select>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.LeagueType" class="control-label"></label>
                 <select asp-for="UserLeague.LeagueType" class="form-control" asp-items="ViewBag.LeagueTypeList"></select>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.LineupFrequency" class="control-label"></label>
                 <select asp-for="UserLeague.LineupFrequency" class="form-control" asp-items="ViewBag.LineupFrequencyList"></select>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.NumberOfTeams" class="control-label"></label>
                 <input asp-for="UserLeague.NumberOfTeams" class="form-control" />
                 <span asp-validation-for="UserLeague.NumberOfTeams" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.IRSpots" class="control-label"></label>
                 <input asp-for="UserLeague.IRSpots" class="form-control" />
                 <span asp-validation-for="UserLeague.IRSpots" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.StartWeekday" class="control-label"></label>
                 <input asp-for="UserLeague.StartWeekday" class="form-control" />
                 <span asp-validation-for="UserLeague.StartWeekday" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.QualityGamesLimit" class="control-label"></label>
                 <input asp-for="UserLeague.QualityGamesLimit" class="form-control" />
                 <span asp-validation-for="UserLeague.QualityGamesLimit" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
+            <div class="mb-3 form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="UserLeague.SameDayTransactions" /> @Html.DisplayNameFor(model => model.UserLeague.SameDayTransactions)
                 </label>
             </div>
-            <div class="form-group form-check">
+            <div class="mb-3 form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="UserLeague.IsMoney" /> @Html.DisplayNameFor(model => model.UserLeague.IsMoney)
                 </label>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.DraftDate" class="control-label"></label>
                 <input asp-for="UserLeague.DraftDate" class="form-control" />
                 <span asp-validation-for="UserLeague.DraftDate" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
+            <div class="mb-3 form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="UserLeague.AutoEndDate" /> @Html.DisplayNameFor(model => model.UserLeague.AutoEndDate)
                 </label>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label asp-for="UserLeague.GameLimit" class="control-label"></label>
                 <input asp-for="UserLeague.GameLimit" class="form-control" />
                 <span asp-validation-for="UserLeague.GameLimit" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
+            <div class="mb-3 form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="UserLeague.AutoUpdate" /> @Html.DisplayNameFor(model => model.UserLeague.AutoUpdate)
                 </label>
             </div>
-            <div class="form-group form-check">
+            <div class="mb-3 form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="UserLeague.ContinuousWaivers" /> @Html.DisplayNameFor(model => model.UserLeague.ContinuousWaivers)
                 </label>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>

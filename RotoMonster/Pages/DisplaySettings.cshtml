@@ -14,11 +14,11 @@
         </div>
 
         <div class="row">
-            <div class="col- m-2">
+            <div class="col-auto m-2">
                 <h4>Stat Columns</h4>
                 @for (var i = 0; i < Model.DisplayCategorySelects.Count(); i++)
                 {
-                    <div class="ml-2">
+                    <div class="ms-2">
                         <input type="checkbox" asp-for="@Model.DisplayCategorySelects[i].Selected" />
                         <label asp-for="@Model.DisplayCategorySelects[i].Selected">@Model.DisplayCategorySelects[i].Name</label>
                         <input type="hidden" asp-for="@Model.DisplayCategorySelects[i].Id" />
@@ -26,11 +26,11 @@
                     </div>
                 }
             </div>
-            <div class="col- m-2">
+            <div class="col-auto m-2">
                 <h4>Other Columns</h4>
                 @for (var i = 0; i < Model.DisplayColumnSelects.Count(); i++)
                 {
-                    <div class="ml-2">
+                    <div class="ms-2">
                         <input type="checkbox" asp-for="@Model.DisplayColumnSelects[i].Selected" />
                         <label asp-for="@Model.DisplayColumnSelects[i].Selected">@Model.DisplayColumnSelects[i].Name</label>
                         <input type="hidden" asp-for="@Model.DisplayColumnSelects[i].Id" />

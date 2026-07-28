@@ -11,7 +11,7 @@
     <div class="card-body">
         @if (Model.IsYahooConnected)
         {
-            <h5 class="card-title text-success font-weight-bold">Yahoo! Connected</h5>
+            <h5 class="card-title text-success fw-bold">Yahoo! Connected</h5>
 
             <form method="post">
                 <a class="btn btn-primary" asp-page-handler="YahooList">List Your Leagues</a>
@@ -25,16 +25,16 @@
         }
         else
         {
-            <h5 class="card-title text-danger font-weight-bold">Yahoo! Not Connected</h5>
-            <div class="row ml-4 mt-2">
+            <h5 class="card-title text-danger fw-bold">Yahoo! Not Connected</h5>
+            <div class="row ms-4 mt-2">
                 <form method="post">
-                    <div class="col- p-2">
+                    <div class="col-auto p-2">
                         <a href="@Model.YahooUrl" target="_blank">Get Yahoo! Authorization Code</a>
                     </div>
-                    <div class="col- p-2">
+                    <div class="col-auto p-2">
                         <input asp-for="YahooCode" placeholder="Enter Yahoo! Code" class="form-control" />
                     </div>
-                    <div class="col- p-2">
+                    <div class="col-auto p-2">
                         <button class="btn btn-sm btn-secondary" asp-page-handler="Yahoo">Submit</button>
                     </div>
                 </form>
@@ -49,7 +49,7 @@
         <div class="card-body">
             @if (Model.IsESPNConnected)
             {
-                <h5 class="card-title text-success font-weight-bold">ESPN Connected</h5>
+                <h5 class="card-title text-success fw-bold">ESPN Connected</h5>
                 <form method="post">
                     <a class="btn btn-primary" asp-page-handler="ESPNList">List Your Leagues</a>
                     <button type="submit" class="btn btn-link" asp-page-handler="ESPNDisconnect">Disconnect ESPN</button>
@@ -62,17 +62,17 @@
             }
             else
             {
-                <h5 class="card-title text-danger font-weight-bold">ESPN Not Connected</h5>
-                <div class="row ml-4 mt-2">
+                <h5 class="card-title text-danger fw-bold">ESPN Not Connected</h5>
+                <div class="row ms-4 mt-2">
                     <form method="post">
-                        <div class="row ml-4 mt-2">
-                            <div class="col- p-2">
+                        <div class="row ms-4 mt-2">
+                            <div class="col-auto p-2">
                                 <input asp-for="ESPNSWID" placeholder="ESPN SWID" class="form-control" />
                             </div>
-                            <div class="col- p-2">
+                            <div class="col-auto p-2">
                                 <input asp-for="ESPNS2" placeholder="ESPN S2" class="form-control" />
                             </div>
-                            <div class="col- p-2">
+                            <div class="col-auto p-2">
                                 <button class="btn btn-sm btn-secondary" asp-page-handler="ESPN">Submit</button>
                             </div>
                         </div>
@@ -108,7 +108,7 @@
 
         @if (Model.IsFanTraxConnected)
         {
-            <h5 class="card-title text-success font-weight-bold">FanTrax Connected</h5>
+            <h5 class="card-title text-success fw-bold">FanTrax Connected</h5>
             <form method="post">
                 <a class="btn btn-primary" asp-page-handler="FanTraxList">List Your Leagues</a>
                 <button type="submit" class="btn btn-link" asp-page-handler="FanTraxDisconnect">Disconnect FanTrax</button>
@@ -121,15 +121,15 @@
         }
         else
         {
-            <h5 class="card-title text-danger font-weight-bold">FanTrax Not Connected</h5>
+            <h5 class="card-title text-danger fw-bold">FanTrax Not Connected</h5>
             <div class="p-2">You can find your Secret ID under your <a target="_blank" href='https://www.fantrax.com/newui/userProfile.go'>FanTrax profile</a></div>
-            <div class="row ml-4 mt-2">
+            <div class="row ms-4 mt-2">
                 <form method="post">
-                    <div class="row ml-4 mt-2">
-                        <div class="col- p-2">
+                    <div class="row ms-4 mt-2">
+                        <div class="col-auto p-2">
                             <input asp-for="FanTraxEmail" placeholder="FanTrax Secret ID" class="form-control" />
                         </div>
-                        <div class="col- p-2">
+                        <div class="col-auto p-2">
                             <button class="btn btn-sm btn-secondary" asp-page-handler="FanTrax">Submit</button>
                         </div>
                     </div>
@@ -141,7 +141,7 @@
 
     <div class="card-body">
         <form method="post">
-            <h5 class="card-title text-success font-weight-bold">Optionally Import using FanTrax League ID</h5>
+            <h5 class="card-title text-success fw-bold">Optionally Import using FanTrax League ID</h5>
             <div class="p-2">Please enter your FanTrax league ID which can be found in your URL.</div>
             <small class="p-2">Ex: https://www.fantrax.com/fantasy/league/<b>t0xqjo74kpm0ki7k</b>/home the ID is <b>t0xqjo74kpm0ki7k</b></small>
             <div class="p-2">
@@ -156,7 +156,7 @@
 
 <div class="card mt-3">
     <div class="card-body">
-        <h5 class="card-title text-success font-weight-bold">Create Custom League</h5>
+        <h5 class="card-title text-success fw-bold">Create Custom League</h5>
         <p>Use this if you don't use Yahoo!, FanTrax, or ESPN.  This will create a league with default settings that you can then edit.</p>
         <div>
             <form method="post">

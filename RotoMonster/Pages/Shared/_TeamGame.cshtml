@@ -6,7 +6,7 @@
 
 @if (Model.Game != null)
 {
-    <div class="float-left mr-1" style="margin-top:2px;">
+    <div class="float-start me-1" style="margin-top:2px;">
         <partial name="_GameState" model="new RotoMonster.Core.PartialViewModels.GameStateViewModel(){Game=Model.Game,Sport=Model.Sport,Team=Model.Team,ShowOpponent=false};" />
     </div>
 
@@ -21,7 +21,7 @@
                 </small>
             }
         </div>
-        <div class="teamscore ml-1">
+        <div class="teamscore ms-1">
             @{
                 string oppStyle = "";
                 @if (Model.DisplayPlayer != null && Model.DisplayPlayer.OpposingTeamValuePlayer != null)
@@ -46,7 +46,7 @@
                 @Model.Game.GetTeamScore(Model.Team)
             </small>
         </div>
-        <div class="teamscore ml-1" style="@Model.Game.GetTeamStyle(Model.Game.GetOpponent(Model.Team))">
+        <div class="teamscore ms-1" style="@Model.Game.GetTeamStyle(Model.Game.GetOpponent(Model.Team))">
             @Model.Game.GetOpponentText(Model.Team)
             <small>
                 @Model.Game.GetOpponentTeamScore(Model.Team)

@@ -6,7 +6,7 @@
 {
     @if (Model.IsStartable)
     {
-        <span class="small" data-toggle="tooltip" data-placement="top" title="Top Player at @Model.MostValuablePosition.Abbreviation">
+        <span class="small" data-bs-toggle="tooltip" data-bs-placement="top" title="Top Player at @Model.MostValuablePosition.Abbreviation">
             @Html.Raw(new Icon(new IconInput { Type = IconType.Success, Size = 16 }).Render())
         </span>
     }

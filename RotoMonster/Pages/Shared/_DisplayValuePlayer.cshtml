@@ -4,10 +4,10 @@
 {
     @if (Model.ShowMPG && Model.ValuePlayer.StatPlayer.MeasureText.Length > 0)
     {
-        <small class="float-left mr-1">@Model.ValuePlayer.StatPlayer.MeasureText</small>
+        <small class="float-start me-1">@Model.ValuePlayer.StatPlayer.MeasureText</small>
     }
 
-    <span class="float-right">
+    <span class="float-end">
         @String.Format("{0:#####0.00}",Model.ValuePlayer.LeagueValue)
         @if (Model.ShowGames)
         {

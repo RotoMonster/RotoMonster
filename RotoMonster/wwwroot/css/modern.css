@@ -1,0 +1,143 @@
+/* ============================================================
+   modern.css - visual refresh layer
+
+   Loaded last, so it overrides Bootstrap and site.css without
+   editing either. Remove the <link> in _Layout.cshtml to revert.
+
+   Thesis: the data already carries the colour - green Final
+   pills, tinted score cells, red INJ badges. The chrome was
+   competing with it. This quiets the chrome so the data reads.
+   ============================================================ */
+
+:root {
+    --rm-surface: #ffffff;
+    --rm-page: #f5f6f8;
+    --rm-line: #e6e8ec;
+    --rm-line-soft: #f0f1f4;
+    --rm-ink: #1c2024;
+    --rm-ink-soft: #5b6572;
+    --rm-radius: 10px;
+}
+
+body.bg,
+body {
+    background: var(--rm-page);
+    color: var(--rm-ink);
+}
+
+/* ---- Cards ------------------------------------------------ */
+
+.card {
+    background: var(--rm-surface);
+    border: 1px solid var(--rm-line);
+    border-radius: var(--rm-radius);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04),
+                0 4px 12px rgba(16, 24, 40, 0.04);
+    overflow: hidden;
+}
+
+/* The coloured outlines were doing the work of a heading.
+   Move that signal to a top edge so it reads as a label
+   rather than boxing the content in. */
+.card.border-success,
+.card.border-primary,
+.card.border-info,
+.card.border-danger,
+.card.border-warning {
+    border-color: var(--rm-line) !important;
+    border-top-width: 3px;
+}
+
+.card.border-success  { border-top-color: #22a45d !important; }
+.card.border-primary  { border-top-color: #2f6fd0 !important; }
+.card.border-info     { border-top-color: #2a9db5 !important; }
+.card.border-danger   { border-top-color: #d64545 !important; }
+.card.border-warning  { border-top-color: #d99513 !important; }
+
+.card-header {
+    background: var(--rm-surface);
+    border-bottom: 1px solid var(--rm-line-soft);
+    padding: 0.6rem 0.85rem;
+}
+
+.card-header h5 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.card-header a {
+    color: var(--rm-ink);
+    text-decoration: none;
+}
+
+.card-header a:hover {
+    color: var(--rm-ink);
+    text-decoration: none;
+}
+
+/* ---- Dense data tables ------------------------------------ */
+
+/* A full border grid on every cell is a lot of ink for rows
+   that are already colour-coded. Hairline separators between
+   rows carry the same structure with far less noise. */
+.card .table-bordered > :not(caption) > * {
+    border-width: 0;
+}
+
+.card .table-bordered > :not(caption) > * > * {
+    border-width: 0 0 1px 0;
+    border-color: var(--rm-line-soft);
+}
+
+.card .table-bordered > :not(caption) > *:last-child > * {
+    border-bottom-width: 0;
+}
+
+.card .table > tbody > tr:hover > td {
+    background-color: rgba(16, 24, 40, 0.025);
+}
+
+.card .table td {
+    vertical-align: middle;
+}
+
+/* ---- Controls --------------------------------------------- */
+
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.dropdown-menu {
+    border: 1px solid var(--rm-line);
+    border-radius: var(--rm-radius);
+    box-shadow: 0 4px 16px rgba(16, 24, 40, 0.10);
+    padding: 0.3rem;
+}
+
+.dropdown-item {
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+}
+
+.navbar {
+    border-bottom: 1px solid var(--rm-line);
+    box-shadow: none;
+}
+
+/* ---- Accessibility floor ---------------------------------- */
+
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible {
+    outline: 2px solid #2f6fd0;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}

@@ -1,9 +1,9 @@
 ﻿@model RotoMonster.Core.DisplayPlayerGameState
 @if (Model.PlayerGameState != null)
 {
-    <span class="mr-1 badge"
-          data-toggle="tooltip"
-          data-placement="top"
+    <span class="me-1 badge"
+          data-bs-toggle="tooltip"
+          data-bs-placement="top"
           title="@Model.PlayerGameState.PlayerGameStateType.Title"
           style="color:white;background-color:#@Model.PlayerGameState.PlayerGameStateType.TextColor">
         <i class="@Model.PlayerGameState.PlayerGameStateType.Icon"></i>

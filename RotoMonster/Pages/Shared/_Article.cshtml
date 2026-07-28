@@ -11,11 +11,11 @@
         <h5 class="card-title">
             @if (Model.IsAutomated)
             {
-                <span class="mr-1" data-toggle="tooltip" data-placement="top" title="Article is automated">
+                <span class="me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Article is automated">
                     @Html.Raw(new Icon(new IconInput { Type = IconType.WandMagic, Size = 16 }).Render())
                 </span>
             }
-            <a href="#@collapseId" data-toggle="collapse">@Model.Title</a>
+            <a href="#@collapseId" data-bs-toggle="collapse">@Model.Title</a>
         </h5>
         <p class="card-subtitle mb-2 text-muted">
             <span><partial name="_Timespan" model="Model.TimeSince" /> ago</span>
@@ -23,14 +23,14 @@
         </p>
 
         <div id="@collapseId" class="collapse">
-            <div class="text-muted small mt-2 ml-3">
+            <div class="text-muted small mt-2 ms-3">
                 @if (Model.ArticlePlayers.Count() > 0)
                 {
                     <div>
                         Players:
                         @foreach (var articlePlayer in Model.ArticlePlayers)
                         {
-                            <span class="ml-1 mr-1">
+                            <span class="ms-1 me-1">
                                 <partial name="_PlayerLink" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {Player=articlePlayer.Player,SelectedUserLeague=null,PlayerGameState=null}" />
                             </span>
                         }
@@ -43,7 +43,7 @@
                         Games:
                         @foreach (var articleGame in Model.ArticleGames)
                         {
-                            <span class="ml-1 mr-1">@articleGame.Game.GameText from @articleGame.Game.GameDate.ToShortDateString()</span>
+                            <span class="ms-1 me-1">@articleGame.Game.GameText from @articleGame.Game.GameDate.ToShortDateString()</span>
                         }
                     </div>
                 }
@@ -53,7 +53,7 @@
                         Teams:
                         @foreach (var articleTeam in Model.ArticleTeams)
                         {
-                            <span class="ml-1 mr-1">@articleTeam.Team.Code</span>
+                            <span class="ms-1 me-1">@articleTeam.Team.Code</span>
                         }
                     </div>
                 }

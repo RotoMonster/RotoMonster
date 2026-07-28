@@ -6,7 +6,7 @@
     bool isUser = (Model.UserId != null);
 }
 
-<div class="container-fuild ml-0 p-0">
+<div class="container-fuild ms-0 p-0">
     <table class="@RotoMonster.Core.RMCss.DataTable">
         <thead class="@RotoMonster.Core.RMCss.DataTableTHead">
             <tr>
@@ -22,7 +22,7 @@
                 @if (Model.ShowMonsterBot)
                 {
                     <th class="tdc">
-                        <span data-toggle="tooltip" data-placement="top" title="MonsterBot Recommendation">
+                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="MonsterBot Recommendation">
                             <partial name="_IconMonsterBot" />
                         </span>
                     </th>
@@ -49,8 +49,8 @@
                 {
                     <th class="text-center">
                         <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                data-toggle="tooltip"
-                                data-placement="top"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
                                 title="Injuries"
                                 asp-route-sort="INJ">
                             Inj
@@ -61,8 +61,8 @@
                 @if (Model.MonsterBarGame != null)
                 {
                     <th class="tdc">
-                        <span data-toggle="tooltip" data-placement="top" title="@Model.MonsterBarGame.Tooltip">
-                            @Model.MonsterBarGame.ColumnTitle(false)<small class="ml-1">game</small>
+                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="@Model.MonsterBarGame.Tooltip">
+                            @Model.MonsterBarGame.ColumnTitle(false)<small class="ms-1">game</small>
                         </span>
                     </th>
                 }
@@ -70,8 +70,8 @@
                 @if (Model.MonsterBarTotal != null)
                 {
                     <th class="tdc">
-                        <span data-toggle="tooltip" data-placement="top" title="@Model.MonsterBarTotal.Tooltip">
-                            @Model.MonsterBarTotal.ColumnTitle(false)<small class="ml-1">total</small>
+                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="@Model.MonsterBarTotal.Tooltip">
+                            @Model.MonsterBarTotal.ColumnTitle(false)<small class="ms-1">total</small>
                         </span>
                     </th>
                 }
@@ -85,15 +85,15 @@
                 {
                     <th class="text-nowrap">
                         <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                data-toggle="tooltip"
-                                data-placement="top"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
                                 title="Change in Ownership Percent"
                                 asp-route-sort="OWNCHANGE">
                             +-
                         </button>
                         <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                data-toggle="tooltip"
-                                data-placement="top"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
                                 title="Ownership Percent"
                                 asp-route-sort="OWN">
                             Own%
@@ -106,8 +106,8 @@
                         {
                             <th class="text-nowrap">
                                 <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                        data-toggle="tooltip"
-                                        data-placement="top"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
                                         title="Ownership trend for all leagues"
                                         asp-route-sort="TREND">
                                     Trend
@@ -117,15 +117,15 @@
 
                         <th class="text-nowrap">
                             <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
                                     title="Change in Active Percent"
                                     asp-route-sort="ACTIVECHANGE">
                                 +-
                             </button>
                             <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
                                     title="Active Percent"
                                     asp-route-sort="ACTIVE">
                                 Act%
@@ -153,8 +153,8 @@
 
                     <th>
                         <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                data-toggle="tooltip"
-                                data-placement="top"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
                                 title="@pv.Title"
                                 asp-route-sort="PV_@pv.Id">
                             @pv.ColumnTitle
@@ -168,8 +168,8 @@
                     {
                         <th class="tdc">
                             <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
                                     title="@Model.ExtraColumnDescription1"
                                     asp-route-sort="EXTRAVALUE1">
                                 @Model.ExtraColumnTitle1
@@ -181,8 +181,8 @@
                     {
                         <th class="tdc">
                             <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
                                     title="@Model.ExtraColumnDescription2"
                                     asp-route-sort="EXTRAVALUE2">
                                 @Model.ExtraColumnTitle2
@@ -194,8 +194,8 @@
                     {
                         <th class="tdc">
                             <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
                                     title="@Model.ExtraColumnDescription3"
                                     asp-route-sort="EXTRAVALUE3">
                                 @Model.ExtraColumnTitle3
@@ -208,8 +208,8 @@
                 {
                     <th class="text-nowrap">
                         <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                data-toggle="tooltip"
-                                data-placement="top"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
                                 title="Position Value"
                                 asp-route-sort="POSVALUE">
                             PosV
@@ -267,8 +267,8 @@
                     {
                         <th class="tdc">
                             <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
                                     title="Analysis Games"
                                     asp-route-sort="AGAMES">
                                 &#35;
@@ -277,8 +277,8 @@
 
                         <th>
                             <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
                                     title="The rough estimate projected total value over the anlaysis period"
                                     asp-route-sort="PROJV">
                                 ProjV
@@ -289,8 +289,8 @@
                         {
                             <th class="text-nowrap">
                                 <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                        data-toggle="tooltip"
-                                        data-placement="top"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
                                         title="Shows where a player may be over/under projected"
                                         asp-route-sort="PROJVINFO">
                                     ProjV Info
@@ -350,8 +350,8 @@
                     {
                         <th>
                             <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
                                     title="Average Draft Pick for Analysis Drafts"
                                     asp-route-sort="ADP">
                                 ADP
@@ -365,8 +365,8 @@
                     {
                         <th>
                             <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
                                     title="Average Draft Pick for All Drafts"
                                     asp-route-sort="ALLADP">
                                 AllADP
@@ -378,8 +378,8 @@
                     {
                         <th>
                             <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
                                     title="Default Average Draft Pick"
                                     asp-route-sort="DADP">
                                 dADP
@@ -450,7 +450,7 @@
                 }
 
                 @{
-                    var titleCss = dp.IndentDisplayTitle ? " pl-3" : "";
+                    var titleCss = dp.IndentDisplayTitle ? " ps-3" : "";
                 }
 
                 @if (Model.ShowRank)
@@ -534,11 +534,11 @@
                         <td class="tdr text-nowrap" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
                             @if (dp.OwnershipPlayer.PercentOwnershipChange != 0)
                             {
-                                <small class="text-nowrap float-left pr-1 pl-1 mr-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">
+                                <small class="text-nowrap float-start pe-1 ps-1 me-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">
                                     <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentOwnershipChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentOwnershipChange)
                                 </small>
                             }
-                            <div class="float-right">
+                            <div class="float-end">
                                 @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)
                             </div>
                         </td>
@@ -575,11 +575,11 @@
                             <td class="tdr text-nowrap" style="background-color:#@colorLib.ActiveGetPercentColor(dp.OwnershipPlayer.ActivePercent)">
                                 @if (dp.OwnershipPlayer.PercentActiveChange != 0)
                                 {
-                                    <small class="text-nowrap float-left pr-1 pl-1 mr-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentActiveChange)">
+                                    <small class="text-nowrap float-start pe-1 ps-1 me-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentActiveChange)">
                                         <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentActiveChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentActiveChange)
                                     </small>
                                 }
-                                <div class="float-right">
+                                <div class="float-end">
                                     @String.Format("{0:##0}", dp.OwnershipPlayer.ActivePercent)
                                 </div>
                             </td>
@@ -776,7 +776,7 @@
                                                 {
                                                     @if (gameState != null && gameState.PlayerGameStateType.Title.Contains("Starter"))
                                                     {
-                                                        <small class="ml-1">
+                                                        <small class="ms-1">
                                                             <partial name="_PlayerGameState" model="new RotoMonster.Core.DisplayPlayerGameState() { PlayerGameState = gameState }" />
                                                         </small>
                                                     }
@@ -849,7 +849,7 @@
                         {
                             <td class="tdr">
                                 @String.Format("{0:##0.0}", dp.AllAdpPlayer.Adp)
-                                <small class="ml-1 text-muted">
+                                <small class="ms-1 text-muted">
                                     @String.Format("{0:##0}", Math.Round(dp.AllAdpPlayer.MinPick, 0))
                                     <span>-</span>
                                     @if (dp.AllAdpPlayer.DraftCount == dp.AllAdpPlayer.Picks.Count)

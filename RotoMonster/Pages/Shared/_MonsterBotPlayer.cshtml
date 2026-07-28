@@ -4,7 +4,7 @@
 {
     @foreach (var c in Model.MonsterBotPlayerComments)
     {
-        <span data-toggle="tooltip" data-placement="top" title="@c.Text">
+        <span data-bs-toggle="tooltip" data-bs-placement="top" title="@c.Text">
             <i class="@c.Icon @c.Color"></i>
         </span>
     }

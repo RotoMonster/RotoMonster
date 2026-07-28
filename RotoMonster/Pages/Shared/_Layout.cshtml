@@ -29,7 +29,7 @@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light light border-bottom box-shadow mb-3">
             <div class="container">
                 <partial name="_Logo" model='new RotoMonster.Core.PartialViewModels.LogoModel(){Sport=sport,Controller="/Index"}' />
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -38,7 +38,7 @@
                     <ul class="navbar-nav flex-grow-1">
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Tools
                             </a>
                             <div class="dropdown-menu">
@@ -49,7 +49,7 @@
                         </li>
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Settings
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -61,7 +61,7 @@
                         @if (ViewData["Helpers"] != null)
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Helpers
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -79,7 +79,7 @@
                             <a class="nav-link text-dark" title="email support@rotomonster.com" href="mailto:support@rotomonster.com">@Html.Raw(new Icon(new IconInput { Type = IconType.Envelope, Size = 22 }).Render())</a>
                         </li>
 
-                        <li class="nav-item mr-2">
+                        <li class="nav-item me-2">
                             @{
                                 string t = "https://twitter.com/rotomonster";
                             }
@@ -99,7 +99,7 @@
 
                         @if (User.IsInRole("Admin"))
                         {
-                            <li class="nav-item ml-3">
+                            <li class="nav-item ms-3">
                                 <a class="nav-link" asp-area="" asp-page="/Admin">
                                     @Html.Raw(new Icon(new IconInput { Type = IconType.Settings, Size = 16 }).Render())
                                     @if (ViewData["AdminErrors"] != null)
@@ -113,7 +113,7 @@
 
                         @if (ViewData["SeasonState"] != null)
                         {
-                            <li class="nav-item ml-3">
+                            <li class="nav-item ms-3">
                                 <div class="mt-2 small">
                                     Season: @ViewData["SeasonState"]
                                 </div>
@@ -142,7 +142,7 @@
         </div>
     }
 
-    <div class="ml-2">
+    <div class="ms-2">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -150,9 +150,9 @@
 
     <footer>
         @RenderSection("footer", required: false)
-        <div class="text-muted text-right mr-2 mt-2">
+        <div class="text-muted text-end me-2 mt-2">
             &copy; @DateTime.Today.Year RotoMonster LLC
-            @*            <small class="text-monospace">
+            @*            <small class="font-monospace">
             @Configuration["InstanceID"].ToString()
             </small>
             *@

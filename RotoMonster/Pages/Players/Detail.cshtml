@@ -49,32 +49,32 @@
                 }
             </h1>
 
-            <h4 class="ml-1 mt-1">
-                <span class="pr-2"><partial name="_PlayerHeight" model="Model.Player.Height" /></span>
-                <span class="pr-2">
+            <h4 class="ms-1 mt-1">
+                <span class="pe-2"><partial name="_PlayerHeight" model="Model.Player.Height" /></span>
+                <span class="pe-2">
                     <partial name="_PlayerWeight" model="Model.Player.Weight" />
                 </span>
-                <span class="pr-2">
+                <span class="pe-2">
                     <partial name="_PlayerBirthdate" model="Model.Player.Birthdate" />
                 </span>
-                <span class="pr-2"><partial name="_PlayerDraft" model="Model.Player" /></span>
-                <span class="pr-2"><partial name="_PlayerSalary" model="Model.SeasonPlayer" /></span>
+                <span class="pe-2"><partial name="_PlayerDraft" model="Model.Player" /></span>
+                <span class="pe-2"><partial name="_PlayerSalary" model="Model.SeasonPlayer" /></span>
             </h4>
 
             @if (Model.OwnershipPlayer != null)
             {
                 <div class="mt-0">
-                    <span class="mr-2 border pl-1 pr-1" style="background-color:#@colorLib.OwnershipGetPercentColor(Model.OwnershipPlayer.OwnershipPercent)">
+                    <span class="me-2 border ps-1 pe-1" style="background-color:#@colorLib.OwnershipGetPercentColor(Model.OwnershipPlayer.OwnershipPercent)">
                         <partial name="_PlayerOwnershipChange" model="new RotoMonster.Core.PartialViewModels.PlayerOwnershipChangeModel(Model.OwnershipPlayer.OwnershipPercent,Model.OwnershipPlayer.PercentOwnershipChange)" />
                         <small>% Own</small>
                     </span>
-                    <span class="border pl-1 pr-1" style="background-color:#@colorLib.ActiveGetPercentColor(Model.OwnershipPlayer.ActivePercent)">
+                    <span class="border ps-1 pe-1" style="background-color:#@colorLib.ActiveGetPercentColor(Model.OwnershipPlayer.ActivePercent)">
                         <partial name="_PlayerOwnershipChange" model="new RotoMonster.Core.PartialViewModels.PlayerOwnershipChangeModel(Model.OwnershipPlayer.ActivePercent,Model.OwnershipPlayer.PercentActiveChange)" />
                         <small>% Active</small>
                     </span>
                     @if (Model.OwnershipPlayer.IRPercent > 0)
                     {
-                        <span class="border pl-1 pr-1 ml-2">
+                        <span class="border ps-1 pe-1 ms-2">
                             <partial name="_PlayerOwnershipChange" model="new RotoMonster.Core.PartialViewModels.PlayerOwnershipChangeModel(Model.OwnershipPlayer.IRPercent,Model.OwnershipPlayer.PercentActiveChange)" />
                             <small>% IR</small>
                         </span>
@@ -146,7 +146,7 @@
                                 @gameLog.Game.HomeTeam.Code
                                 @if (gameLog.Game.Number > 1)
                                 {
-                                    <span class="ml-1">#@gameLog.Game.Number</span>
+                                    <span class="ms-1">#@gameLog.Game.Number</span>
                                 }
                             </td>
 

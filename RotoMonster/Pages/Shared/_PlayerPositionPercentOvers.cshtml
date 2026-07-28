@@ -5,13 +5,13 @@
         <div style="background-color:#@Model.EstimatedUpsideColorCode; color:#bfbfbf;">
             @if (Model.EstimatedUpside >= 0)
             {
-                <span data-toggle="tooltip" data-placement="top" title="@Math.Abs(Model.EstimatedUpside)% upside">
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="@Math.Abs(Model.EstimatedUpside)% upside">
                     <partial name="_IconUpside" />
                 </span>
             }
             else
             {
-                <span data-toggle="tooltip" data-placement="top" title="@Math.Abs(Model.EstimatedUpside)% downside">
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="@Math.Abs(Model.EstimatedUpside)% downside">
                     <partial name="_IconDownside" />
                 </span>
             }

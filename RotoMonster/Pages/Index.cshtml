@@ -30,19 +30,19 @@
         }
     }
 
-    <div class="mb-2 ml-1">
+    <div class="mb-2 ms-1">
         <a class="btn btn-primary" asp-page="./UserLeagues/Import">Add Leagues</a>
-        <a class="btn btn-secondary ml-1" asp-page-handler="UpdateAllRosters" alt="Refresh Rosters" title="Refresh Rosters">Refresh Rosters</a>
+        <a class="btn btn-secondary ms-1" asp-page-handler="UpdateAllRosters" alt="Refresh Rosters" title="Refresh Rosters">Refresh Rosters</a>
     </div>
 
     <div class="row">
-        <div class="col- p-2">
+        <div class="col-auto p-2">
 
             @if (Model.RecentArticles.Count > 0)
             {
                 <div class="card mb-3 border-success bg">
                     <div class="card-header text-nowrap">
-                        <h5 class="p-0 m-0"><a href="#RecentArcticles" data-toggle="collapse">Recent Articles (@Model.RecentArticles.Count)</a></h5>
+                        <h5 class="p-0 m-0"><a href="#RecentArcticles" data-bs-toggle="collapse">Recent Articles (@Model.RecentArticles.Count)</a></h5>
                         <div id="RecentArcticles" class="collapse">
                             <div class="card-body p-2">
                                 @foreach (var a in Model.RecentArticles)
@@ -70,11 +70,11 @@
             {
                 <div class="card mb-3 border-success bg">
                     <div class="card-header text-nowrap">
-                        <h5 class="p-0 m-0"><a href="#ScoringLog" data-toggle="collapse">Scoring Log</a></h5>
+                        <h5 class="p-0 m-0"><a href="#ScoringLog" data-bs-toggle="collapse">Scoring Log</a></h5>
                     </div>
                     <div id="ScoringLog" class="collapse">
                         <div class="card-body p-2">
-                            <table class="small table-bordered">
+                            <table class="table table-sm small table-bordered w-auto">
                                 @foreach (var dp in Model.GameScoringAlertDisplayPlayers)
                                 {
                                     <tr>
@@ -82,7 +82,7 @@
                                             <partial name="_TimeSpan" model="dp.GameScoringAlert.TimeSince" />
                                         </td>
 
-                                        <td class="pl-1 pr-1">
+                                        <td class="ps-1 pe-1">
                                             <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp}" />
                                         </td>
 
@@ -110,7 +110,7 @@
 
                                         @if (dp.NoWaiverOwnershipPlayer != null)
                                         {
-                                            <td class="tdr text-nowrap pr-1 pl-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.NoWaiverOwnershipPlayer.PercentOwnershipChange)">
+                                            <td class="tdr text-nowrap pe-1 ps-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.NoWaiverOwnershipPlayer.PercentOwnershipChange)">
                                                 @if (dp.NoWaiverOwnershipPlayer.PercentOwnershipChange != 0)
                                                 {
                                                     <partial name="_ShowPlusIfPositive" model="dp.NoWaiverOwnershipPlayer.PercentOwnershipChange" />
@@ -123,7 +123,7 @@
                                         {
                                             <td />
                                         }
-                                        <td class="pl-1 pr-1">
+                                        <td class="ps-1 pe-1">
                                             @if (dp.OwnedInUserLeagues != null && dp.OwnedInUserLeagues.Count > 0)
                                             {
                                                 var tt = "<div>Owned:</div>";
@@ -131,12 +131,12 @@
                                                 {
                                                     tt += "<div>" + ul.DisplayTitle + "<div>";
                                                 }
-                                                <span class="badge badge-success" data-toggle="tooltip" data-placement="top" data-html="true" title="@tt">
+                                                <span class="badge bg-success" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="@tt">
                                                     @dp.OwnedInUserLeagues.Count
                                                 </span>
                                             }
                                         </td>
-                                        <td class="pl-1 pr-1">
+                                        <td class="ps-1 pe-1">
                                             @if (dp.AvailableInUserLeagues != null && dp.AvailableInUserLeagues.Count > 0)
                                             {
                                                 var tt = "<div>Available:</div>";
@@ -144,7 +144,7 @@
                                                 {
                                                     tt += "<div>" + ul.DisplayTitle + "<div>";
                                                 }
-                                                <span class="badge badge-info" data-toggle="tooltip" data-placement="top" data-html="true" title="@tt">
+                                                <span class="badge bg-info" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="@tt">
                                                     @dp.AvailableInUserLeagues.Count
                                                 </span>
                                             }
@@ -163,15 +163,15 @@
             {
                 <div class="card mb-3 border-info bg">
                     <div class="card-header text-nowrap">
-                        <h5 class="p-0 m-0"><a href="#WaiverTrends" data-toggle="collapse">@Model.Sport.Title Waiver Trends</a></h5>
+                        <h5 class="p-0 m-0"><a href="#WaiverTrends" data-bs-toggle="collapse">@Model.Sport.Title Waiver Trends</a></h5>
                     </div>
                     <div id="WaiverTrends" class="collapse.show">
                         <div class="card-body p-2">
-                            <table class="small table-bordered">
+                            <table class="table table-sm small table-bordered w-auto">
                                 @foreach (var dp in Model.TrendingDisplayPlayers)
                                 {
                                     <tr>
-                                        <td class="pl-1 pr-1">
+                                        <td class="ps-1 pe-1">
                                             <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp}" />
                                         </td>
 
@@ -186,7 +186,7 @@
 
                                         @if (dp.NoWaiverOwnershipPlayer != null)
                                         {
-                                            <td class="tdr text-nowrap pr-1 pl-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.NoWaiverOwnershipPlayer.PercentOwnershipChange)">
+                                            <td class="tdr text-nowrap pe-1 ps-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.NoWaiverOwnershipPlayer.PercentOwnershipChange)">
                                                 @if (dp.NoWaiverOwnershipPlayer.PercentOwnershipChange != 0)
                                                 {
                                                     <partial name="_ShowPlusIfPositive" model="dp.NoWaiverOwnershipPlayer.PercentOwnershipChange" />
@@ -199,7 +199,7 @@
                                         {
                                             <td />
                                         }
-                                        <td class="pl-1 pr-1">
+                                        <td class="ps-1 pe-1">
                                             @if (dp.OwnedInUserLeagues != null && dp.OwnedInUserLeagues.Count > 0)
                                             {
                                                 var tt = "<div>Owned:</div>";
@@ -207,12 +207,12 @@
                                                 {
                                                     tt += "<div>" + ul.DisplayTitle + "<div>";
                                                 }
-                                                <span class="badge badge-success" data-toggle="tooltip" data-placement="top" data-html="true" title="@tt">
+                                                <span class="badge bg-success" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="@tt">
                                                     @dp.OwnedInUserLeagues.Count
                                                 </span>
                                             }
                                         </td>
-                                        <td class="pl-1 pr-1">
+                                        <td class="ps-1 pe-1">
                                             @if (dp.AvailableInUserLeagues != null && dp.AvailableInUserLeagues.Count > 0)
                                             {
                                                 var tt = "<div>Available:</div>";
@@ -220,7 +220,7 @@
                                                 {
                                                     tt += "<div>" + ul.DisplayTitle + "<div>";
                                                 }
-                                                <span class="badge badge-info" data-toggle="tooltip" data-placement="top" data-html="true" title="@tt">
+                                                <span class="badge bg-info" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="@tt">
                                                     @dp.AvailableInUserLeagues.Count
                                                 </span>
                                             }
@@ -237,24 +237,24 @@
             {
                 <div class="card mb-3 border-danger bg">
                     <div class="card-header text-nowrap">
-                        <h5 class="p-0 m-0"><a href="#RecentInjuries" data-toggle="collapse">@Model.Sport.Title Recent Injuries (@Model.InjuryDisplayPlayers.Count)</a></h5>
+                        <h5 class="p-0 m-0"><a href="#RecentInjuries" data-bs-toggle="collapse">@Model.Sport.Title Recent Injuries (@Model.InjuryDisplayPlayers.Count)</a></h5>
                     </div>
                     <div id="RecentInjuries" class="collapse.show">
                         <div class="card-body p-2">
-                            <table class="small table-bordered">
+                            <table class="table table-sm small table-bordered w-auto">
                                 @foreach (var dp in Model.InjuryDisplayPlayers)
                                 {
                                     <tr>
-                                        <td class="pl-1 pr-1">
+                                        <td class="ps-1 pe-1">
                                             <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp}" />
                                         </td>
 
                                         @if (dp.OwnershipPlayer != null)
                                         {
-                                            <td class="tdr text-nowrap pl-1 pr-1" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
+                                            <td class="tdr text-nowrap ps-1 pe-1" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
                                                 @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)
                                             </td>
-                                            <td class="tdr text-nowrap pl-1 pr-1" style="background-color:#@colorLib.ActiveGetPercentColor(dp.OwnershipPlayer.ActivePercent)">
+                                            <td class="tdr text-nowrap ps-1 pe-1" style="background-color:#@colorLib.ActiveGetPercentColor(dp.OwnershipPlayer.ActivePercent)">
                                                 @String.Format("{0:##0}", dp.OwnershipPlayer.ActivePercent)
                                             </td>
                                         }
@@ -282,19 +282,19 @@
             }
         </div>
 
-        <div class="col- p-2">
+        <div class="col-auto p-2">
             @foreach (var ulv in Model.UserLeagueViews)
             {
                 <div class="card mb-3 bg" style="border-color:#@ViewData["LogoColor"];">
 
                     <div class="card-header text-nowrap">
                         <div class="small clearfix">
-                            <div class="float-left">
+                            <div class="float-start">
                                 <a href="@ulv.UserLeague.ProviderURL" target="_blank">@ulv.UserLeague.FantasyProvider.Name @ulv.UserLeague.ProviderLeagueId</a>
                             </div>
-                            <div class="float-right ml-2">
+                            <div class="float-end ms-2">
                                 <a asp-page="./UserLeagues/Edit" asp-route-id="@ulv.UserLeague.Id" alt="Edit Settings" title="Edit Settings">@Html.Raw(new Icon(new IconInput { Type = IconType.Settings, Size = 16 }).Render())</a>
-                                <a class="ml-2" asp-page-handler="UpdateRosters" asp-route-id="@ulv.UserLeague.Id" alt="Refresh Rosters" title="Refresh Rosters">@Html.Raw(new Icon(new IconInput { Type = IconType.RefreshRosters, Size = 16 }).Render())</a>
+                                <a class="ms-2" asp-page-handler="UpdateRosters" asp-route-id="@ulv.UserLeague.Id" alt="Refresh Rosters" title="Refresh Rosters">@Html.Raw(new Icon(new IconInput { Type = IconType.RefreshRosters, Size = 16 }).Render())</a>
                             </div>
                         </div>
 
@@ -314,36 +314,36 @@
 
                         @if (ulv.PlayerStatusDisplayPlayers.Count > 0)
                         {
-                            <table class="small table-bordered">
+                            <table class="table table-sm small table-bordered w-auto">
                                 <tbody>
                                     @foreach (var dp in ulv.PlayerStatusDisplayPlayers)
                                     {
                                         <tr>
-                                            <td class="tdc text-center text-nowrap text-white pr-1 @colorLib.GetDisplayPlayerOwnCss(dp)" style="min-width:40px;">
+                                            <td class="tdc text-center text-nowrap text-white pe-1 @colorLib.GetDisplayPlayerOwnCss(dp)" style="min-width:40px;">
                                                 <partial name="_DisplayPlayerOwn" model="dp" />
                                             </td>
 
-                                            <td class="pr-1 pl-1">
+                                            <td class="pe-1 ps-1">
                                                 <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp,SelectedUserLeague=ulv.UserLeague}" />
                                             </td>
 
                                             @if (dp.OwnershipPlayer != null)
                                             {
-                                                <td class="tdr text-nowrap pl-1 pr-1" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
+                                                <td class="tdr text-nowrap ps-1 pe-1" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
                                                     @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)
                                                     @if (dp.OwnershipPlayer.PercentOwnershipChange != 0)
                                                     {
-                                                        <small class="text-nowrap float-left pr-1 pl-1 mr-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">
+                                                        <small class="text-nowrap float-start pe-1 ps-1 me-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">
                                                             <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentOwnershipChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentOwnershipChange)
                                                         </small>
                                                     }
                                                 </td>
 
-                                                <td class="tdr text-nowrap pl-1 pr-1" style="background-color:#@colorLib.ActiveGetPercentColor(dp.OwnershipPlayer.ActivePercent)">
+                                                <td class="tdr text-nowrap ps-1 pe-1" style="background-color:#@colorLib.ActiveGetPercentColor(dp.OwnershipPlayer.ActivePercent)">
                                                     @String.Format("{0:##0}", dp.OwnershipPlayer.ActivePercent)
                                                     @if (dp.OwnershipPlayer.PercentActiveChange != 0)
                                                     {
-                                                        <small class="text-nowrap float-left pr-1 pl-1 mr-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentActiveChange)">
+                                                        <small class="text-nowrap float-start pe-1 ps-1 me-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentActiveChange)">
                                                             <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentActiveChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentActiveChange)
                                                         </small>
                                                     }
@@ -362,7 +362,7 @@
 
                         @if (ulv.DayDisplayPlayers.Count > 0)
                         {
-                            <table class="small table-bordered mt-2">
+                            <table class="table table-sm small table-bordered w-auto mt-2">
                                 <thead>
                                     <tr>
                                         <th></th>
@@ -371,7 +371,7 @@
                                         <th>Game</th>
                                         <th>Player</th>
                                         <th class="tdc">
-                                            <span data-toggle="tooltip" data-placement="top" title="@ulv.MonsterBar.Tooltip">
+                                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="@ulv.MonsterBar.Tooltip">
                                                 @ulv.MonsterBar.ColumnTitle(false)
                                             </span>
                                         </th>
@@ -382,13 +382,13 @@
                                     @foreach (var dp in ulv.DayDisplayPlayers)
                                     {
                                         <tr>
-                                            <td class="tdc text-center text-nowrap text-white pr-1 @colorLib.GetDisplayPlayerOwnCss(dp)" style="min-width:40px;">
+                                            <td class="tdc text-center text-nowrap text-white pe-1 @colorLib.GetDisplayPlayerOwnCss(dp)" style="min-width:40px;">
                                                 <partial name="_DisplayPlayerOwn" model="dp" />
                                             </td>
 
                                             @if (dp.OwnershipPlayer != null)
                                             {
-                                                <td class="tdr text-nowrap pl-1 pr-1" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
+                                                <td class="tdr text-nowrap ps-1 pe-1" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
                                                     @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)
                                                 </td>
                                             }
@@ -412,7 +412,7 @@
                                                 <td />
                                             }
 
-                                            <td class="pr-1 pl-1">
+                                            <td class="pe-1 ps-1">
                                                 <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp,SelectedUserLeague=ulv.UserLeague}" />
                                             </td>
 
@@ -434,11 +434,11 @@
                                 </div>
                                 @foreach (var analysisPlayerType in ulv.UserLeagueTeamAnalysis.UserLeagueTeamAnalysisPlayerTypes)
                                 {
-                                    <div class="small pl-1">
-                                        <span class="mr-1 pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="Average ownership %" style="background-color:#@colorLib.OwnershipGetPercentColor(analysisPlayerType.AverageOwnershipPercent)">
+                                    <div class="small ps-1">
+                                        <span class="me-1 ps-1" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="Average ownership %" style="background-color:#@colorLib.OwnershipGetPercentColor(analysisPlayerType.AverageOwnershipPercent)">
                                             @String.Format("{0:##0}% avg own", analysisPlayerType.AverageOwnershipPercent)
                                         </span>
-                                        <span class="mr-1 pl-1" data-toggle="tooltip" data-placement="top" data-html="true" title="Average active %" style="background-color:#@colorLib.ActiveGetPercentColor(analysisPlayerType.AverageActivePercent)">
+                                        <span class="me-1 ps-1" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="Average active %" style="background-color:#@colorLib.ActiveGetPercentColor(analysisPlayerType.AverageActivePercent)">
                                             @String.Format("{0:##0}% avg active", analysisPlayerType.AverageActivePercent)
                                         </span>
                                         @analysisPlayerType.PlayerType.DisplayTitle
@@ -454,7 +454,7 @@
                                 MonsterBot Recommendations
                                 @foreach (var mbp in ulv.MonsterBotPlayers)
                                 {
-                                    <div class="ml-2">
+                                    <div class="ms-2">
                                         <partial name="_MonsterBotPlayer" model="mbp" />
                                         <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=mbp.DisplayPlayer,SelectedUserLeague=ulv.UserLeague}" />
                                     </div>
@@ -465,13 +465,13 @@
                         @if (ulv.FreeAgentDisplayPlayers.Count > 0)
                         {
                             <div class="mt-2"><partial name="_MonsterBotIcon" /> MonsterBot Top Free Agents</div>
-                            <table class="small table-bordered mt-1">
+                            <table class="table table-sm small table-bordered w-auto mt-1">
                                 <tbody>
                                     @foreach (var dp in ulv.FreeAgentDisplayPlayers)
                                     {
                                         <tr>
 
-                                            <td class="pr-1 pl-1">
+                                            <td class="pe-1 ps-1">
                                                 <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp,SelectedUserLeague=ulv.UserLeague}" />
                                             </td>
 
@@ -486,11 +486,11 @@
 
                                             @if (dp.OwnershipPlayer != null)
                                             {
-                                                <td class="tdr text-nowrap pl-1 pr-1" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
+                                                <td class="tdr text-nowrap ps-1 pe-1" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
                                                     @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)
                                                     @if (dp.OwnershipPlayer.PercentOwnershipChange != 0)
                                                     {
-                                                        <small class="text-nowrap float-left pr-1 pl-1 mr-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">
+                                                        <small class="text-nowrap float-start pe-1 ps-1 me-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">
                                                             <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentOwnershipChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentOwnershipChange)
                                                         </small>
                                                     }
@@ -499,11 +499,11 @@
                                                 @if (Model.Sport.IsNFL)
                                                 {
 
-                                                    <td class="tdr text-nowrap pl-1 pr-1" style="background-color:#@colorLib.ActiveGetPercentColor(dp.OwnershipPlayer.ActivePercent)">
+                                                    <td class="tdr text-nowrap ps-1 pe-1" style="background-color:#@colorLib.ActiveGetPercentColor(dp.OwnershipPlayer.ActivePercent)">
                                                         @String.Format("{0:##0}", dp.OwnershipPlayer.ActivePercent)
                                                         @if (dp.OwnershipPlayer.PercentActiveChange != 0)
                                                         {
-                                                            <small class="text-nowrap float-left pr-1 pl-1 mr-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentActiveChange)">
+                                                            <small class="text-nowrap float-start pe-1 ps-1 me-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentActiveChange)">
                                                                 <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentActiveChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentActiveChange)
                                                             </small>
                                                         }

@@ -49,4 +49,10 @@
     <ProjectReference Include="..\..\RotoMonsterUI\RotoMonsterUI.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="node_modules\**" />
+    <None Remove="node_modules\**" />
+    <TypeScriptCompile Remove="node_modules\**" />
+  </ItemGroup>
+
 </Project>

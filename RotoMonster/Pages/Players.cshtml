@@ -9,10 +9,10 @@
 <div class="container">
 
     <form method="get">
-        <div class="container ml-3 form-group" style="max-width: 400px;">
+        <div class="container ms-3 mb-3" style="max-width: 400px;">
             <div class="input-group">
                 <input type="search" id="tags" placeholder="Enter player name" class="form-control" asp-for="SearchTerm" />
-                <button class="btn btn-primary ml-1">Search</button>
+                <button class="btn btn-primary ms-1">Search</button>
             </div>
         </div>
     </form>
@@ -31,22 +31,22 @@
                         }
                     </h1>
 
-                    <h4 class="ml-1 mt-1">
-                        <span class="pr-2"><partial name="_PlayerHeight" model="Model.Player.Height" /></span>
-                        <span class="pr-2">
+                    <h4 class="ms-1 mt-1">
+                        <span class="pe-2"><partial name="_PlayerHeight" model="Model.Player.Height" /></span>
+                        <span class="pe-2">
                             <partial name="_PlayerWeight" model="Model.Player.Weight" />
                         </span>
-                        <span class="pr-2">
+                        <span class="pe-2">
                             <partial name="_PlayerBirthdate" model="Model.Player.Birthdate" />
                         </span>
-                        <span class="pr-2"><partial name="_PlayerDraft" model="Model.Player" /></span>
-                        <span class="pr-2"><partial name="_PlayerSalary" model="Model.SeasonPlayer" /></span>
+                        <span class="pe-2"><partial name="_PlayerDraft" model="Model.Player" /></span>
+                        <span class="pe-2"><partial name="_PlayerSalary" model="Model.SeasonPlayer" /></span>
                     </h4>
 
                     @if (Model.PlayerStatus != null)
                     {
                         <h4 class="mt-1 mb-3">
-                            <span class="pl-2 pr-2 mr-1" style="@colorLib.GetPlayerStatusTypeStyle(Model.PlayerStatus.PlayerStatusType)">@Model.PlayerStatus.PlayerStatusType.TextFormat.Replace("{t}", "").Trim()</span>
+                            <span class="ps-2 pe-2 me-1" style="@colorLib.GetPlayerStatusTypeStyle(Model.PlayerStatus.PlayerStatusType)">@Model.PlayerStatus.PlayerStatusType.TextFormat.Replace("{t}", "").Trim()</span>
                             <span>@Model.PlayerStatus.Comment</span>
                             <small style="color:black;background-color:#@colorLib.TimeSinceInjuryColorStyle(Model.PlayerStatus)"><partial name="_Timespan" model="Model.PlayerStatus.TimeSince" /></small>
                         </h4>
@@ -55,17 +55,17 @@
                     @if (Model.OwnershipPlayer != null)
                     {
                         <div class="mt-0">
-                            <span class="mr-2 border pl-1 pr-1" style="background-color:#@colorLib.OwnershipGetPercentColor(Model.OwnershipPlayer.OwnershipPercent)">
+                            <span class="me-2 border ps-1 pe-1" style="background-color:#@colorLib.OwnershipGetPercentColor(Model.OwnershipPlayer.OwnershipPercent)">
                                 <partial name="_PlayerOwnershipChange" model="new RotoMonster.Core.PartialViewModels.PlayerOwnershipChangeModel(Model.OwnershipPlayer.OwnershipPercent,Model.OwnershipPlayer.PercentOwnershipChange)" />
                                 <small>% Own</small>
                             </span>
-                            <span class="border pl-1 pr-1" style="background-color:#@colorLib.ActiveGetPercentColor(Model.OwnershipPlayer.ActivePercent)">
+                            <span class="border ps-1 pe-1" style="background-color:#@colorLib.ActiveGetPercentColor(Model.OwnershipPlayer.ActivePercent)">
                                 <partial name="_PlayerOwnershipChange" model="new RotoMonster.Core.PartialViewModels.PlayerOwnershipChangeModel(Model.OwnershipPlayer.ActivePercent,Model.OwnershipPlayer.PercentActiveChange)" />
                                 <small>% Active</small>
                             </span>
                             @if (Model.OwnershipPlayer.IRPercent > 0)
                             {
-                                <span class="border pl-1 pr-1 ml-2">
+                                <span class="border ps-1 pe-1 ms-2">
                                     <partial name="_PlayerOwnershipChange" model="new RotoMonster.Core.PartialViewModels.PlayerOwnershipChangeModel(Model.OwnershipPlayer.IRPercent,Model.OwnershipPlayer.PercentActiveChange)" />
                                     <small>% IR</small>
                                 </span>
@@ -81,19 +81,19 @@
         {
             <form method="post">
                 <div class="mt-2 mb-1 p-2 row">
-                    <div class="col- p-1">
+                    <div class="col-auto p-1">
                         <select asp-for="@Model.SelectedUserLeagueId" class="form-control" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
                     </div>
-                    <div class="col- p-1">
-                        <button class="btn btn-sm btn-primary ml-1" name="refresh">Refresh</button>
+                    <div class="col-auto p-1">
+                        <button class="btn btn-sm btn-primary ms-1" name="refresh">Refresh</button>
                     </div>
-                    <div class="col- p-1">
+                    <div class="col-auto p-1">
                         @if (Model.OwnedInUserLeagues != null && Model.OwnedInUserLeagues.Count > 0)
                         {
                             string note = "";
                             foreach (var userLeague in Model.OwnedInUserLeagues)
                                 note += "[" + userLeague.DisplayTitle + "]";
-                            <span class="badge badge-success" data-toggle="tooltip" data-html="true" title="@note">
+                            <span class="badge bg-success" data-bs-toggle="tooltip" data-html="true" title="@note">
                                 Yours in  @Model.OwnedInUserLeagues.Count
                             </span>
                         }
@@ -102,7 +102,7 @@
                             string note = "";
                             foreach (var userLeague in Model.AvailableInUserLeagues)
                                 note += "[" + userLeague.DisplayTitle + "]";
-                            <span class="badge badge-primary" data-toggle="tooltip" data-html="true" title="@note">
+                            <span class="badge bg-primary" data-bs-toggle="tooltip" data-html="true" title="@note">
                                 Available in @Model.AvailableInUserLeagues.Count
                             </span>
                         }
@@ -117,7 +117,7 @@
 
         @if (Model.GameLogGames != null && Model.GameLogGames.Count() > 0)
         {
-            <div class="container ml-0">
+            <div class="container ms-0">
                 <table class="@RotoMonster.Core.RMCss.DataTable">
                     <thead class="@RotoMonster.Core.RMCss.DataTableTHead">
                         <tr>
@@ -179,7 +179,7 @@
                                                 @gameLog.Game.GetOpponentText(gameLog.StatPlayer.Team)
                                                 @if (gameLog.Game.Number > 1)
                                                 {
-                                                    <span class="ml-1">#@gameLog.Game.Number</span>
+                                                    <span class="ms-1">#@gameLog.Game.Number</span>
                                                 }
                                             </td>
                                         }

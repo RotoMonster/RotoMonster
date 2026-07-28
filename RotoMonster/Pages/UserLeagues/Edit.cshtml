@@ -10,7 +10,7 @@
 <h3>@Model.UserLeague.FantasyProvider.Name : @Model.UserLeague.Title</h3>
 <hr />
 
-<div class="row ml-2">
+<div class="row ms-2">
     <div class="col-">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -31,7 +31,7 @@
             <input type="hidden" asp-for="UserLeague.AutoEndDate" />
             <input type="hidden" asp-for="UserLeague.DisplayOrder" />
 
-            <div class="form-group">
+            <div class="mb-3">
                 <input type="submit" value="Save" asp-page-handler="Save" class="btn btn-primary" />
                 @*<input type="submit" value="Refresh Settings" asp-page-handler="Refresh" class="btn btn-secondary" />*@
                 <a class="btn btn-secondary" asp-page="/Index">Back to Home</a>
@@ -40,65 +40,65 @@
             </div>
 
             <div class="row">
-                <div class="col- p-3">
-                    <div class="form-group">
+                <div class="col-auto p-3">
+                    <div class="mb-3">
                         <label asp-for="UserLeague.DisplayTitle" class="control-label"></label>
                         <input asp-for="UserLeague.DisplayTitle" class="form-control" />
                         <span asp-validation-for="UserLeague.DisplayTitle" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="UserLeague.ProviderLeagueId" class="control-label"></label>
                         :
                         <b>@Html.DisplayFor(model => model.UserLeague.ProviderLeagueId)</b>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <select asp-for="@Model.SelectedTeamId" class="form-control" asp-items="ViewBag.TeamSelectList"></select>
                     </div>
-                    <div class="form-group form-check">
+                    <div class="mb-3 form-check">
                         <label class="form-check-label">
                             <input class="form-check-input" asp-for="UserLeague.TrackLeague" /> @Html.DisplayNameFor(model => model.UserLeague.TrackLeague)
                         </label>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="UserLeague.ScoringSystem" class="control-label"></label>
                         <select asp-for="UserLeague.ScoringSystem" class="form-control" asp-items="ViewBag.ScoringSystemList"></select>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="UserLeague.LeagueType" class="control-label"></label>
                         <select asp-for="UserLeague.LeagueType" class="form-control" asp-items="ViewBag.LeagueTypeList"></select>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="UserLeague.LineupFrequency" class="control-label"></label>
                         <select asp-for="UserLeague.LineupFrequency" class="form-control" asp-items="ViewBag.LineupFrequencyList"></select>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="UserLeague.NumberOfTeams" class="control-label"></label>
                         <input asp-for="UserLeague.NumberOfTeams" class="form-control" />
                         <span asp-validation-for="UserLeague.NumberOfTeams" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="UserLeague.PlayersPerTeam" class="control-label"></label>
                         <input asp-for="UserLeague.PlayersPerTeam" class="form-control" />
                         <span asp-validation-for="UserLeague.PlayersPerTeam" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="UserLeague.IRSpots" class="control-label"></label>
                         <input asp-for="UserLeague.IRSpots" class="form-control" />
                         <span asp-validation-for="UserLeague.IRSpots" class="text-danger"></span>
                     </div>
-                    <div class="form-group form-check">
+                    <div class="mb-3 form-check">
                         <label class="form-check-label">
                             <input class="form-check-input" asp-for="UserLeague.SameDayTransactions" /> @Html.DisplayNameFor(model => model.UserLeague.SameDayTransactions)
                         </label>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label asp-for="UserLeague.GameLimit" class="control-label"></label>
                         <input asp-for="UserLeague.GameLimit" class="form-control" />
                         <span asp-validation-for="UserLeague.GameLimit" class="text-danger"></span>
                     </div>
                 </div>
 
-                <div class="col- p-3">
+                <div class="col-auto p-3">
                     <h3>Categories</h3>
                     @for (int i = 0; i < Model.CategorySelects.Count; i++)
                     {
@@ -114,7 +114,7 @@
                     }
                 </div>
 
-                <div class="col- p-3">
+                <div class="col-auto p-3">
                     <h3>Point Settings</h3>
                     @for (int i = 0; i < Model.PointsValues.Count; i++)
                     {
@@ -129,7 +129,7 @@
                     }
                 </div>
 
-                <div class="col- p-3">
+                <div class="col-auto p-3">
                     <h3>Active Roster</h3>
                     @for (int i = 0; i < Model.ActiveRosterSpotValues.Count; i++)
                     {

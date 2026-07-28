@@ -11,7 +11,7 @@
         var messages = TempData[listId] as IEnumerable<string>;
         if (messages.Count() > 0)
         {
-            <div class="alert @css ml-3 mr-3">
+            <div class="alert @css ms-3 me-3">
                 @foreach (var msg in messages)
                 {
                     <div>@msg</div>
