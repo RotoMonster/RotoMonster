@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +16,6 @@ using Microsoft.Extensions.Hosting;
 using RotoMonster.Core;
 using RotoMonster.Core.Services;
 using RotoMonster.Data;
-using Serilog;
 using Newtonsoft.Json.Serialization;
 
 namespace RotoMonster
@@ -43,6 +43,30 @@ namespace RotoMonster
                 // options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             }
             );
+
+            services.AddDbContext<RMSharedDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("RotoMonsterSharedDb"),
+                    x => x.MigrationsAssembly("RotoMonster")));
+
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<RMSharedDbContext>();
+
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.AutomaticAuthentication = false;
+            });
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 1;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.User.AllowedUserNameCharacters += " !~$#'&";
+            });
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -78,7 +102,6 @@ namespace RotoMonster
                     Configuration["EmailSender:UserName"],
                     Configuration["EmailSender:Password"]
                 ));
-            services.AddSerilog();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
