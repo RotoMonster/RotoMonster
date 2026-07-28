@@ -1,0 +1,20 @@
+﻿@model List<RotoMonster.Core.DisplayPlayer>
+
+@if (Model != null && Model.Count > 0)
+{
+    var depthTT = "";
+    foreach (var hdp in Model)
+    {
+        depthTT += "<div>";
+        depthTT += " " + hdp.SeasonPlayer.Player.ForwardName;
+        depthTT += " " + hdp.DepthPlayer.Depth.ToString();
+        if (hdp.PlayerStatus.PlayerStatusType != null)
+        {
+            depthTT += " " + hdp.PlayerStatus.PlayerStatusType.Title;
+        }
+        depthTT += "</div>";
+    }
+    <span data-toggle="tooltip" data-placement="top" data-html="true" title="@depthTT" class="text-primary">
+        <i class="fas fa-arrow-alt-circle-up"></i>
+    </span>
+}

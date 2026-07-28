@@ -1,0 +1,201 @@
+﻿@page "{playerId:int}"
+
+@model RotoMonster.DetailsModel
+@{
+    ViewData["Title"] = "Details";
+    RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+}
+
+@section Scripts{
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', { 'packages': ['bar'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data = google.visualization.arrayToDataTable([
+                ['Year', 'Sales', 'Expenses', 'Profit'],
+                ['2014', 1000, 400, 200],
+                ['2015', 1170, 460, 250],
+                ['2016', 660, 1120, 300],
+                ['2017', 1030, 540, 350]
+            ]);
+
+            var options = {
+                chart: {
+                    title: 'Company Performance',
+                    subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+                }
+            };
+
+            var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+            chart.draw(data, google.charts.Bar.convertOptions(options));
+        }
+    </script>
+}
+
+<div>
+    @*<div id="columnchart_material" style="width: 500px; height: 400px;"></div>*@
+
+    <div class="card">
+        <div class="card-header">
+            <h1 class="p-0 m-0">
+                @Model.Player.FirstName @Model.Player.LastName
+                @(Model.SeasonPlayer!=null ? Model.SeasonPlayer.Team.Code: "X")
+                @foreach (var psp in Model.PositionSourcePlayers)
+                {
+                    <partial name="_ColoredPosition" model="psp.Position" />
+                }
+            </h1>
+
+            <h4 class="ml-1 mt-1">
+                <span class="pr-2"><partial name="_PlayerHeight" model="Model.Player.Height" /></span>
+                <span class="pr-2">
+                    <partial name="_PlayerWeight" model="Model.Player.Weight" />
+                </span>
+                <span class="pr-2">
+                    <partial name="_PlayerBirthdate" model="Model.Player.Birthdate" />
+                </span>
+                <span class="pr-2"><partial name="_PlayerDraft" model="Model.Player" /></span>
+                <span class="pr-2"><partial name="_PlayerSalary" model="Model.SeasonPlayer" /></span>
+            </h4>
+
+            @if (Model.OwnershipPlayer != null)
+            {
+                <div class="mt-0">
+                    <span class="mr-2 border pl-1 pr-1" style="background-color:#@colorLib.OwnershipGetPercentColor(Model.OwnershipPlayer.OwnershipPercent)">
+                        <partial name="_PlayerOwnershipChange" model="new RotoMonster.Core.PartialViewModels.PlayerOwnershipChangeModel(Model.OwnershipPlayer.OwnershipPercent,Model.OwnershipPlayer.PercentOwnershipChange)" />
+                        <small>% Own</small>
+                    </span>
+                    <span class="border pl-1 pr-1" style="background-color:#@colorLib.ActiveGetPercentColor(Model.OwnershipPlayer.ActivePercent)">
+                        <partial name="_PlayerOwnershipChange" model="new RotoMonster.Core.PartialViewModels.PlayerOwnershipChangeModel(Model.OwnershipPlayer.ActivePercent,Model.OwnershipPlayer.PercentActiveChange)" />
+                        <small>% Active</small>
+                    </span>
+                    @if (Model.OwnershipPlayer.IRPercent > 0)
+                    {
+                        <span class="border pl-1 pr-1 ml-2">
+                            <partial name="_PlayerOwnershipChange" model="new RotoMonster.Core.PartialViewModels.PlayerOwnershipChangeModel(Model.OwnershipPlayer.IRPercent,Model.OwnershipPlayer.PercentActiveChange)" />
+                            <small>% IR</small>
+                        </span>
+                    }
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <partial name="_PlayerTable" model="Model.HistoryTableModel" />
+</div>
+
+@if (Model.GameLogGames != null)
+{
+    <div class="table-responsive">
+        <table class="@RotoMonster.Core.RMCss.DataTable">
+            <thead class="@RotoMonster.Core.RMCss.DataTableTHead">
+                <tr>
+                    <th>Date</th>
+                    <th>Value</th>
+                    <th>Game</th>
+                    <th>Team</th>
+                    @foreach (var dc in Model.HistoryTableModel.BeforeCategories)
+                    {
+                        <th class="text-nowrap"><partial name="_PlayerTableCategoryTitle" model="@dc.Category" /></th>
+                    }
+                    @if (Model.HistoryTableModel.UserDisplayCategories != null)
+                    {
+                        @foreach (var cs in Model.HistoryTableModel.UserDisplayCategories)
+                        {
+                            <th class="text-nowrap"><partial name="_PlayerTableCategoryTitle" model="@cs.Category" /></th>
+                        }
+                    }
+                    @foreach (var dc in Model.HistoryTableModel.AfterCategories)
+                    {
+                        <th class="text-nowrap"><partial name="_PlayerTableCategoryTitle" model="@dc.Category" /></th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var gameLog in Model.GameLogGames)
+                {
+                    @if (gameLog.IsBreak)
+                    {
+                        <tr><td colspan="50" class="bg-dark"></td></tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                @gameLog.Game.GameDate.ToShortDateString()
+                            </td>
+
+                            @if (gameLog.StatPlayer != null)
+                            {
+                                <td class="tdr" style="background-color:#@gameLog.ValuePlayer.LeagueValueColor;">@String.Format("{0:#####0.00}", gameLog.ValuePlayer.LeagueValue)</td>
+                            }
+                            else
+                            {
+                                <td />
+                            }
+
+                            <td class="text-nowrap">
+                                @gameLog.Game.AwayTeam.Code
+                                <span>&#64;</span>
+                                @gameLog.Game.HomeTeam.Code
+                                @if (gameLog.Game.Number > 1)
+                                {
+                                    <span class="ml-1">#@gameLog.Game.Number</span>
+                                }
+                            </td>
+
+                            @if (gameLog.StatPlayer != null)
+                            {
+                                <td>@gameLog.StatPlayer.Team.Code</td>
+                            }
+                            else
+                            {
+                                <td />
+                            }
+
+                            @if (gameLog.PlayerGameMissed != null)
+                            {
+                                int colspan = 0;
+                                colspan += (Model.HistoryTableModel.BeforeCategories != null ? Model.HistoryTableModel.BeforeCategories.Count : 0);
+                                colspan += (Model.HistoryTableModel.UserDisplayCategories != null ? Model.HistoryTableModel.UserDisplayCategories.Count : 0);
+                                colspan += (Model.HistoryTableModel.AfterCategories != null ? Model.HistoryTableModel.AfterCategories.Count : 0);
+                                <td colspan="@colspan"></td>
+                            }
+                            else
+                            {
+
+                                @foreach (var dc in Model.HistoryTableModel.BeforeCategories)
+                                {
+                                    var displayFormat = (from df in dc.Category.CategoryPerValues where df.PerValueId == Model.GameLogPerValue.Id select df.DisplayFormat).FirstOrDefault();
+                                    <td class="tdr">@String.Format("{0:" + displayFormat + "}", gameLog.StatPlayer.Get(Model.HistoryTableModel.DisplayPerValue, dc.Category.Id))</td>
+                                }
+
+                                @if (Model.HistoryTableModel.UserDisplayCategories != null)
+                                {
+                                    @foreach (var cs in Model.HistoryTableModel.UserDisplayCategories)
+                                    {
+                                        var displayFormat = (from df in cs.Category.CategoryPerValues where df.PerValueId == Model.GameLogPerValue.Id select df.DisplayFormat).FirstOrDefault();
+                                        <td class="tdr">@String.Format("{0:" + displayFormat + "}", gameLog.StatPlayer.Get(Model.HistoryTableModel.DisplayPerValue, cs.Category.Id))</td>
+                                    }
+                                }
+
+                                @foreach (var dc in Model.HistoryTableModel.AfterCategories)
+                                {
+                                    var displayFormat = (from df in dc.Category.CategoryPerValues where df.PerValueId == Model.GameLogPerValue.Id select df.DisplayFormat).FirstOrDefault();
+                                    <td class="tdr">@String.Format("{0:" + displayFormat + "}", gameLog.StatPlayer.Get(Model.HistoryTableModel.DisplayPerValue, dc.Category.Id))</td>
+                                }
+
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}

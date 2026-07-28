@@ -1,0 +1,56 @@
+﻿@using RotoMonster.Core.PartialViewModels
+@model FrontGameScoresModel
+@{
+    RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+    RotoMonster.Core.Libs.FileLib fileLib = new Core.Libs.FileLib();
+}
+
+@if (Model.ScheduleGames.Count > 0)
+{
+    <div class="card mb-3 border-info bg">
+        <div class="card-header text-nowrap">
+            <h5 class="p-0 m-0"><a asp-page="Scores" alt="Scores" title="Scores" asp-route-date="@fileLib.GetDateParameter(Model.ScheduleStartDate)">@Model.Sport.Title Scores (@Model.ScheduleGames.Count)</a></h5>
+        </div>
+
+        <div class="card-body p-2">
+            <div class="text-center">
+                @if (Model.ScheduleStartDate == Model.ScheduleEndDate)
+                {
+                    DateTime currentDate = Model.ScheduleStartDate.AddDays(-1);
+                    while (currentDate <= Model.ScheduleEndDate.AddDays(1))
+                    {
+                        string buttonTitle = currentDate.DayOfWeek.ToString().Substring(0, 3) + " " + String.Format("{0}/{1}", currentDate.Month, currentDate.Day);
+                        string dateCss = currentDate == Model.ScheduleStartDate ? "font-weight-bold" : "";
+                        <a class="btn btn-link @dateCss" asp-page-handler="Index" asp-route-date="@fileLib.GetDateParameter(currentDate)" alt="Back Date" title="Back">@buttonTitle</a>
+                        currentDate = currentDate.AddDays(1);
+                    }
+                }
+            </div>
+
+            <table class="small table-bordered">
+                <tbody>
+                    @foreach (var game in Model.ScheduleGames)
+                    {
+                        <tr>
+                            <td>
+                                <partial name="_TeamGame" model="new RotoMonster.Core.PartialViewModels.TeamGameModel() {Sport=Model.Sport,Game=game,Team=game.AwayTeam}" />
+                            </td>
+                            <td class="tdc">
+                                @{
+                                    var gamePlayers = (from gp in Model.OwnedGameUserLeagueTeamPlayers where gp.Game.Id == game.Id select gp).ToList();
+                                }
+                                <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Core.PartialViewModels.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=gamePlayers,UseOwnColor=true}" />
+
+                                @{
+                                    var activePlayers = (from gp in Model.ActiveGameUserLeagueTeamPlayers where gp.Game.Id == game.Id select gp).ToList();
+                                }
+                                <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Core.PartialViewModels.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=activePlayers,UseOwnColor=false}" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+

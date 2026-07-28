@@ -1,0 +1,111 @@
+﻿@model RotoMonster.Core.PartialViewModels.GameStateViewModel
+
+@{
+    RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+}
+
+@if (Model.Game != null)
+{
+    if (Model.ShowCompact)
+    {
+        @*        if (Model.Game.IsFinished)
+            {
+            <span>Final</span>
+            }
+            else
+        *@          {
+            string css = Model.Game.IsFinished ? "finish_bg" : "live_bg";
+            string gameState = Model.Game.IsFinished ? "F" : String.Format("{0:##0}%", Model.Game.PercentComplete);
+            if (Model.Game.HasStarted)
+            {
+                <div class="progress live-holder">
+                    <div aria-valuenow="@Model.Game.PercentComplete" class="progress-bar @css" role="progressbar" style="font-size: 0.9em; width: @Model.Game.PercentComplete%" aria-valuemin="0" aria-valuemax="100">
+                        @Html.Raw("&#160;")
+                        @gameState
+                        @Html.Raw("&#160;")
+                    </div>
+                </div>
+            }
+        }
+    }
+
+    if (!Model.ShowCompact)
+    {
+        int pct = Model.Game.PercentComplete;
+        string holderCss = "";
+        string style = "";
+        string gameState = "";
+        string css = "";
+
+        if (Model.Game.IsFinished)
+        {
+            holderCss = "live-holder";
+            css = "finish_bg";
+            gameState = "Final";
+        }
+        else if (Model.Game.HasStarted)
+        {
+            css = "live_bg";
+            holderCss = "live-holder";
+            if (Model.Game.PercentComplete == 0)
+                gameState = "Starting";
+            else if (Model.Game.GameClock == "00:00" && (double)Model.Game.Period == (double)Model.Sport.PeriodsPerGame / 2)
+                gameState = "Halftime";
+            else if (Model.Game.Period >= 1)
+            {
+                if (Model.Game.Period > Model.Sport.PeriodsPerGame)
+                    gameState = "OT " + Model.Game.Period.ToString();
+                else if (Model.Game.Period == 1)
+                    gameState = "1st";
+                else if (Model.Game.Period == 2)
+                    gameState = "2nd";
+                else if (Model.Game.Period == 3)
+                    gameState = "3rd";
+                else if (Model.Game.Period >= 4 && Model.Game.Period <= 9)
+                    gameState = Model.Game.Period.ToString() + "th";
+                else
+                    gameState = Model.Game.Period.ToString();
+
+                gameState += " " + Model.Game.GameClock;
+                gameState = " " + String.Format("{0:##0}% {1}", Model.Game.PercentComplete, gameState);
+            }
+        }
+        else
+        {
+            gameState += Model.Game.DayOfWeekString + " ";
+            gameState += Model.Game.GameTimeText;
+            css = "before_bg";
+            holderCss = "pre-holder";
+            style = "background-color:#" + colorLib.TimeUntilGameColorStyle(Model.Game);
+        }
+
+        if (Model.ShowOpponent)
+        {
+            string preGameState = "";
+            if (Model.ShowScores && Model.Game.ProjectedPoints(Model.Sport, Model.Team) > 0)
+                preGameState = String.Format("{0:#0.00}", Model.Game.ProjectedPoints(Model.Sport, Model.Team)) + " ";
+            preGameState += Model.Game.GetOpponentText(Model.Team);
+            if (Model.ShowScores && Model.Game.OpponentProjectedPoints(Model.Sport, Model.Team) > 0)
+                preGameState += " " + String.Format("{0:#0.00}", Model.Game.OpponentProjectedPoints(Model.Sport, Model.Team));
+
+            gameState = preGameState + " " + gameState;
+        }
+
+        <div class="progress pbar-holder @holderCss" style="@style">
+            <div aria-valuenow="@pct" class="progress-bar wlink @css" role="progressbar" style="width: @pct%" aria-valuemin="0" s aria-valuemax="100">
+                @if (pct > 0)
+                {
+                    <a class="ml-1 mr-1" asp-page="/Scores" asp-route-g="@Model.Game.Id">
+                        @gameState
+                    </a>
+                }
+                else
+                {
+                    <span class="ml-1 mr-1">
+                        @gameState
+                    </span>
+                }
+            </div>
+        </div>
+    }
+}

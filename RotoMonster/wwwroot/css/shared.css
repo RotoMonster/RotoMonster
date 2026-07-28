@@ -1,0 +1,55 @@
+﻿.bg {
+    background-color: #e6e6e6;
+}
+
+.nba {
+    background-color: #e65c00;
+}
+
+.nba-txt {
+    color: #e65c00;
+}
+
+.mlb {
+    background-color: #009933;
+}
+
+.mlb-txt {
+    color: #009933;
+}
+
+.nfl {
+    background-color: #86592d;
+}
+
+.nfl-txt {
+    color: #86592d;
+}
+
+.nhl {
+    background-color: #0077b3;
+}
+
+.nhl-txt {
+    color: #0077b3;
+}
+
+.logo {
+    font-family: "Passion One", sans-serif;
+    white-space: nowrap;
+    padding: 1px 10px 1px 10px;
+    border-radius: 5px;
+    width: 80px;
+    color: white;
+    text-decoration: none;
+}
+
+    .logo a {
+        text-decoration: none;
+        color: white;
+    }
+
+
+.td-small td {
+    padding: 2px 3px 2px 3px;
+}

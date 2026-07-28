@@ -1,0 +1,20 @@
+﻿@model RotoMonster.Core.PartialViewModels.LogoModel
+
+@if (Model.Controller.Length > 0)
+{
+    <a class="@Model.Sport.ToLower() text-white logo navbar-brand" asp-area="" asp-page="@Model.Controller">
+        rM @Model.Sport.ToUpper()
+    </a>
+}
+else if (Model.Url.Length > 0)
+{
+    <a class="@Model.Sport.ToLower() text-white logo navbar-brand" href="@Model.Url">
+        rM @Model.Sport.ToUpper()
+    </a>
+}
+else
+{
+    <span>
+        rM @Model.Sport.ToUpper()
+    </span>
+}

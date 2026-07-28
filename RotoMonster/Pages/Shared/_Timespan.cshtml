@@ -1,0 +1,19 @@
+﻿@model TimeSpan
+@{
+    if (Model.TotalMinutes < 5)
+    {
+        @String.Format("{0:#0.0}m", Model.TotalMinutes)
+    }
+    else if (Model.TotalMinutes < 60)
+    {
+        @String.Format("{0:#0}m", Model.TotalMinutes)
+    }
+    else if (Model.TotalDays < 1)
+    {
+        @String.Format("{0:#0.0}h", Model.TotalHours)
+    }
+    else
+    {
+        @String.Format("{0:#0.0}d", Model.TotalDays)
+    }
+}

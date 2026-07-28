@@ -1,0 +1,10 @@
+﻿@model string
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script>
+    $(function () {
+        $("#@Model").autocomplete({
+            source: './api/postapi/search'
+        });
+    });
+</script>

@@ -1,0 +1,6 @@
+﻿@model DateTime
+@{
+    TimeSpan ts = DateTime.Today - Model;
+    double age = ts.TotalDays / 365.25;
+}
+<span>@String.Format("{0:#0.0}", age)</span> <small class="text-muted">@Model.ToShortDateString()</small>

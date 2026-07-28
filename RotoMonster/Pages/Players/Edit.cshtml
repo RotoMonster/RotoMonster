@@ -1,0 +1,43 @@
+﻿@page "{playerId:int?}"
+@model RotoMonster.EditModel
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Editing @Model.Player.FirstName @Model.Player.LastName</h1>
+
+<form method="post">
+
+    <input type="hidden" asp-for="Player.Id" />
+    <div class="form-group">
+        <label asp-for="Player.FirstName"></label>
+        <input asp-for="Player.FirstName" class="form-control" />
+        <span class="text-danger" asp-validation-for="Player.FirstName"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Player.LastName"></label>
+        <input asp-for="Player.LastName" class="form-control" />
+        <span class="text-danger" asp-validation-for="Player.LastName"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Player.Birthdate"></label>
+        <input asp-for="Player.Birthdate" class="form-control" />
+        <span class="text-danger" asp-validation-for="Player.Birthdate"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Player.Height"></label>
+        <input asp-for="Player.Height" class="form-control" />
+        <span class="text-danger" asp-validation-for="Player.Height"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Player.Weight"></label>
+        <input asp-for="Player.Weight" class="form-control" />
+        <span class="text-danger" asp-validation-for="Player.Weight"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

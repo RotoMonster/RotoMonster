@@ -1,0 +1,86 @@
+﻿@page
+@model RotoMonster.Pages.UserLeagues.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Your Leagues</h1>
+
+<div class="ml-4 mt-2">
+    <div class="p-2">
+        <a class="btn btn-primary" asp-page="Import">Import Leagues</a>
+        <a class="btn btn-secondary" asp-page="Create">Create Custom League</a>
+    </div>
+
+    <form method="post">
+        <div class="p-2 container ml-1">
+            <table class="table table-bordered table-sm">
+                <thead class="thead-light">
+                    <tr>
+                        <th>
+                            Provider
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.SelectedUserLeagues[0].DisplayTitle)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.SelectedUserLeagues[0].MyTeamTitle)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.SelectedUserLeagues[0].ProviderLeagueId)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.SelectedUserLeagues[0].TrackLeague)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var cnt = 0;
+                    }
+
+                    @foreach (var item in Model.SelectedUserLeagues)
+                    {
+                        <tr>
+                            <td>
+                                @if (item.FantasyProvider != null)
+                                {
+                                    @item.FantasyProvider.Name
+                                }
+                            </td>
+                            <td>
+                                <a asp-page="./Edit" asp-route-id="@item.Id">@item.DisplayTitle</a>
+                            </td>
+                            <td>
+                                @item.MyUserLeagueTeamTitle
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProviderLeagueId)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.TrackLeague)
+                            </td>
+                            <td>
+                                <a asp-page-handler="UpdateRosters" asp-route-id="@item.Id">Rosters</a> |
+                                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                            </td>
+                        </tr>
+
+                        {
+                            cnt++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @*        <div class="p-2">
+        <button type="submit" class="btn btn-primary" asp-page-handler="Save">Save Changes</button>
+        </div>*@
+    </form>
+
+</div>

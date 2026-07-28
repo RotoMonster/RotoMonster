@@ -1,0 +1,42 @@
+﻿@page
+@model RotoMonster.ClientPlayersModel
+@{
+    ViewData["Title"] = "ClientPlayers";
+}
+
+<h1>Client Players</h1>
+
+<table class="table" id="players">
+</table>
+
+@section Scripts{
+
+    <environment include="developent">
+        <script src="~\node_modules\datatables.net\js\jquery.dataTables.js"></script>
+        <script src="~\node_modules\datatables.net-bs4\js\dataTables.bootstrap4.js"></script>
+        <link href="~\node_modules\datatables.net-bs4\css\dataTables.bootstrap4.css" rel="stylesheet" />
+    </environment>
+
+    <environment exclude="developent">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.css" />
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.js"></script>
+    </environment>
+
+    <script>
+        $(function () {
+            $.ajax("/api/players/",
+                { method: "get" })
+                .then(function (response) {
+                    $("#players").dataTable({
+                        data: response,
+                        columns: [
+                            { "data": "firstName" },
+                            { "data": "lastName" },
+                            { "data": "height" },
+                            { "data": "weight" }
+                        ]
+                    });
+                });
+        });
+    </script>
+}

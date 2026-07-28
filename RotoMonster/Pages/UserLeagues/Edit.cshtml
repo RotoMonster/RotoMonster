@@ -1,0 +1,155 @@
+﻿@page
+@model RotoMonster.Pages.UserLeagues.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Edit League</h1>
+<h3>@Model.UserLeague.FantasyProvider.Name : @Model.UserLeague.Title</h3>
+<hr />
+
+<div class="row ml-2">
+    <div class="col-">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="UserLeague.Id" />
+            <input type="hidden" asp-for="UserLeague.SeasonId" />
+            <input type="hidden" asp-for="UserLeague.UserId" />
+            <input type="hidden" asp-for="UserLeague.Title" />
+            <input type="hidden" asp-for="UserLeague.FantasyProviderId" />
+            <input type="hidden" asp-for="UserLeague.ProviderLeagueId" />
+            <input type="hidden" asp-for="UserLeague.MyTeamTitle" />
+            <input type="hidden" asp-for="UserLeague.MyProviderTeamId" />
+            <input type="hidden" asp-for="UserLeague.StartWeekday" />
+            <input type="hidden" asp-for="UserLeague.QualityGamesLimit" />
+            <input type="hidden" asp-for="UserLeague.IsMoney" />
+            <input type="hidden" asp-for="UserLeague.DraftDate" />
+            <input type="hidden" asp-for="UserLeague.AutoUpdate" />
+            <input type="hidden" asp-for="UserLeague.ContinuousWaivers" />
+            <input type="hidden" asp-for="UserLeague.AutoEndDate" />
+            <input type="hidden" asp-for="UserLeague.DisplayOrder" />
+
+            <div class="form-group">
+                <input type="submit" value="Save" asp-page-handler="Save" class="btn btn-primary" />
+                @*<input type="submit" value="Refresh Settings" asp-page-handler="Refresh" class="btn btn-secondary" />*@
+                <a class="btn btn-secondary" asp-page="/Index">Back to Home</a>
+                <a class="btn btn-danger" asp-page="./Delete" asp-route-id="@Model.UserLeague.Id">Delete</a>
+
+            </div>
+
+            <div class="row">
+                <div class="col- p-3">
+                    <div class="form-group">
+                        <label asp-for="UserLeague.DisplayTitle" class="control-label"></label>
+                        <input asp-for="UserLeague.DisplayTitle" class="form-control" />
+                        <span asp-validation-for="UserLeague.DisplayTitle" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserLeague.ProviderLeagueId" class="control-label"></label>
+                        :
+                        <b>@Html.DisplayFor(model => model.UserLeague.ProviderLeagueId)</b>
+                    </div>
+                    <div class="form-group">
+                        <select asp-for="@Model.SelectedTeamId" class="form-control" asp-items="ViewBag.TeamSelectList"></select>
+                    </div>
+                    <div class="form-group form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" asp-for="UserLeague.TrackLeague" /> @Html.DisplayNameFor(model => model.UserLeague.TrackLeague)
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserLeague.ScoringSystem" class="control-label"></label>
+                        <select asp-for="UserLeague.ScoringSystem" class="form-control" asp-items="ViewBag.ScoringSystemList"></select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserLeague.LeagueType" class="control-label"></label>
+                        <select asp-for="UserLeague.LeagueType" class="form-control" asp-items="ViewBag.LeagueTypeList"></select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserLeague.LineupFrequency" class="control-label"></label>
+                        <select asp-for="UserLeague.LineupFrequency" class="form-control" asp-items="ViewBag.LineupFrequencyList"></select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserLeague.NumberOfTeams" class="control-label"></label>
+                        <input asp-for="UserLeague.NumberOfTeams" class="form-control" />
+                        <span asp-validation-for="UserLeague.NumberOfTeams" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserLeague.PlayersPerTeam" class="control-label"></label>
+                        <input asp-for="UserLeague.PlayersPerTeam" class="form-control" />
+                        <span asp-validation-for="UserLeague.PlayersPerTeam" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserLeague.IRSpots" class="control-label"></label>
+                        <input asp-for="UserLeague.IRSpots" class="form-control" />
+                        <span asp-validation-for="UserLeague.IRSpots" class="text-danger"></span>
+                    </div>
+                    <div class="form-group form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" asp-for="UserLeague.SameDayTransactions" /> @Html.DisplayNameFor(model => model.UserLeague.SameDayTransactions)
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserLeague.GameLimit" class="control-label"></label>
+                        <input asp-for="UserLeague.GameLimit" class="form-control" />
+                        <span asp-validation-for="UserLeague.GameLimit" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col- p-3">
+                    <h3>Categories</h3>
+                    @for (int i = 0; i < Model.CategorySelects.Count; i++)
+                    {
+                        var css = "bg-success text-white";
+                        if (Model.CategorySelects[i].Value == "Punt")
+                            css = "bg-warning text-white";
+                        if (Model.CategorySelects[i].Value == "Off")
+                            css = "";
+                        <div class="@css mb-1">
+                            <select asp-for="@Model.CategorySelects[i].Value" asp-items="ViewBag.CategorySelectionList"></select>
+                            @Model.CategorySelects[i].Title
+                        </div>
+                    }
+                </div>
+
+                <div class="col- p-3">
+                    <h3>Point Settings</h3>
+                    @for (int i = 0; i < Model.PointsValues.Count; i++)
+                    {
+                        var css = "bg-success text-white";
+                        if (Model.PointsValues[i].Value == 0)
+                            css = "";
+                        <div class="@css mb-1">
+                            <input asp-for="@Model.PointsValues[i].Value" maxlength="10" />
+                            <span asp-validation-for="@Model.PointsValues[i].Value" class="text-danger"></span>
+                            @Model.PointsValues[i].Title
+                        </div>
+                    }
+                </div>
+
+                <div class="col- p-3">
+                    <h3>Active Roster</h3>
+                    @for (int i = 0; i < Model.ActiveRosterSpotValues.Count; i++)
+                    {
+                        var css = "bg-success text-white";
+                        if (Model.ActiveRosterSpotValues[i].Value == 0)
+                            css = "";
+                        <div class="@css mb-1">
+                            <input asp-for="@Model.ActiveRosterSpotValues[i].Value" maxlength="10" />
+                            <span asp-validation-for="@Model.ActiveRosterSpotValues[i].Value" class="text-danger"></span>
+                            @Model.ActiveRosterSpotValues[i].Title
+                        </div>
+                    }
+                </div>
+
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

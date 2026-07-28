@@ -1,0 +1,9 @@
+﻿@model RotoMonster.Core.Category
+
+<button class="btn btn-sm btn-link text-white p-0 m-0"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="@Model.Title"
+        asp-route-sort="@Model.Id">
+    @Model.Abbreviation
+</button>

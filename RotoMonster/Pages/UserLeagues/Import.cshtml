@@ -1,0 +1,167 @@
+﻿@page
+@model RotoMonster.Pages.UserLeagues.ImportModel
+@{
+    ViewData["Title"] = "Import";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Add Leagues</h1>
+
+<div class="card">
+    <div class="card-body">
+        @if (Model.IsYahooConnected)
+        {
+            <h5 class="card-title text-success font-weight-bold">Yahoo! Connected</h5>
+
+            <form method="post">
+                <a class="btn btn-primary" asp-page-handler="YahooList">List Your Leagues</a>
+                <button type="submit" class="btn btn-link" asp-page-handler="YahooDisconnect">Disconnect Yahoo!</button>
+            </form>
+
+            if (Model.YahooUserLeagueTableModel != null)
+            {
+                <partial name="_UserLeagueTable" model="Model.YahooUserLeagueTableModel" />
+            }
+        }
+        else
+        {
+            <h5 class="card-title text-danger font-weight-bold">Yahoo! Not Connected</h5>
+            <div class="row ml-4 mt-2">
+                <form method="post">
+                    <div class="col- p-2">
+                        <a href="@Model.YahooUrl" target="_blank">Get Yahoo! Authorization Code</a>
+                    </div>
+                    <div class="col- p-2">
+                        <input asp-for="YahooCode" placeholder="Enter Yahoo! Code" class="form-control" />
+                    </div>
+                    <div class="col- p-2">
+                        <button class="btn btn-sm btn-secondary" asp-page-handler="Yahoo">Submit</button>
+                    </div>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.Sport.IsNBA || Model.Sport.IsMLB || Model.Sport.IsNFL)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            @if (Model.IsESPNConnected)
+            {
+                <h5 class="card-title text-success font-weight-bold">ESPN Connected</h5>
+                <form method="post">
+                    <a class="btn btn-primary" asp-page-handler="ESPNList">List Your Leagues</a>
+                    <button type="submit" class="btn btn-link" asp-page-handler="ESPNDisconnect">Disconnect ESPN</button>
+                </form>
+
+                @if (Model.ESPNUserLeagueTableModel != null)
+                {
+                    <partial name="_UserLeagueTable" model="Model.ESPNUserLeagueTableModel" />
+                }
+            }
+            else
+            {
+                <h5 class="card-title text-danger font-weight-bold">ESPN Not Connected</h5>
+                <div class="row ml-4 mt-2">
+                    <form method="post">
+                        <div class="row ml-4 mt-2">
+                            <div class="col- p-2">
+                                <input asp-for="ESPNSWID" placeholder="ESPN SWID" class="form-control" />
+                            </div>
+                            <div class="col- p-2">
+                                <input asp-for="ESPNS2" placeholder="ESPN S2" class="form-control" />
+                            </div>
+                            <div class="col- p-2">
+                                <button class="btn btn-sm btn-secondary" asp-page-handler="ESPN">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <h3>How to find the SWID and S2 values</h3>
+                <h5>Chrome (Edge and Brave similar):</h5>
+                <ul>
+                    <li>Make sure you're logged into ESPN.</li>
+                    <li>Click three dots in upper-right to open the menu and click Settings.</li>
+                    <li>In the "Search Settings" prompt, search for "Cookies".</li>
+                    <li>Click "Cookies and other site data".</li>
+                    <li>Click "See all cookies and site data".</li>
+                    <li>In the "Search Cookies" prompt, search "ESPN".</li>
+                    <li>Open ESPN.com, and copy SWID Content to SWID below and espn_s2 Content to ESPN S2.</li>
+                </ul>
+                <h5>Firefox:</h5>
+                <ul>
+                    <li>Make sure you're logged into ESPN.</li>
+                    <li>Press F12 to enter Developer Mode.</li>
+                    <li>Click the Storage tab.</li>
+                    <li>Under the Cookies folder, select https://www.espn.com".</li>
+                    <li>SWID Value to SWID below and espn_s2 Value to ESPN S2.</li>
+                </ul>
+            }
+        </div>
+    </div>
+}
+
+<div class="card mt-3">
+    <div class="card-body">
+
+        @if (Model.IsFanTraxConnected)
+        {
+            <h5 class="card-title text-success font-weight-bold">FanTrax Connected</h5>
+            <form method="post">
+                <a class="btn btn-primary" asp-page-handler="FanTraxList">List Your Leagues</a>
+                <button type="submit" class="btn btn-link" asp-page-handler="FanTraxDisconnect">Disconnect FanTrax</button>
+            </form>
+
+            @if (Model.FanTraxUserLeagueTableModel != null)
+            {
+                <partial name="_UserLeagueTable" model="Model.FanTraxUserLeagueTableModel" />
+            }
+        }
+        else
+        {
+            <h5 class="card-title text-danger font-weight-bold">FanTrax Not Connected</h5>
+            <div class="p-2">You can find your Secret ID under your <a target="_blank" href='https://www.fantrax.com/newui/userProfile.go'>FanTrax profile</a></div>
+            <div class="row ml-4 mt-2">
+                <form method="post">
+                    <div class="row ml-4 mt-2">
+                        <div class="col- p-2">
+                            <input asp-for="FanTraxEmail" placeholder="FanTrax Secret ID" class="form-control" />
+                        </div>
+                        <div class="col- p-2">
+                            <button class="btn btn-sm btn-secondary" asp-page-handler="FanTrax">Submit</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        }
+    </div>
+
+    <div class="card-body">
+        <form method="post">
+            <h5 class="card-title text-success font-weight-bold">Optionally Import using FanTrax League ID</h5>
+            <div class="p-2">Please enter your FanTrax league ID which can be found in your URL.</div>
+            <small class="p-2">Ex: https://www.fantrax.com/fantasy/league/<b>t0xqjo74kpm0ki7k</b>/home the ID is <b>t0xqjo74kpm0ki7k</b></small>
+            <div class="p-2">
+                <input asp-for="FanTraxLeagueId" placeholder="FanTrax League ID" class="form-control" />
+            </div>
+            <div class="p-2">
+                <button class="btn btn-sm btn-secondary" asp-page-handler="ImportFanTrax">Import</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <h5 class="card-title text-success font-weight-bold">Create Custom League</h5>
+        <p>Use this if you don't use Yahoo!, FanTrax, or ESPN.  This will create a league with default settings that you can then edit.</p>
+        <div>
+            <form method="post">
+                <button class="btn btn-primary" asp-page-handler="CustomLeague">Create League</button>
+            </form>
+        </div>
+    </div>
+</div>

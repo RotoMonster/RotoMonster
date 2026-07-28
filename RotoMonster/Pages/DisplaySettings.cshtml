@@ -1,0 +1,43 @@
+﻿@page
+@model RotoMonster.Pages.DisplaySettingsModel
+@{
+    ViewData["Title"] = "DisplaySettings";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Display Settings</h1>
+
+<div class="container">
+    <form method="post">
+        <div class="mt-2 mb-2">
+            <button class="btn btn-primary">Save</button>
+        </div>
+
+        <div class="row">
+            <div class="col- m-2">
+                <h4>Stat Columns</h4>
+                @for (var i = 0; i < Model.DisplayCategorySelects.Count(); i++)
+                {
+                    <div class="ml-2">
+                        <input type="checkbox" asp-for="@Model.DisplayCategorySelects[i].Selected" />
+                        <label asp-for="@Model.DisplayCategorySelects[i].Selected">@Model.DisplayCategorySelects[i].Name</label>
+                        <input type="hidden" asp-for="@Model.DisplayCategorySelects[i].Id" />
+                        <input type="hidden" asp-for="@Model.DisplayCategorySelects[i].Name" />
+                    </div>
+                }
+            </div>
+            <div class="col- m-2">
+                <h4>Other Columns</h4>
+                @for (var i = 0; i < Model.DisplayColumnSelects.Count(); i++)
+                {
+                    <div class="ml-2">
+                        <input type="checkbox" asp-for="@Model.DisplayColumnSelects[i].Selected" />
+                        <label asp-for="@Model.DisplayColumnSelects[i].Selected">@Model.DisplayColumnSelects[i].Name</label>
+                        <input type="hidden" asp-for="@Model.DisplayColumnSelects[i].Id" />
+                        <input type="hidden" asp-for="@Model.DisplayColumnSelects[i].Name" />
+                    </div>
+                }
+            </div>
+        </div>
+    </form>
+</div>

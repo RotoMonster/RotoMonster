@@ -1,0 +1,15 @@
+﻿@using RotoMonster.Core
+
+@model PositionValuePlayer
+
+@if (Model != null)
+{
+    @if (Model.IsStartable)
+    {
+        <span class="small" data-toggle="tooltip" data-placement="top" title="Top Player at @Model.MostValuableActiveRosterSpot.Title">
+            <i class="far fa-check-circle"></i>
+        </span>
+    }
+    <small>@Model.MostValuableActiveRosterSpot.Title</small>
+    @String.Format("{0:#####0.00}",Model.PositionValue)
+}

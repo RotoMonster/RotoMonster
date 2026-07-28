@@ -1,0 +1,12 @@
+﻿@model RotoMonster.Core.PartialViewModels.PlayerOwnershipChangeModel
+
+@if (Model != null)
+{
+    @String.Format("{0:##0}", Model.CurrentPercent)
+    double c = Math.Round(Model.PercentChange, 0);
+    if (c != 0)
+    {
+        string pm = (c > 0 ? "+" : "");
+        <small>@String.Format(pm + "{0:##0}", c)</small>
+    }
+}

@@ -1,0 +1,1002 @@
+﻿@using RotoMonster.Core.PartialViewModels
+@model RotoMonster.Core.PartialViewModels.PlayerTableModel
+
+@{
+    RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+    bool isUser = (Model.UserId != null);
+}
+
+<div class="container-fuild ml-0 p-0">
+    <table class="@RotoMonster.Core.RMCss.DataTable">
+        <thead class="@RotoMonster.Core.RMCss.DataTableTHead">
+            <tr>
+                @if (!Model.IsPlayerHistory)
+                {
+                    @if (isUser)
+                    {
+                        <th>Own</th>
+                    }
+                }
+
+                @if (Model.ShowMonsterBot)
+                @if (Model.ShowMonsterBot)
+                {
+                    <th class="tdc">
+                        <span data-toggle="tooltip" data-placement="top" title="MonsterBot Recommendation">
+                            <partial name="_IconMonsterBot" />
+                        </span>
+                    </th>
+                }
+
+                @if (Model.ShowRank)
+                {
+                    <th>Rank</th>
+                }
+
+                <th>@Model.PlayerHeaderTitle</th>
+
+                @if (Model.ShowTeam)
+                {
+                    <th>Team</th>
+                }
+
+                @if (!Model.IsPlayerHistory && Model.ShowPositions)
+                {
+                    <th class="tdc">Pos</th>
+                }
+
+                @if (Model.ShowInjuries)
+                {
+                    <th class="text-center">
+                        <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="Injuries"
+                                asp-route-sort="INJ">
+                            Inj
+                        </button>
+                    </th>
+                }
+
+                @if (Model.MonsterBarGame != null)
+                {
+                    <th class="tdc">
+                        <span data-toggle="tooltip" data-placement="top" title="@Model.MonsterBarGame.Tooltip">
+                            @Model.MonsterBarGame.ColumnTitle(false)<small class="ml-1">game</small>
+                        </span>
+                    </th>
+                }
+
+                @if (Model.MonsterBarTotal != null)
+                {
+                    <th class="tdc">
+                        <span data-toggle="tooltip" data-placement="top" title="@Model.MonsterBarTotal.Tooltip">
+                            @Model.MonsterBarTotal.ColumnTitle(false)<small class="ml-1">total</small>
+                        </span>
+                    </th>
+                }
+
+                @if (Model.ShowPositionPercents)
+                {
+                    <th class="tdc">Position %</th>
+                }
+
+                @if (!Model.IsPlayerHistory)
+                {
+                    <th class="text-nowrap">
+                        <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="Change in Ownership Percent"
+                                asp-route-sort="OWNCHANGE">
+                            +-
+                        </button>
+                        <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="Ownership Percent"
+                                asp-route-sort="OWN">
+                            Own%
+                        </button>
+                    </th>
+
+                    @if (isUser)
+                    {
+                        @if (Model.ShowTrending && Model.ShowTrending)
+                        {
+                            <th class="text-nowrap">
+                                <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Ownership trend for all leagues"
+                                        asp-route-sort="TREND">
+                                    Trend
+                                </button>
+                            </th>
+                        }
+
+                        <th class="text-nowrap">
+                            <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Change in Active Percent"
+                                    asp-route-sort="ACTIVECHANGE">
+                                +-
+                            </button>
+                            <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Active Percent"
+                                    asp-route-sort="ACTIVE">
+                                Act%
+                            </button>
+                        </th>
+                    }
+
+                    @if (!Model.Sport.IsNFL && Model.ShowIR)
+                    {
+                        if (isUser)
+                        {
+                            <th>
+                                IR%
+                            </th>
+                        }
+                    }
+                }
+
+                @foreach (var pv in Model.ValuePerValues)
+                {
+                    if (!Model.UserDisplayColumns.IsSelected("Total Value") && pv.ColumnTitle == "TotalV")
+                        continue;
+                    if (!Model.UserDisplayColumns.IsSelected("Skill Value") && pv.ColumnTitle == "SkillV")
+                        continue;
+
+                    <th>
+                        <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="@pv.Title"
+                                asp-route-sort="PV_@pv.Id">
+                            @pv.ColumnTitle
+                        </button>
+                    </th>
+                }
+
+                @if (!Model.ShowDraft)
+                {
+                    @if (Model.ExtraColumnTitle1.Length > 0)
+                    {
+                        <th class="tdc">
+                            <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="@Model.ExtraColumnDescription1"
+                                    asp-route-sort="EXTRAVALUE1">
+                                @Model.ExtraColumnTitle1
+                            </button>
+                        </th>
+                    }
+
+                    @if (Model.ExtraColumnTitle2.Length > 0)
+                    {
+                        <th class="tdc">
+                            <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="@Model.ExtraColumnDescription2"
+                                    asp-route-sort="EXTRAVALUE2">
+                                @Model.ExtraColumnTitle2
+                            </button>
+                        </th>
+                    }
+
+                    @if (Model.ExtraColumnTitle3.Length > 0)
+                    {
+                        <th class="tdc">
+                            <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="@Model.ExtraColumnDescription3"
+                                    asp-route-sort="EXTRAVALUE3">
+                                @Model.ExtraColumnTitle3
+                            </button>
+                        </th>
+                    }
+                }
+
+                @if (!Model.IsPlayerHistory && Model.ShowPositionalValue)
+                {
+                    <th class="text-nowrap">
+                        <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="Position Value"
+                                asp-route-sort="POSVALUE">
+                            PosV
+                        </button>
+                        <partial name="_PositionBoostTable" model="Model.PositionBoostHashModel" />
+                    </th>
+                }
+
+                @if (!Model.IsPlayerHistory && Model.ShowDepth)
+                {
+                    @if (isUser)
+                    {
+                        <th class="tdc">Depth</th>
+                    }
+                }
+
+                @if (Model.ShowCurrentGame)
+                {
+                    @if (!Model.IsPlayerHistory && !Model.ShowDraft)
+                    {
+                        @if (Model.Sport.IsNFL || Model.Sport.IsNBA || Model.Sport.IsNHL || Model.Sport.IsMLB)
+                        {
+                            <th>Current Game</th>
+                            @*                        <th>Opp</th>
+                @if (Model.ShowEase)
+                {
+                <th>Ease</th>
+                }
+                <th class="text-nowrap">Game (ET)</th>
+                @if (Model.PlayerType.Title == "Defense")
+                {
+                <th>OppPts</th>
+                }
+                else if (Model.Sport.IsMLB)
+                {
+                <th>OddsR</th>
+                }
+                else if (Model.Sport.IsNHL)
+                {
+                <th>OddsG</th>
+                }
+                else
+                {
+                <th>OddsPts</th>
+                }
+                *@
+                            @*<th class="tdc">@Model.NextColumnTitle</th>*@
+                        }
+                    }
+                }
+
+                @if (Model.ShowAnalysisDates && Model.AreAnalysisDatesValid)
+                {
+                    @if (Model.ShowProjections)
+                    {
+                        <th class="tdc">
+                            <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Analysis Games"
+                                    asp-route-sort="AGAMES">
+                                &#35;
+                            </button>
+                        </th>
+
+                        <th>
+                            <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="The rough estimate projected total value over the anlaysis period"
+                                    asp-route-sort="PROJV">
+                                ProjV
+                            </button>
+                        </th>
+
+                        @if (Model.ShowProjectionPercents)
+                        {
+                            <th class="text-nowrap">
+                                <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Shows where a player may be over/under projected"
+                                        asp-route-sort="PROJVINFO">
+                                    ProjV Info
+                                </button>
+                            </th>
+                        }
+                    }
+
+                    foreach (var analysisDate in Model.AnalysisDates)
+                    {
+                        <th class="tdc">
+                            <partial name="_DayOfWeek" model="analysisDate" />
+                            <partial name="_SmallDate" model="analysisDate" />
+                        </th>
+                    }
+                }
+
+                @if (Model.ShowCurrentWeekGame)
+                {
+                    <th>
+                        @{
+                            RotoMonster.Core.PartialViewModels.GameDatesHeaderModel gameDatesHeaderModel = new RotoMonster.Core.PartialViewModels.GameDatesHeaderModel(0, Model.DateSelects) { StreamSelects = Model.StreamSelects };
+                            gameDatesHeaderModel.StartIndex = 0;
+                            gameDatesHeaderModel.Title = "This";
+                            gameDatesHeaderModel.StartDate = Model.RemainingWeekStartDate;
+                            gameDatesHeaderModel.EndDate = Model.RemainingWeekEndDate;
+                            gameDatesHeaderModel.SortId = "RemainingWeek";
+                            gameDatesHeaderModel.StartIndex = 0;
+                            gameDatesHeaderModel.Tooltip = "Remaining Games " + gameDatesHeaderModel.StartDate.ToShortDateString() + " to " + gameDatesHeaderModel.EndDate.ToShortDateString();
+                        }
+                        <partial name="_GameDatesHeader" model="gameDatesHeaderModel" />
+                    </th>
+                }
+
+                @if (Model.ShowNextWeekGames)
+                {
+                    <th>
+                        @{
+                            RotoMonster.Core.PartialViewModels.GameDatesHeaderModel gameDatesHeaderModel = new RotoMonster.Core.PartialViewModels.GameDatesHeaderModel(1, Model.DateSelects) { StreamSelects = Model.StreamSelects };
+                            gameDatesHeaderModel.Title = "Next";
+                            gameDatesHeaderModel.StartDate = Model.NextWeekStartDate;
+                            gameDatesHeaderModel.EndDate = Model.NextWeekEndDate;
+                            gameDatesHeaderModel.SortId = "NextWeek";
+                            if (Model.ShowCurrentWeekGame)
+                                gameDatesHeaderModel.StartIndex = Convert.ToInt32((Model.RemainingWeekEndDate - Model.RemainingWeekStartDate).TotalDays) + 1;
+                            else
+                                gameDatesHeaderModel.StartIndex = 0;
+                            gameDatesHeaderModel.Tooltip = "Next Week Games " + gameDatesHeaderModel.StartDate.ToShortDateString() + " to " + gameDatesHeaderModel.EndDate.ToShortDateString();
+                        }
+                        <partial name="_GameDatesHeader" model="gameDatesHeaderModel" />
+                    </th>
+                }
+
+                @if (Model.ShowDraft)
+                {
+                    @if (Model.ShowAdp)
+                    {
+                        <th>
+                            <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Average Draft Pick for Analysis Drafts"
+                                    asp-route-sort="ADP">
+                                ADP
+                            </button>
+                        </th>
+                        <th>Draft%</th>
+                        <th>Range</th>
+                    }
+
+                    @if (Model.ShowAllAdp)
+                    {
+                        <th>
+                            <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Average Draft Pick for All Drafts"
+                                    asp-route-sort="ALLADP">
+                                AllADP
+                            </button>
+                        </th>
+                    }
+
+                    @if (Model.ShowDefaultAdp)
+                    {
+                        <th>
+                            <button class="btn btn-sm btn-link text-white p-0 m-0"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Default Average Draft Pick"
+                                    asp-route-sort="DADP">
+                                dADP
+                            </button>
+                        </th>
+                        <th>Draft%</th>
+                        <th>Range</th>
+                    }
+
+                    @if (Model.Draft != null)
+                    {
+                        <th>Drafted</th>
+                    }
+                }
+
+                @if (Model.ShowGames)
+                {
+                    <th>g</th>
+                }
+
+                @foreach (var dc in Model.BeforeCategories)
+                {
+                    <th class="text-nowrap"><partial name="_PlayerTableCategoryTitle" model="@dc.Category" /></th>
+                }
+                @if (Model.UserDisplayCategories != null)
+                {
+                    @foreach (var cs in Model.UserDisplayCategories)
+                    {
+                        <th class="text-nowrap"><partial name="_PlayerTableCategoryTitle" model="@cs.Category" /></th>
+                    }
+                }
+                @foreach (var dc in Model.AfterCategories)
+                {
+                    <th class="text-nowrap"><partial name="_PlayerTableCategoryTitle" model="@dc.Category" /></th>
+                }
+
+                @if (Model.ShowCategoryValues)
+                {
+                    @foreach (var cs in Model.CategorySettings)
+                    {
+                        <th class="text-nowrap">@cs.Category.Abbreviation V</th>
+                    }
+                }
+            </tr>
+        </thead>
+
+        @foreach (var dp in Model.DisplayPlayers)
+        {
+            var trClass = "";
+            if (dp.ShowBottomBorder)
+                trClass = "trdivider";
+            <tr class="@trClass">
+                @if (!Model.IsPlayerHistory)
+                {
+                    @if (isUser)
+                    {
+                        <td class="tdc text-center text-nowrap text-white @colorLib.GetDisplayPlayerOwnCss(dp)">
+                            <partial name="_DisplayPlayerOwn" model="dp" />
+                        </td>
+                    }
+                }
+
+                @if (Model.ShowMonsterBot)
+                {
+                    <td class="tdc text-center text-nowrap">
+                        <partial name="_MonsterBotPlayer" model="dp.MonsterBotPlayer" />
+                    </td>
+                }
+
+                @{
+                    var titleCss = dp.IndentDisplayTitle ? " pl-3" : "";
+                }
+
+                @if (Model.ShowRank)
+                {
+                    <td class="tdr @trClass">
+                        @if (dp.ValuePlayer != null)
+                        {
+                            @dp.ValuePlayer.Rank
+                        }
+                    </td>
+                }
+
+                <td class="text-nowrap @titleCss">
+                    @if (dp.DisplayTitle == "")
+                    {
+                        <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp, Player=dp.SeasonPlayer.Player,SelectedUserLeague=Model.SelectedUserLeague,PlayerGameState=dp.PlayerGameState}" />
+                    }
+                    else
+                    {
+                        @dp.DisplayTitle
+                    }
+                </td>
+
+                @if (Model.ShowTeam)
+                {
+                    <td class="tdc">@dp.SeasonPlayer.Team.Code</td>
+                }
+
+                @if (!Model.IsPlayerHistory && Model.ShowPositions)
+                {
+                    <td class="tdc text-nowrap">
+                        @if (dp.Positions != null)
+                        {
+                            @foreach (var p in dp.Positions)
+                            {
+                                <partial name="_ColoredPosition" model="p" />
+                            }
+                        }
+                    </td>
+                }
+
+                @if (Model.ShowInjuries)
+                {
+                    if (dp.PlayerStatus != null)
+                    {
+                        <td class="text-nowrap text-center" style="@colorLib.GetPlayerStatusTypeStyle(dp.PlayerStatus.PlayerStatusType)">
+                            <partial name="_PlayerStatus" model="dp.PlayerStatus" />
+                        </td>
+                    }
+                    else
+                    {
+                        <td />
+                    }
+                }
+
+                @if (Model.MonsterBarGame != null)
+                {
+                    <td class="text-nowrap flex-nowrap">
+                        <partial name="_DisplayMonsterBarPlayer" model="new RotoMonster.Core.DisplayMonsterBarPlayer() { IsCompact = false, MonsterBarPlayer = dp.MonsterBarGamePlayer, MonsterBarItems = Model.MonsterBarGame.MonsterBarItems }" />
+                    </td>
+                }
+
+                @if (Model.MonsterBarTotal != null)
+                {
+                    <td class="text-nowrap flex-nowrap">
+                        <partial name="_DisplayMonsterBarPlayer" model="new RotoMonster.Core.DisplayMonsterBarPlayer() { IsCompact = false, MonsterBarPlayer = dp.MonsterBarTotalPlayer, MonsterBarItems = Model.MonsterBarTotal.MonsterBarItems }" />
+                    </td>
+                }
+
+                @if (Model.ShowPositionPercents)
+                {
+                    <td class="text-nowrap flex-nowrap">
+                        <partial name="_PlayerPositionPercents" model="new PlayerPositionPercentsModel(){AllPositions=Model.AllPositions,PlayerPositionPercents=dp.PlayerPositionPercents}" />
+                    </td>
+                }
+
+                @if (!Model.IsPlayerHistory)
+                {
+                    if (dp.OwnershipPlayer != null)
+                    {
+                        <td class="tdr text-nowrap" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
+                            @if (dp.OwnershipPlayer.PercentOwnershipChange != 0)
+                            {
+                                <small class="text-nowrap float-left pr-1 pl-1 mr-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">
+                                    <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentOwnershipChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentOwnershipChange)
+                                </small>
+                            }
+                            <div class="float-right">
+                                @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)
+                            </div>
+                        </td>
+                    }
+                    else
+                    {
+                        <td />
+                    }
+
+                    @if (isUser)
+                    {
+                        @if (Model.ShowTrending && Model.ShowTrending)
+                        {
+                            if (dp.NoWaiverOwnershipPlayer != null)
+                            {
+                                <td class="tdr text-nowrap" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.NoWaiverOwnershipPlayer.PercentOwnershipChange)">
+                                    @if (dp.NoWaiverOwnershipPlayer.PercentOwnershipChange != 0)
+                                    {
+                                        <partial name="_ShowPlusIfPositive" model="dp.NoWaiverOwnershipPlayer.PercentOwnershipChange" />
+
+                                        @String.Format("{0:##0}", dp.NoWaiverOwnershipPlayer.PercentOwnershipChange)
+                                    }
+                                </td>
+                            }
+                            else
+                            {
+                                <td />
+                            }
+
+                        }
+
+                        if (dp.OwnershipPlayer != null)
+                        {
+                            <td class="tdr text-nowrap" style="background-color:#@colorLib.ActiveGetPercentColor(dp.OwnershipPlayer.ActivePercent)">
+                                @if (dp.OwnershipPlayer.PercentActiveChange != 0)
+                                {
+                                    <small class="text-nowrap float-left pr-1 pl-1 mr-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentActiveChange)">
+                                        <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentActiveChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentActiveChange)
+                                    </small>
+                                }
+                                <div class="float-right">
+                                    @String.Format("{0:##0}", dp.OwnershipPlayer.ActivePercent)
+                                </div>
+                            </td>
+                        }
+                        else
+                        {
+                            <td />
+                        }
+                    }
+
+                    @if (!Model.Sport.IsNFL && Model.ShowIR)
+                    {
+                        @if (isUser)
+                        {
+                            if (dp.OwnershipPlayer != null)
+                            {
+                                <td class="tdr">
+                                    @String.Format("{0:###}", dp.OwnershipPlayer.IRPercent)
+                                </td>
+                            }
+                            else
+                            {
+                                <td />
+                            }
+                        }
+                    }
+                }
+
+                @foreach (var pv in Model.ValuePerValues)
+                {
+                    if (!Model.UserDisplayColumns.IsSelected("Total Value") && pv.ColumnTitle == "TotalV")
+                        continue;
+                    if (!Model.UserDisplayColumns.IsSelected("Skill Value") && pv.ColumnTitle == "SkillV")
+                        continue;
+
+                    var dvp = (from vp in dp.DisplayValuePlayers where vp.PerValue.Id == pv.Id select vp).FirstOrDefault();
+                    if (dvp != null && dvp.ValuePlayer != null)
+                    {
+                        <td class="tdr" style="background-color:#@dvp.ValuePlayer.LeagueValueColor;">@String.Format("{0:#####0.00}", dvp.ValuePlayer.LeagueValue)</td>
+                    }
+                    else
+                    {
+                        <td />
+                    }
+                }
+
+                @if (!Model.ShowDraft)
+                {
+                    @if (Model.ExtraColumnTitle1.Length > 0)
+                    {
+                        if (dp.ExtraValuePlayer1 != null)
+                        {
+                            <td class="tdr text-nowrap" style="background-color:#@dp.ExtraValuePlayer1.LeagueValueColor;">
+                                <partial name="_DisplayValuePlayer"
+                                         model="new RotoMonster.Core.PartialViewModels.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer1,ShowGames=!Model.Sport.IsNFL }" />
+                            </td>
+                        }
+                        else
+                        {
+                            <td />
+                        }
+                    }
+
+                    @if (Model.ExtraColumnTitle2.Length > 0)
+                    {
+                        if (dp.ExtraValuePlayer2 != null)
+                        {
+                            <td class="tdr text-nowrap" style="background-color:#@dp.ExtraValuePlayer2.LeagueValueColor;">
+                                <partial name="_DisplayValuePlayer" model="new RotoMonster.Core.PartialViewModels.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer2,ShowGames=!Model.Sport.IsNFL }" />
+                            </td>
+                        }
+                        else
+                        {
+                            <td />
+                        }
+                    }
+                    @if (Model.ExtraColumnTitle3.Length > 0)
+                    {
+                        if (dp.ExtraValuePlayer3 != null)
+                        {
+                            <td class="tdr text-nowrap" style="background-color:#@dp.ExtraValuePlayer3.LeagueValueColor;">
+                                <partial name="_DisplayValuePlayer"
+                                         model="new RotoMonster.Core.PartialViewModels.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer3}" />
+                            </td>
+                        }
+                        else
+                        {
+                            <td />
+                        }
+                    }
+                }
+
+                @if (!Model.IsPlayerHistory && Model.ShowPositionalValue)
+                {
+                    @if (dp.PositionValuePlayer != null)
+                    {
+                        <td class="tdr text-nowrap"><partial name="_DisplayPositionValuePlayer" model="dp.PositionValuePlayer" /></td>
+                    }
+                    else
+                    {
+                        <td />
+                    }
+                }
+
+                @if (!Model.IsPlayerHistory && Model.ShowDepth)
+                {
+                    @if (isUser)
+                    {
+                        <td class="tdc text-nowrap">
+                            @if (dp.DepthPlayer != null)
+                            {
+                                <partial name="_ColoredPosition" model="dp.DepthPlayer.Position" />
+                                @dp.DepthPlayer.Depth
+                                @if (dp.DepthPlayer.OwnershipDepthPercent > 0)
+                                {
+                                    <small>@String.Format("{0:##0}",dp.DepthPlayer.OwnershipDepthPercent)</small>
+                                }
+                            }
+                            <partial name="_HigherDepthInjuredDisplayPlayers" model="dp.HigherDepthInjuredDisplayPlayers" />
+                        </td>
+                    }
+                }
+
+                @if (Model.ShowCurrentGame)
+                {
+                    @if (!Model.IsPlayerHistory && !Model.ShowDraft)
+                    {
+                        @if (Model.Sport.IsNFL || Model.Sport.IsNBA || Model.Sport.IsNHL || Model.Sport.IsMLB)
+                        {
+                            string oppStyle = "";
+                            @if (dp.OpposingTeamValuePlayer != null)
+                                oppStyle = "background-color:#" + dp.OpposingTeamValuePlayer.LeagueValueColor;
+                            <td style="@oppStyle">
+                                @if (dp.Game != null)
+                                {
+                                    <div class="tdnw">
+                                        <partial name="_TeamGame" model="new RotoMonster.Core.PartialViewModels.TeamGameModel() {Sport=Model.Sport,Game=dp.Game,DisplayPlayer=dp,Team=dp.SeasonPlayer.Team}" />
+                                    </div>
+                                }
+                            </td>
+                        }
+                    }
+                }
+
+                @if (Model.ShowAnalysisDates && Model.AreAnalysisDatesValid)
+                {
+                    @if (Model.ShowProjections)
+                    {
+                        <td class="tdc text-nowrap">
+                            @dp.TeamGameCount
+                            @if (dp.PlayerGameCount < dp.TeamGameCount)
+                            {
+                                <small style="color:crimson;">@dp.PlayerGameCount</small>
+                            }
+                        </td>
+
+                        @if (dp.ProjectionPlayer != null)
+                        {
+                            <td class="tdr" style="background-color:#@dp.ProjectionPlayer.ValuePlayer.LeagueValueColor;">@String.Format("{0:#####0.00}", dp.ProjectionPlayer.ValuePlayer.LeagueValue)</td>
+                            @if (Model.ShowProjectionPercents)
+                            {
+                                <td class="text-nowrap flex-nowrap">
+                                    <partial name="_PlayerPositionPercentOvers" model="new PlayerPositionPercentsModel(){AllPositions=Model.AllPositions,PlayerPositionPercentOvers=dp.ProjectionPlayer.OverPlayerPositionPercents,EstimatedUpside=dp.ProjectionPlayer.DisplayEstimatedOverPercent,EstimatedUpsideColorCode=dp.ProjectionPlayer.EstimatedUpsideColorCode}" />
+                                </td>
+                            }
+                        }
+                        else
+                        {
+                            <td />
+                            @if (Model.ShowProjectionPercents)
+                            {
+                                <td />
+                            }
+                        }
+                    }
+
+                    foreach (var analysisDate in Model.AnalysisDates)
+                    {
+                        <td class="tdc">
+                            @{
+                                var analysisGames = (from ag in dp.PlayerAnalysisGames where ag.Game.GameDate == analysisDate select ag).ToList();
+                                foreach (var analysisGame in analysisGames)
+                                {
+                                    string style1 = "";
+                                    if (analysisGame.OpponentEasePlayer != null)
+                                        style1 = "background-color:#" + analysisGame.OpponentEasePlayer.LeagueValueColor;
+
+                                    <div class="gamestate" style="@style1">
+                                        @analysisGame.Game.GetOpponentText(dp.SeasonPlayer.Team)
+                                        @{
+                                            if (analysisGame.PlayerGameStates != null)
+                                            {
+                                                foreach (var gameState in analysisGame.PlayerGameStates)
+                                                {
+                                                    @if (gameState != null && gameState.PlayerGameStateType.Title.Contains("Starter"))
+                                                    {
+                                                        <small class="ml-1">
+                                                            <partial name="_PlayerGameState" model="new RotoMonster.Core.DisplayPlayerGameState() { PlayerGameState = gameState }" />
+                                                        </small>
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </div>
+                                }
+                            }
+                        </td>
+                    }
+                }
+
+                @if (Model.ShowCurrentWeekGame)
+                {
+                    <td class="small">
+                        <partial name="_GameDates"
+                                 model="new RotoMonster.Core.PartialViewModels.GameDatesModel(){ TeamGames=dp.TeamGames, PlayerGameDates=dp.PlayerGameDates, StartDate = Model.RemainingWeekStartDate, EndDate = Model.RemainingWeekEndDate }" />
+                    </td>
+                }
+
+                @if (Model.ShowNextWeekGames)
+                {
+                    <td class="small">
+                        <partial name="_GameDates"
+                                 model="new RotoMonster.Core.PartialViewModels.GameDatesModel(){TeamGames=dp.TeamGames,PlayerGameDates=dp.PlayerGameDates,StartDate = Model.NextWeekStartDate, EndDate = Model.NextWeekEndDate }" />
+                    </td>
+                }
+
+                @if (Model.ShowDraft)
+                {
+                    @if (Model.ShowAdp)
+                    {
+                        @if (dp.AdpPlayer != null)
+                        {
+                            string nextCss = "";
+                            <td class="tdr">
+                                @String.Format("{0:##0.0}", dp.AdpPlayer.Adp)
+                            </td>
+                            <td class="tdr text-nowrap">
+                                @String.Format("{0:##0}%", dp.AdpPlayer.DraftPercent)
+                            </td>
+
+                            @if (dp.AdpPlayer.MaxPick < Model.NextPick)
+                            {
+                                nextCss = "text-danger";
+                            }
+                            <td class="text-nowrap text-center @nextCss">
+                                @String.Format("{0:##0}", Math.Round(dp.AdpPlayer.MinPick, 0))
+                                <span>-</span>
+                                @if (dp.AdpPlayer.DraftCount == dp.AdpPlayer.Picks.Count)
+                                    @String.Format("{0:##0}", Math.Round(dp.AdpPlayer.MaxPick, 0))
+                                else
+                                {
+                                    <span>?</span>
+                                }
+                            </td>
+                        }
+                        else
+                        {
+                            <td />
+                            <td />
+                            <td />
+                        }
+                    }
+
+                    @if (Model.ShowAllAdp)
+                    {
+                        @if (dp.AllAdpPlayer != null)
+                        {
+                            <td class="tdr">
+                                @String.Format("{0:##0.0}", dp.AllAdpPlayer.Adp)
+                                <small class="ml-1 text-muted">
+                                    @String.Format("{0:##0}", Math.Round(dp.AllAdpPlayer.MinPick, 0))
+                                    <span>-</span>
+                                    @if (dp.AllAdpPlayer.DraftCount == dp.AllAdpPlayer.Picks.Count)
+                                        @String.Format("{0:##0}", Math.Round(dp.AllAdpPlayer.MaxPick, 0))
+                                    else
+                                    {
+                                        <span>?</span>
+                                    }
+                                </small>
+                            </td>
+                        }
+                        else
+                        {
+                            <td />
+                        }
+                    }
+
+                    @if (Model.ShowDefaultAdp)
+                    {
+                        @if (dp.DefaultAdpPlayer != null)
+                        {
+                            <td class="tdr">
+                                @String.Format("{0:##0.0}", dp.DefaultAdpPlayer.Adp)
+                            </td>
+                            <td class="tdr text-nowrap">
+                                @String.Format("{0:##0}%", dp.DefaultAdpPlayer.DraftPercent)
+                            </td>
+                            <td class="text-nowrap text-center">
+                                @String.Format("{0:##0}", Math.Round(dp.DefaultAdpPlayer.MinPick, 0))
+                                <span>-</span>
+                                @if (dp.DefaultAdpPlayer.DraftCount == dp.DefaultAdpPlayer.Picks.Count)
+                                    @String.Format("{0:##0}", Math.Round(dp.DefaultAdpPlayer.MaxPick, 0))
+                                else
+                                {
+                                    <span>?</span>
+                                }
+                            </td>
+                        }
+                        else
+                        {
+                            <td />
+                            <td />
+                            <td />
+                        }
+                    }
+
+                    @if (Model.Draft != null)
+                    {
+                        @if (dp.DraftPlayer != null)
+                        {
+                            <td class="text-nowrap tdc">
+                                @if (dp.DraftPlayer.Price > 0)
+                                {
+                                    @String.Format("${0:##0}", dp.DraftPlayer.Price)
+                                }
+                                else
+                                {
+                                    @String.Format("#{0:##0}", dp.DraftPlayer.DraftOrder)
+                                }
+                            </td>
+                        }
+                        else
+                        {
+                            <td />
+                        }
+                    }
+                }
+
+                @if (Model.ShowGames)
+                {
+                    <td class="tdr">
+                        @if (dp.StatPlayer != null)
+                        {
+                            @String.Format("{0:##0}", dp.StatPlayer.Get(Model.GamesCategoryId))
+                        }
+                    </td>
+                }
+
+                @foreach (var dc in Model.BeforeCategories)
+                {
+                    @if (dp.StatPlayer != null)
+                    {
+                        var displayFormat = (from df in dc.Category.CategoryPerValues where df.PerValueId == Model.DisplayPerValue.Id select df.DisplayFormat).FirstOrDefault();
+                        var style = Model.ColorStats && dp.ValuePlayer != null ? "background-color:#" + colorLib.GetStatColor(dp.ValuePlayer.GetStatColor(dc.Category.Id)) : "";
+                        <td class="tdr" style="@style">@String.Format("{0:" + displayFormat + "}", dp.StatPlayer.Get(Model.DisplayPerValue, dc.Category.Id))</td>
+                    }
+                    else
+                    {
+                        <td />
+                    }
+                }
+
+                @{
+                    string borderCss = "";
+                }
+
+                @if (Model.UserDisplayCategories != null)
+                {
+                    @foreach (var cs in Model.UserDisplayCategories)
+                    {
+                        @if (dp.ValuePlayer != null)
+                        {
+                            var displayFormat = (from df in cs.Category.CategoryPerValues where df.PerValueId == Model.DisplayPerValue.Id select df.DisplayFormat).FirstOrDefault();
+                            var style = Model.ColorStats ? "background-color:#" + colorLib.GetStatColor(dp.ValuePlayer.GetStatColor(cs.Category.Id)) : "";
+                            <td class="tdr @borderCss" style="@style">@String.Format("{0:" + displayFormat + "}", dp.StatPlayer.Get(Model.DisplayPerValue, cs.Category.Id))</td>
+                        }
+                        else
+                        {
+                            <td />
+                        }
+                    }
+                }
+
+                @foreach (var dc in Model.AfterCategories)
+                {
+                    @if (dp.ValuePlayer != null)
+                    {
+                        var displayFormat = (from df in dc.Category.CategoryPerValues where df.PerValueId == Model.DisplayPerValue.Id select df.DisplayFormat).FirstOrDefault();
+                        var style = Model.ColorStats ? "background-color:#" + colorLib.GetStatColor(dp.ValuePlayer.GetStatColor(dc.Category.Id)) : "";
+                        <td class="tdr" style="@style">@String.Format("{0:" + displayFormat + "}", dp.StatPlayer.Get(Model.DisplayPerValue, dc.Category.Id))</td>
+                    }
+                    else
+                    {
+                        <td />
+                    }
+                }
+
+                @{
+                    borderCss = "tdleft";
+                }
+
+                @if (Model.ShowCategoryValues)
+                {
+                    @foreach (var cs in Model.CategorySettings)
+                    {
+                        @if (dp.ValuePlayer != null)
+                        {
+                            <td class="tdr @borderCss" style="background-color:#@dp.ValuePlayer.GetC(cs.Category.Id);">@String.Format("{0:#####0.00}", dp.ValuePlayer.Get(cs.Category.Id))</td>
+                            borderCss = "";
+                        }
+                        else
+                        {
+                            <td />
+                        }
+                    }
+                }
+            </tr>
+        }
+    </table>
+</div>

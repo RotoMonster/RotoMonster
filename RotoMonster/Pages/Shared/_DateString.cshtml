@@ -1,0 +1,6 @@
+﻿@model DateTime
+@{ 
+    int hour = Model.Hour > 12 ? Model.Hour - 12 : Model.Hour;
+}
+<partial name="_DayOfWeek" model="Model" />
+<partial name="_SmallDate" model="Model" /> @hour:@String.Format("{0:00}",Model.Minute)

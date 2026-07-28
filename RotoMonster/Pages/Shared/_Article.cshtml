@@ -1,0 +1,68 @@
+﻿@using RotoMonster.Core.Libs
+@model RotoMonster.Core.Article
+
+@{
+    string collapseId = "article" + Model.Id.ToString();
+    ColorLib colorLib = new ColorLib();
+}
+
+<div class="card mt-2 p-1 border-primary p-1" style="background-color:#@colorLib.GetTimeSpanColor(Model.TimeSince,18)">
+    <div class="card-body p-1 m-1">
+        <h5 class="card-title">
+            @if (Model.IsAutomated)
+            {
+                <span class="mr-1" data-toggle="tooltip" data-placement="top" title="Article is automated">
+                    <i class="far fa-wand-magic"></i>
+                </span>
+            }
+            <a href="#@collapseId" data-toggle="collapse">@Model.Title</a>
+        </h5>
+        <p class="card-subtitle mb-2 text-muted">
+            <span><partial name="_Timespan" model="Model.TimeSince" /> ago</span>
+            @Model.EasternCreatedDate.ToShortDateString() @Model.EasternCreatedDate.ToShortTimeString() ET @Model.Byline @Model.Dateline
+        </p>
+
+        <div id="@collapseId" class="collapse">
+            <div class="text-muted small mt-2 ml-3">
+                @if (Model.ArticlePlayers.Count() > 0)
+                {
+                    <div>
+                        Players:
+                        @foreach (var articlePlayer in Model.ArticlePlayers)
+                        {
+                            <span class="ml-1 mr-1">
+                                <partial name="_PlayerLink" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {Player=articlePlayer.Player,SelectedUserLeague=null,PlayerGameState=null}" />
+                            </span>
+                        }
+                    </div>
+                }
+
+                @if (Model.ArticleGames.Count() > 0)
+                {
+                    <div>
+                        Games:
+                        @foreach (var articleGame in Model.ArticleGames)
+                        {
+                            <span class="ml-1 mr-1">@articleGame.Game.GameText from @articleGame.Game.GameDate.ToShortDateString()</span>
+                        }
+                    </div>
+                }
+                else if (Model.ArticleTeams.Count() > 0)
+                {
+                    <div>
+                        Teams:
+                        @foreach (var articleTeam in Model.ArticleTeams)
+                        {
+                            <span class="ml-1 mr-1">@articleTeam.Team.Code</span>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="card-body">
+                <div class="card-text">@Html.Raw(@Model.Content)</div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+    <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
+    <UserSecretsId>b9d66f14-30ea-4e2f-bd51-7baa45a1c4ae</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Api\PlayersController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.8" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="6.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
+	  <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="10.0.8" />
+	  <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.8" />
+	  <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+	  <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
+	  <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+	  <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
+	  <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="10.0.0" />
+	  <PackageReference Include="System.Web.Services.Description" Version="10.0.652802" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RotoMonster.Data\RotoMonster.Data.csproj" />
+    <ProjectReference Include="..\RotoMonster.MLB.Migrations\RotoMonster.MLB.Migrations.csproj" />
+    <ProjectReference Include="..\RotoMonster.NBA.Migrations\RotoMonster.NBA.Migrations.csproj" />
+    <ProjectReference Include="..\RotoMonster.NFL.Migrations\RotoMonster.NFL.Migrations.csproj" />
+    <ProjectReference Include="..\RotoMonster.NHL.Migrations\RotoMonster.NHL.Migrations.csproj" />
+  </ItemGroup>
+
+</Project>

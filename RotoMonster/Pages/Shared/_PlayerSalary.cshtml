@@ -1,0 +1,6 @@
+﻿@model RotoMonster.Core.SeasonPlayer
+
+@if (Model != null && Model.Salary.GetValueOrDefault() > 0)
+{
+    <span>@String.Format("${0:###,###,##0}", Model.Salary)</span>
+}

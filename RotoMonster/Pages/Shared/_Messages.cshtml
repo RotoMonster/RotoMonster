@@ -1,0 +1,22 @@
+﻿@{
+    string[,] msgArray = new string[,] { { "messages", "alert-success" }, { "errormessages", "alert-danger" }, { "warningmessages", "alert-warning" } };
+}
+
+@for (int i = 0; i < msgArray.Length / 2; i++)
+{
+    var listId = msgArray[i, 0];
+    var css = msgArray[i, 1];
+    @if (TempData[listId] != null)
+    {
+        var messages = TempData[listId] as IEnumerable<string>;
+        if (messages.Count() > 0)
+        {
+            <div class="alert @css ml-3 mr-3">
+                @foreach (var msg in messages)
+                {
+                    <div>@msg</div>
+                }
+            </div>
+        }
+    }
+}

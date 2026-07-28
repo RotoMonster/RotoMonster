@@ -1,0 +1,39 @@
+﻿@using RotoMonster.Core.PartialViewModels
+@model PositionBoostHashModel
+@if (Model != null)
+{
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-sm btn-light" data-toggle="modal" data-target="#pvmodal">
+        ?
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="pvmodal" tabindex="-1" aria-labelledby="Position Value" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body text-dark">
+                    <h5 class="modal-title">Position Value Boosts</h5>
+                    <p>The more positive the value, the harder it is to find that position.</p>
+                    <table class="table">
+                        @foreach (var activeRosterSpot in Model.ActiveRosterSpots)
+                        {
+                            if (Model.ActiveRosterSpotBoostHash.ContainsKey(activeRosterSpot.Id))
+                            {
+                                <tr>
+                                    <td>@activeRosterSpot.Title</td>
+                                    <td class="text-nowrap">
+                                        <partial name="_ShowPlusIfPositive" model="Model.ActiveRosterSpotBoostHash[activeRosterSpot.Id]" />
+                                        @String.Format("{0:#####0.00}",Model.ActiveRosterSpotBoostHash[activeRosterSpot.Id])
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

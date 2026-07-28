@@ -1,0 +1,44 @@
+﻿@model RotoMonster.Core.PartialViewModels.UserLeagueTableModel
+
+<table class="@RotoMonster.Core.RMCss.DataTable mt-3">
+    <thead class="@RotoMonster.Core.RMCss.DataTableTHead">
+        <tr>
+            <th />
+            <th>League Id</th>
+            <th>League Name</th>
+            @if (Model.ShowMyTeam)
+            {
+                <th>Your Team</th>
+            }
+        </tr>
+    </thead>
+
+    @if (Model.ProviderUserLeagues != null)
+    {
+        @foreach (var league in Model.ProviderUserLeagues)
+        {
+            <tr>
+                <td class="tdc">
+                    @{
+                        if ((from a in Model.CurrentUserLeagues where a.ProviderLeagueId == league.ProviderLeagueId select a).FirstOrDefault() == null)
+                        {
+                            <a class="btn btn-link" asp-page-handler="ImportLeague" asp-route-id="@league.ProviderLeagueId" asp-route-provider="@Model.FantasyProvider.Name">Import</a>
+                        }
+                        else
+                        {
+                            <label>Imported</label>
+                        }
+                    }
+                </td>
+                <td>@league.ProviderLeagueId</td>
+                <td>@league.Title</td>
+                @if (Model.ShowMyTeam)
+                {
+                    <td>
+                        @league.MyTeamTitle
+                    </td>
+                }
+            </tr>
+        }
+    }
+</table>

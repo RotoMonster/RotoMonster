@@ -1,0 +1,58 @@
+﻿@model RotoMonster.Core.PartialViewModels.TeamGameModel
+
+@{
+    RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+}
+
+@if (Model.Game != null)
+{
+    <div class="float-left mr-1" style="margin-top:2px;">
+        <partial name="_GameState" model="new RotoMonster.Core.PartialViewModels.GameStateViewModel(){Game=Model.Game,Sport=Model.Sport,Team=Model.Team,ShowOpponent=false};" />
+    </div>
+
+    @if (Model.Game.PercentComplete == 0)
+    {
+        <div class="teamscore">
+            @Model.Team.Code
+            @if (Model.Game.ProjectedPoints(Model.Sport, Model.Team) > 0)
+            {
+                <small>
+                    @String.Format(" {0:#0.0}", Model.Game.ProjectedPoints(Model.Sport, Model.Team))
+                </small>
+            }
+        </div>
+        <div class="teamscore ml-1">
+            @{
+                string oppStyle = "";
+                @if (Model.DisplayPlayer != null && Model.DisplayPlayer.OpposingTeamValuePlayer != null)
+                    oppStyle = "background-color:#" + Model.DisplayPlayer.OpposingTeamValuePlayer.LeagueValueColor;
+            }
+            <span style="@oppStyle;">
+                @Model.Game.GetOpponentText(Model.Team)
+            </span>
+            @if (Model.Game.OpponentProjectedPoints(Model.Sport, Model.Team) > 0)
+            {
+                <small>
+                    @String.Format("{0:#0.0}", Model.Game.OpponentProjectedPoints(Model.Sport, Model.Team))
+                </small>
+            }
+        </div>
+    }
+    else if (Model.Game.PercentComplete > 0)
+    {
+        <div class="teamscore" style="@Model.Game.GetTeamStyle(Model.Team)">
+            @Model.Team.Code
+            <small>
+                @Model.Game.GetTeamScore(Model.Team)
+            </small>
+        </div>
+        <div class="teamscore ml-1" style="@Model.Game.GetTeamStyle(Model.Game.GetOpponent(Model.Team))">
+            @Model.Game.GetOpponentText(Model.Team)
+            <small>
+                @Model.Game.GetOpponentTeamScore(Model.Team)
+            </small>
+        </div>
+
+    }
+
+}

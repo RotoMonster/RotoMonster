@@ -1,0 +1,39 @@
+﻿@page
+@model RotoMonster.Pages.ArticlesModel
+
+@{
+    RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+}
+
+<div class="container">
+    <h2>
+        Recent AP Articles
+        @if (Model.Player != null)
+        {
+            <span> for @Model.Player.ForwardName</span>
+        }
+    </h2>
+
+    @if (Model.AutomatedArticles.Count() > 0 && !Model.ShowingAutomated)
+    {
+        <form method="post">
+            <div>
+                <input type="submit" name="includeautomated" value="Show Automated Articles (@Model.AutomatedArticles.Count())" class="btn btn-sm btn-link" />
+            </div>
+        </form>
+    }
+
+    <div class="container ml-2 mt-3">
+        @if (Model.Articles.Count() > 0)
+        {
+            @foreach (var article in Model.Articles)
+            {
+                <partial name="_Article" model="article" />
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">There are no recent articles.</div>
+        }
+    </div>
+</div>

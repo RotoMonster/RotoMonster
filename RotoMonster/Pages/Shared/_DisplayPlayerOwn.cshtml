@@ -1,0 +1,38 @@
+﻿@model RotoMonster.Core.DisplayPlayer
+
+@if (Model.UserLeagueTeam != null)
+{
+    @if (Model.IsActive)
+    {
+    }
+    else if (Model.IsIR)
+    {
+        <span class="ml-1"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Injured Reserve">IR</span>
+    }
+    else
+    {
+        <span class=" ml-1"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Bench">BN</span>
+    }
+
+    @if (Model.IsMyLastPlayer)
+    {
+        <span class="ml-1"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Your last owned player"><i class="far fa-arrow-to-bottom"></i></span>
+    }
+}
+
+else if (Model.IsWaiver)
+{
+    <span class="text-black"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="On Waiver Wire" style="color:black;">WW</span>
+}

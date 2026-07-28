@@ -1,0 +1,11 @@
+﻿@model RotoMonster.Core.Player
+@{
+    if (Model.RookieYear > 0)
+    {
+        <label>@Model.RookieYear</label>
+        if (Model.PickNumber>0)
+        {
+            <label>#@Model.PickNumber</label>
+        }
+    }
+}

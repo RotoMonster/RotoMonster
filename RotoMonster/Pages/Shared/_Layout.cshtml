@@ -1,0 +1,181 @@
+﻿@using RotoMonster.Core
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="@ViewData["metadescription"]">
+    <title>@ViewData["pagetitle"]</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css?v=5" />
+    <link rel="stylesheet" href="~/css/shared.css?v=3" />
+    <script src="https://kit.fontawesome.com/b83d48eb98.js" crossorigin="anonymous"></script>
+    <link rel="icon" type="image/x-icon" href="https://rotomonster.com/@ViewData["sport"].ToString().ToLower()/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Passion+One&display=swap" rel="stylesheet">
+</head>
+
+@{
+    @inject IConfiguration Configuration
+    string sport = ViewData["sport"].ToString().ToUpper();
+    string[] codes = { "NBA", "MLB", "NFL", "NHL" };
+    string[] icons = { "fa-solid fa-basketball", "fa-solid fa-baseball", "fa-solid fa-football", "fa-solid fa-hockey-puck" };
+}
+
+<body class="bg">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light light border-bottom box-shadow mb-3">
+            <div class="container">
+                <partial name="_Logo" model='new RotoMonster.Core.PartialViewModels.LogoModel(){Sport=sport,Controller="/Index"}' />
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <partial name="_LoginPartial" />
+                    <ul class="navbar-nav flex-grow-1">
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                                Tools
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-area="" asp-page="/PlayerRankings">Rankings</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/Scores">Box Scores</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/DepthCharts">Depth Charts</a>
+                            </div>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Settings
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item text-dark" asp-area="" asp-page="/UserLeagues/Index">Leagues</a>
+                                <a class="dropdown-item text-dark" asp-area="" asp-page="/DisplaySettings">Display</a>
+                            </div>
+                        </li>
+
+                        @if (ViewData["Helpers"] != null)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Helpers
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    @foreach (Helper helper in (List<Helper>)ViewData["Helpers"])
+                                    {
+                                        <a href="@Html.Raw(helper.GetPlayerTypeUrl(helper.Url,null))" class="dropdown-item text-dark">@Html.Raw(helper.GetDisplayText(helper.Title,null))</a>
+                                    }
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item text-dark" asp-area="" asp-page="/Help">Help Page</a>
+                                </div>
+                            </li>
+                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" title="email support@rotomonster.com" href="mailto:support@rotomonster.com"><i class="far fa-envelope"></i></a>
+                        </li>
+
+                        <li class="nav-item mr-2">
+                            @{
+                                string t = "https://twitter.com/rotomonster";
+                            }
+                            <a class="nav-link text-dark" target="_blank" href="@t"><i style="color:#1DA1F2;" class="fab fa-twitter"></i></a>
+                        </li>
+
+                        @for (int i = 0; i < codes.Count(); i++)
+                        {
+                            string code = codes[i];
+                            string icon = icons[i];
+                            string cssCode = (sport == code) ? code.ToLower() + " text-white rounded" : code.ToLower() + "-txt";
+
+                            <li class="nav-item">
+                                <a class="nav-link p-0" style="margin: 7px 0 0 4px;" href="/@code.ToLower()"><i class="p-1 @icon @cssCode"></i></a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item ml-3">
+                                <a class="nav-link" asp-area="" asp-page="/Admin">
+                                    <i class="fa-solid fa-user-gear"></i>
+                                    @if (ViewData["AdminErrors"] != null)
+                                    {
+                                        var logItems = (List<LogItem>)ViewData["AdminErrors"];
+                                        <small>@logItems.Count</small>
+                                    }
+                                </a>
+                            </li>
+                        }
+
+                        @if (ViewData["SeasonState"] != null)
+                        {
+                            <li class="nav-item ml-3">
+                                <div class="mt-2 small">
+                                    Season: @ViewData["SeasonState"]
+                                </div>
+                            </li>
+                        }
+
+                    </ul>
+
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <partial name="_Messages" />
+
+    @if (ViewData["Helper"] != null)
+    {
+        Helper helper = (Helper)ViewData["Helper"];
+        <div class="alert alert-info container">
+            <h3>Helper: @Html.Raw(helper.Title)</h3>
+            <div>Description: @Html.Raw(helper.Description)</div>
+            @if (helper.OnPageDetails != null && helper.OnPageDetails.Length > 0)
+            {
+                <div class="mt-1">Page Info: @Html.Raw(helper.OnPageDetails)</div>
+            }
+        </div>
+    }
+
+    <div class="ml-2">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer>
+        @RenderSection("footer", required: false)
+        <div class="text-muted text-right mr-2 mt-2">
+            &copy; @DateTime.Today.Year RotoMonster LLC
+            @*            <small class="text-monospace">
+            @Configuration["InstanceID"].ToString()
+            </small>
+            *@
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @*<script>
+    (function (i, s, o, g, r, a, m) {
+    i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+    (i[r].q = i[r].q || []).push(arguments)
+    }, i[r].l = 1 * new Date(); a = s.createElement(o),
+    m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-41816439-1', 'rotomonster.com');
+    ga('send', 'pageview');
+    </script>*@
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

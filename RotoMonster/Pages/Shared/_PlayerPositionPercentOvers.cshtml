@@ -1,0 +1,31 @@
+﻿@model RotoMonster.Core.PartialViewModels.PlayerPositionPercentsModel
+@if (Model.PlayerPositionPercentOvers != null)
+{
+    <div class="ppos">
+        <div style="background-color:#@Model.EstimatedUpsideColorCode; color:#bfbfbf;">
+            @if (Model.EstimatedUpside >= 0)
+            {
+                <span data-toggle="tooltip" data-placement="top" title="@Math.Abs(Model.EstimatedUpside)% upside">
+                    <partial name="_IconUpside" />
+                </span>
+            }
+            else
+            {
+                <span data-toggle="tooltip" data-placement="top" title="@Math.Abs(Model.EstimatedUpside)% downside">
+                    <partial name="_IconDownside" />
+                </span>
+            }
+        </div>
+
+        @foreach (var position in Model.AllPositions)
+        {
+            var playerPositionPercentOver = (from pp in Model.PlayerPositionPercentOvers where pp.NormalPlayerPositionPercent.DisplayPercent > 0 && pp.Position.Id == position.Id select pp).FirstOrDefault();
+            if (playerPositionPercentOver != null)
+            {
+                <div style="border-color:#@position.ColorCode;background-color:#@playerPositionPercentOver.PercentColorCode;">
+                    <span class="m-0 p-0" style="color:#@position.ColorCode;">@playerPositionPercentOver.NormalPlayerPositionPercent.DisplayPercent</span>
+                </div>
+            }
+        }
+    </div>
+}

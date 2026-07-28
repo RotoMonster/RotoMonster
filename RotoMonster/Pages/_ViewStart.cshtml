@@ -1,0 +1,13 @@
+﻿@{
+    @inject RotoMonster.Data.IRMData idb;
+
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+
+    string sport = idb.Sport.Title;
+    string appTitle = "RotoMonster " + sport.ToUpper();
+
+    ViewData["LogoColor"] = idb.Sport.LogoColor;
+    ViewData["MenuColor"] = idb.Sport.MenuColor;
+    ViewData["sport"] = sport;
+    ViewData["apptitle"] = appTitle;
+}

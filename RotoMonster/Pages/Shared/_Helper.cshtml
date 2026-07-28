@@ -1,0 +1,8 @@
+﻿@model RotoMonster.Core.PartialViewModels.HelperModel
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title"><a href="@Model.Helper.GetPlayerTypeUrl(Model.Helper.Url,Model.PlayerType)" class="card-link">@Model.Helper.GetDisplayText(Model.Helper.Title,Model.PlayerType)</a></h5>
+        <p class="card-text">@Model.Helper.GetDisplayText(Model.Helper.Description,Model.PlayerType)</p>
+    </div>
+</div>

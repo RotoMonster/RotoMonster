@@ -1,0 +1,19 @@
+﻿@model RotoMonster.Core.DisplayPlayerGameState
+@if (Model.PlayerGameState != null)
+{
+    <span class="mr-1 badge"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="@Model.PlayerGameState.PlayerGameStateType.Title"
+          style="color:white;background-color:#@Model.PlayerGameState.PlayerGameStateType.TextColor">
+        <i class="@Model.PlayerGameState.PlayerGameStateType.Icon"></i>
+        @if (Model.PlayerGameState.Details != null && Model.PlayerGameState.Details.Length > 0)
+        {
+            <span>@Model.PlayerGameState.Details</span>
+        }
+        @if (Model.PlayerGameState.PlayerGameStateType.ShowLockAfterStart & Model.PlayerGameState.Game.HasStarted)
+        {
+            <i class="far fa-lock-alt"></i>
+        }
+    </span>
+}

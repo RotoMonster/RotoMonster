@@ -1,0 +1,47 @@
+﻿@using RotoMonster.Core
+@model RotoMonster.Core.PartialViewModels.PlayerLinkModel
+
+@{
+    RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+}
+
+<partial name="_PlayerLink" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() { Player = Model.DisplayPlayer.SeasonPlayer.Player, SelectedUserLeague = Model.SelectedUserLeague }" />
+
+<small>@Model.DisplayPlayer.SeasonPlayer.Team.Code</small>
+
+<small>
+    @foreach (var p in Model.DisplayPlayer.Positions)
+    {
+        <partial name="_ColoredPosition" model="p" />
+    }
+</small>
+
+@if (Model.DisplayPlayer.PlayerStatus != null)
+{
+    <partial name="_PlayerStatus" model="Model.DisplayPlayer.PlayerStatus" />
+}
+
+@if (Model.DisplayPlayer.RecentArticles != null && Model.DisplayPlayer.RecentArticles.Count > 0)
+{
+    string articleText = Model.DisplayPlayer.RecentArticles.First().Title;
+    if (Model.DisplayPlayer.RecentArticles.Count > 1)
+        articleText += " (+" + (Model.DisplayPlayer.RecentArticles.Count - 1).ToString() + ")";
+    <a asp-page="/Articles" asp-route-playerid="@Model.Player.Id" class="small" data-toggle="tooltip" data-placement="top" title="@articleText">
+        <partial name="_IconArticle" />
+    </a>
+}
+
+@if (Model.PlayerGameState != null)
+{
+    var displayPlayerGameState = new DisplayPlayerGameState() { PlayerGameState = Model.PlayerGameState };
+    <small>
+        <partial name="_PlayerGameState" model="displayPlayerGameState" />
+    </small>
+}
+
+@*
+    @if (Model.DisplayPlayer.Game != null)
+    {
+    <small class="text-info">@Model.DisplayPlayer.Game.DayOfWeekString</small>
+    }
+*@

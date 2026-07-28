@@ -1,0 +1,24 @@
+﻿@using RotoMonster.Core
+@model Player
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h3>@Model.FirstName @Model.LastName</h3>
+    </div>
+    <div class="card-body">
+        <div>@Html.LabelFor(m => m.Birthdate): @Html.DisplayFor(m => m.Birthdate)</div>
+        <div>@Html.LabelFor(m => m.Height): @Html.DisplayFor(m => m.Height)</div>
+        <div>@Html.LabelFor(m => m.Weight): @Html.DisplayFor(m => m.Weight)</div>
+    </div>
+    <div class="card-footer">
+        <a class="btn btn-primary" asp-page="./Detail" asp-route-playerId="@Model.Id">
+            Details
+        </a>
+        <a class="btn btn-primary" asp-page="./Edit" asp-route-playerId="@Model.Id">
+            Edit
+        </a>
+        <a class="btn btn-danger" asp-page="./Delete" asp-route-playerId="@Model.Id">
+            Delete
+        </a>
+    </div>
+</div>

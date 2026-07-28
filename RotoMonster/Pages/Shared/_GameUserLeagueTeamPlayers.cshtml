@@ -1,0 +1,20 @@
+﻿@model RotoMonster.Core.PartialViewModels.GameUserLeagueTeamPlayersModel
+
+@if (Model.GameUserLeagueTeamPlayers.Count > 0)
+{
+    var colorCode = Model.UseOwnColor ? "#99ffff" : "#ffff99";
+
+    string tooltip = Model.UseOwnColor ? "Owned: " : "Active: ";
+    foreach (var tp in Model.GameUserLeagueTeamPlayers)
+    {
+        tooltip += " " + tp.UserLeagueTeamPlayer.Player.ForwardName;
+    }
+
+    <span class="badge"
+      data-toggle="tooltip"
+      data-placement="top"
+      title="@tooltip"
+      style="background-color:@colorCode">
+        @Model.GameUserLeagueTeamPlayers.Count
+    </span>
+}

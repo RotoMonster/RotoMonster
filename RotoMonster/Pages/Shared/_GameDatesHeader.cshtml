@@ -1,0 +1,36 @@
+﻿@model RotoMonster.Core.PartialViewModels.GameDatesHeaderModel
+
+@{
+    int days = Convert.ToInt32((Model.EndDate - Model.StartDate).TotalDays) + 1;
+}
+
+<div class="d-flex justify-content-center">
+    <div class="game-day">
+        <button class="btn btn-sm btn-link text-white p-0 m-0"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="@Model.Tooltip"
+                asp-route-sort="@Model.SortId">
+            <partial name="_SmallDate" model="Model.StartDate" />
+        </button>
+    </div>
+
+    @{
+        for (int i = Model.StartIndex; i < Model.StartIndex + days; i++)
+        {
+            <div class="game-day">
+                <input type="checkbox" asp-for="@Model.DateSelects[i].Selected" />
+                <label asp-for="@Model.DateSelects[i].Selected">@Model.DateSelects[i].Name</label>
+                @if (Model.StreamSelects != null)
+                {
+                    <div class="small">
+                        <input type="checkbox" asp-for="@Model.StreamSelects[i].Selected" />
+                        <label asp-for="@Model.StreamSelects[i].Selected"><i class="fas fa-user"></i></label>
+                    </div>
+                }
+            </div>
+
+        }
+    }
+
+</div>

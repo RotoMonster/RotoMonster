@@ -1,0 +1,168 @@
+﻿@page
+@using RotoMonster.Core.PartialViewModels;
+@model RotoMonster.Pages.DepthChartsModel
+@{
+    RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+}
+
+<div class="container">
+
+    <h1>Depth Charts</h1>
+
+    <form method="post" asp-page-handler="Refresh">
+
+        <div class="row m-1 mb-1">
+            @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
+            {
+                <div class="col- p-1">
+                    <select asp-for="@Model.SelectedUserLeagueId" class="form-control" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
+                </div>
+            }
+            <div class="col- p-1">
+                <select asp-for="@Model.SelectedTeamId" class="form-control" asp-items="ViewBag.TeamList" onchange="this.form.submit()"></select>
+            </div>
+            <div class="col- p-1">
+                <button class="btn btn-primary" asp-page-handler="Refresh">Refresh</button>
+            </div>
+        </div>
+
+        <div class="row m-1 mb-1">
+            <div class="col- p-1">
+                <label class="form-check-label">
+                    <input asp-for="HideZeroPlayers" onchange="this.form.submit()">
+                    @Html.DisplayNameFor(model => model.HideZeroPlayers)
+                </label>
+            </div>
+            <div class="col- p-1">
+                <label class="form-check-label">
+                    <input asp-for="ShowGameMonsterBar" onchange="this.form.submit()">
+                    @Html.DisplayNameFor(model => model.ShowGameMonsterBar)
+                </label>
+            </div>
+            <div class="col- p-1">
+                <label class="form-check-label">
+                    <input asp-for="ShowTotalMonsterBar" onchange="this.form.submit()">
+                    @Html.DisplayNameFor(model => model.ShowTotalMonsterBar)
+                </label>
+            </div>
+        </div>
+
+    </form>
+
+    <div class="clearfix">
+        @foreach (var depthChartTeamModel in Model.DepthChartTeamModels)
+        {
+            <div class="float-left card mt-3 mr-3 p-2" style="border-color:#@ViewData["LogoColor"];">
+                <div class="card-header">
+                    <h2>@depthChartTeamModel.Team.Name</h2>
+                </div>
+
+                <div class="card-body">
+                    <table class="small table-bordered">
+
+                        <thead>
+                            <tr>
+                                <th>Own</th>
+                                <th class="tdc">Pos</th>
+                                <th>Player</th>
+                                <th>Own%</th>
+                                @if (Model.ShowGameMonsterBar)
+                                {
+                                    <th class="tdc">
+                                        <span data-toggle="tooltip" data-placement="top" title="@Model.MonsterBar.Tooltip">
+                                            @Model.MonsterBar.ColumnTitle(false)<small class="ml-1">game</small>
+                                        </span>
+                                    </th>
+                                }
+                                @if (Model.ShowTotalMonsterBar)
+                                {
+                                    <th class="tdc">
+                                        <span data-toggle="tooltip" data-placement="top" title="@Model.TotalMonsterBar.Tooltip">
+                                            @Model.TotalMonsterBar.ColumnTitle(false)<small class="ml-1">total</small>
+                                        </span>
+                                    </th>
+                                }
+                                @if (Model.ShowPositionPercents)
+                                {
+                                    <th class="tdc">Position %</th>
+                                }
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var dp in depthChartTeamModel.DisplayPlayers)
+                            {
+                                <tr>
+                                    <td class="tdc text-center text-nowrap text-white pr-1 @colorLib.GetDisplayPlayerOwnCss(dp)" style="min-width:40px;">
+                                        <partial name="_DisplayPlayerOwn" model="dp" />
+                                    </td>
+
+                                    <td class="tdc text-nowrap">
+                                        @if (dp.DepthPlayer != null && dp.DepthPlayer.Position != null)
+                                        {
+                                            <small><partial name="_ColoredPosition" model="dp.DepthPlayer.Position" /></small>
+                                            @dp.DepthPlayer.Depth
+                                            @if (dp.DepthPlayer.OwnershipDepthPercent > 0)
+                                            {
+                                                <small>@String.Format("{0:##0}",dp.DepthPlayer.OwnershipDepthPercent)</small>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <small><partial name="_ColoredPosition" model="dp.SeasonPlayer.Player.DefaultPosition" /></small>
+                                        }
+                                        <partial name="_HigherDepthInjuredDisplayPlayers" model="dp.HigherDepthInjuredDisplayPlayers" />
+                                    </td>
+
+                                    <td class="pl-1 pr-1 text-nowrap">
+                                        <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp}" />
+                                    </td>
+
+                                    @if (dp.OwnershipPlayer != null)
+                                    {
+                                        <td class="tdr text-nowrap pl-1 pr-1" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
+                                            @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)
+                                            @if (dp.OwnershipPlayer.PercentOwnershipChange != 0)
+                                            {
+                                                <small class="text-nowrap float-left pr-1 pl-1 mr-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">
+                                                    <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentOwnershipChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentOwnershipChange)
+                                                </small>
+                                            }
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td />
+                                    }
+
+                                    @if (Model.ShowGameMonsterBar)
+                                    {
+                                        <td class="text-nowrap flex-nowrap">
+                                            <partial name="_DisplayMonsterBarPlayer" model="new RotoMonster.Core.DisplayMonsterBarPlayer() { IsCompact = false, MonsterBarPlayer = dp.MonsterBarGamePlayer, MonsterBarItems = Model.MonsterBar.MonsterBarItems }" />
+                                        </td>
+                                    }
+
+                                    @if (Model.ShowTotalMonsterBar)
+                                    {
+                                        <td class="text-nowrap flex-nowrap">
+                                            <partial name="_DisplayMonsterBarPlayer" model="new RotoMonster.Core.DisplayMonsterBarPlayer() { IsCompact = false, MonsterBarPlayer = dp.MonsterBarTotalPlayer, MonsterBarItems = Model.TotalMonsterBar.MonsterBarItems }" />
+                                        </td>
+                                    }
+
+                                    @if (Model.ShowPositionPercents)
+                                    {
+                                        <td class="text-nowrap flex-nowrap">
+                                            <partial name="_PlayerPositionPercents" model="new PlayerPositionPercentsModel(){AllPositions=Model.AllPositions,PlayerPositionPercents=dp.PlayerPositionPercents}" />
+                                        </td>
+                                    }
+
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>

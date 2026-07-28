@@ -1,0 +1,17 @@
+﻿@model RotoMonster.Core.PartialViewModels.ValuePlayerModel
+
+@if (Model != null)
+{
+    @if (Model.ShowMPG && Model.ValuePlayer.StatPlayer.MeasureText.Length > 0)
+    {
+        <small class="float-left mr-1">@Model.ValuePlayer.StatPlayer.MeasureText</small>
+    }
+
+    <span class="float-right">
+        @String.Format("{0:#####0.00}",Model.ValuePlayer.LeagueValue)
+        @if (Model.ShowGames)
+        {
+            <small>@String.Format("{0:#####0}g", Model.ValuePlayer.StatPlayer.Games)</small>
+        }
+    </span>
+}

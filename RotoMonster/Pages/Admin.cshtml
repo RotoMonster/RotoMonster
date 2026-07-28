@@ -1,0 +1,54 @@
+﻿@page
+@model RotoMonster.Pages.AdminModel
+@{
+    ViewData["Title"] = "Admin Menu";
+}
+
+<h1>Admin Tools</h1>
+
+<p>
+    <a class="nav-link text-dark" asp-area="" asp-page="/Players/List">Edit Players</a>
+</p>
+
+<form method="post">
+    <button type="submit" class="btn btn-link" asp-page-handler="ClearCache">Clear Cache</button>
+    <button type="submit" class="btn btn-link" asp-page-handler="ClearLogs">Clear Logs</button>
+    <button type="submit" class="btn btn-link" asp-page-handler="ImportUserAuths">Import User Auths</button>
+    @*    <button type="submit" class="btn btn-link" asp-page-handler="ImportUsers">Import Users</button>
+    *@
+</form>
+
+@{
+    if (Model.LogItems != null)
+    {
+        <div>
+            <a class="btn btn-sm btn-link" href="./Admin?filterlevel=Information">Information</a>
+            <a class="btn btn-sm btn-link" href="./Admin?filterlevel=Warning">Warning</a>
+            <a class="btn btn-sm btn-link" href="./Admin?filterlevel=Error">Error</a>
+        </div>
+
+        <table class="table table-sm table-bordered small">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Date</th>
+                    <th>Message</th>
+                    <th>Level</th>
+                    <th>Exception</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.LogItems)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.TimeStamp</td>
+                        <td>@item.Message</td>
+                        <td>@item.Level</td>
+                        <td>@item.Exception</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}

@@ -1,0 +1,7 @@
+﻿@model int
+@{
+    int inches;
+    int feet = Math.DivRem(Model, 12, out inches);
+}
+
+<label>@feet'@inches"</label>

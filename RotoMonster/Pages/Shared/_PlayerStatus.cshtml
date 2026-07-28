@@ -1,0 +1,35 @@
+﻿@model RotoMonster.Core.PlayerStatus
+
+@{
+    RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+}
+
+@if (Model != null)
+{
+    string txt = Model.PlayerStatusType.Title;
+    if (Model.Comment.Length > 0)
+        txt += " - " + Model.Comment;
+    if (Model.Subject != null && Model.Subject.Length > 0)
+        txt += " (" + Model.Subject + ")";
+
+    if (Model.EstimatedReturnDate != null)
+        txt += " - est. return " + Model.EstimatedReturnDate.GetValueOrDefault().Month.ToString() + "/" + Model.EstimatedReturnDate.GetValueOrDefault().Day.ToString();
+
+    <span class="badge" style="margin-left: 3px; @colorLib.GetPlayerStatusTypeStyle(Model.PlayerStatusType)"
+      data-toggle="tooltip"
+      data-placement="top"
+      title="@txt">
+        @Model.PlayerStatusType.TextFormat.Replace("{t}", "")
+        @if (Model.EstimatedGamesToMiss!=null && Model.EstimatedGamesToMiss.Count>1)
+        {
+            string g = Model.EstimatedGamesToMiss.Count.ToString() + "g";
+            <small>@g</small>
+        }
+        @if (Model.TimeSince.TotalHours <= 8)
+        {
+            <small>
+                <partial name="_Timespan" model="Model.TimeSince" />
+            </small>
+        }
+    </span>
+}

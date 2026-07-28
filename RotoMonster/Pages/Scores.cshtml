@@ -1,0 +1,107 @@
+﻿@page
+@model RotoMonster.Pages.ScoresModel
+@{
+    RotoMonster.Core.Libs.FileLib fileLib = new Core.Libs.FileLib();
+}
+
+<div class="container">
+
+    <form method="post">
+
+        <h2>
+            Box Scores for
+            @Model.SelectedDate.DayOfWeek.ToString()
+            <partial name="_SmallDate" model="Model.SelectedDate" />
+            <small class="ml-1">
+                (@Model.ScheduleGames.Count)
+            </small>
+        </h2>
+
+        <span class="ml-2">
+            <label class="form-check-label">
+                <input asp-for="ShowTopToo">
+                @Html.DisplayNameFor(model => model.ShowTopToo)
+            </label>
+        </span>
+
+        @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
+        {
+            <div class="row m-1 mb-1">
+                <div class="col- p-1">
+                    <select asp-for="@Model.SelectedUserLeagueId" class="form-control" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
+                </div>
+            </div>
+        }
+
+        <div class="row m-1 mb-3 ml-0">
+            <div class="col- p-1 pt-2">
+                <input type="submit" name="backbutton" value="Back" class="btn btn-sm btn-primary" />
+                <input type="submit" name="nextbutton" value="Next" class="btn btn-sm btn-primary" />
+            </div>
+            <div class="col- p-1 pt-2">
+                <input type="date" asp-for="@Model.SelectedDate" onchange="this.form.submit()" />
+            </div>
+            <div class="col- p-1 pt-2">
+                <button class="btn btn-success">Refresh</button>
+            </div>
+        </div>
+
+        <div class="container ml-2 p-0">
+
+            <div class="row">
+                <div class="col- border border-primary p-2 m-0 mb-3">
+                    @foreach (var game in Model.ScheduleGames)
+                    {
+                        <div class="clearfix small mb-1">
+                            <partial name="_TeamGame" model="new RotoMonster.Core.PartialViewModels.TeamGameModel() {Sport=Model.Sport,Game=game,Team=game.AwayTeam}" />
+                            @if (game.PercentComplete > 0)
+                            {
+                                <input type="submit" name="viewgame" asp-route-newgameid="@game.Id" value="view" class="linkbutton" />
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (Model.BoxScoreModel != null && Model.BoxScoreModel.Game != null)
+            {
+                <input type="hidden" id="gameid" name="prevgameid" value="@Model.BoxScoreModel.Game.Id" />
+
+                <div class="mt-3">
+                    @foreach (var team in Model.BoxScoreModel.Game.GetTeams())
+                    {
+                        <h3 class="teamscore mb-2" style="@Model.BoxScoreModel.Game.GetTeamStyle(team)">
+                            @team.Code
+                            <span class="ml-2 small">
+                                @Model.BoxScoreModel.Game.GetTeamScore(team)
+                            </span>
+                        </h3>
+
+                        @foreach (var playerType in Model.BoxScoreModel.PlayerTypes)
+                        {
+                            var playerTableModel = Model.BoxScoreModel.TeamPlayerTableModels[team][playerType];
+                            if (playerTableModel.DisplayPlayers.Count > 0)
+                            {
+                                <div>
+                                    <partial name="_PlayerTable" model="playerTableModel" />
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+
+                if (Model.BoxScoreModel.Articles != null && Model.BoxScoreModel.Articles.Count > 0)
+                {
+                    foreach (var article in Model.BoxScoreModel.Articles)
+                    {
+                        <partial name="_Article" model="article" />
+                    }
+                }
+            }
+        </div>
+
+        <input type="hidden" id="prevdate" name="prevdate" value="@Model.SelectedDate.ToShortDateString()" />
+
+    </form>
+
+</div>

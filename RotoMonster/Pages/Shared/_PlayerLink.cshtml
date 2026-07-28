@@ -1,0 +1,9 @@
+﻿@model RotoMonster.Core.PartialViewModels.PlayerLinkModel
+@{
+    int userLeagueId = (Model.SelectedUserLeague != null ? Model.SelectedUserLeague.Id : 0);
+}
+<a asp-page="/Players" asp-route-playerId="@Model.Player.Id" asp-route-l="@userLeagueId">
+    @Model.Player.FirstName @Model.Player.LastName
+</a>
+
+<partial name="_PlayerGameState" model="new RotoMonster.Core.DisplayPlayerGameState() { PlayerGameState = Model.PlayerGameState }"/>
