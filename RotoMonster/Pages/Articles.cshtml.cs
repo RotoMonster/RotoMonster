@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,7 +25,7 @@ namespace RotoMonster.Pages
         {
         }
 
-        public void OnGet(bool auto = false, int articleid = 0, int playerid = 0)
+        public async Task OnGetAsync(bool auto = false, int articleid = 0, int playerid = 0)
         {
             InitGet("Articles");
 
@@ -38,7 +38,7 @@ namespace RotoMonster.Pages
             List<Article> tmpArticles = new List<Article>();
             if (articleid > 0)
             {
-                var article = db.GetArticle(articleid);
+                var article = await db.GetArticleAsync(articleid);
                 if (article != null)
                     tmpArticles.Add(article);
             }

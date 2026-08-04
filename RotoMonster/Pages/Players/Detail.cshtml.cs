@@ -33,9 +33,9 @@ namespace RotoMonster
         {
         }
 
-        public IActionResult OnGet(int playerId)
+        public async Task<IActionResult> OnGetAsync(int playerId)
         {
-            SelectedUserLeague = db.SelectUserLeague(UserId, null);
+            SelectedUserLeague = await db.SelectUserLeagueAsync(UserId, null);
 
             SeasonPlayer = db.GetSeasonPlayer(playerId);
             if (SeasonPlayer == null)
@@ -49,7 +49,7 @@ namespace RotoMonster
                 OwnershipPlayer = (from op in ops where op.PlayerId == SeasonPlayer.PlayerId select op).FirstOrDefault();
 
                 HistoryTableModel.CategorySettings = db.GetUserLeagueCategorySettings(SelectedUserLeague, SeasonPlayer.PlayerType);
-                HistoryTableModel.UserDisplayCategories = db.GetUserDisplayCategories(UserId, SelectedUserLeague, SeasonPlayer.PlayerType);
+                HistoryTableModel.UserDisplayCategories = await db.GetUserDisplayCategoriesAsync(UserId, SelectedUserLeague, SeasonPlayer.PlayerType);
                 HistoryTableModel.DisplayPerValue = db.GetDefaultPerValue(SeasonPlayer.PlayerTypeId);
                 HistoryTableModel.GamesCategoryId = db.GetGamesCategory(SeasonPlayer.PlayerTypeId).Id;
                 HistoryTableModel.BeforeCategories = db.GetBeforeDisplayCategories(SeasonPlayer.PlayerType);
@@ -130,7 +130,7 @@ namespace RotoMonster
                 //    }
                 //}
 
-                if (GameLogGames.Count > 0 && GameLogGames.First().IsBreak)
+                if (GameLogGames != null && GameLogGames.Count > 0 && GameLogGames.First().IsBreak)
                     GameLogGames.RemoveAt(0);
 
                 return Page();

@@ -495,5 +495,13 @@ namespace RotoMonster.Data
 
             return draft;
         }
+        // ---------------------------------------------------------------
+        // Articles
+        // ---------------------------------------------------------------
+
+        public async Task<Article> GetArticleAsync(int articleId)
+        {
+            return await (from a in db.Articles where a.Id == articleId select a).FirstOrDefaultAsync();
+        }
     }
 }

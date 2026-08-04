@@ -24,11 +24,11 @@ namespace RotoMonster.Pages.UserLeagues
         public IndexModel(IRMData db, IRMSharedData sharedDb, IConfiguration config, UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor, ILogger<PageModel> logger)
             : base(config, db, sharedDb, userManager, contextAccessor, logger)
         {
-            SelectedUserLeagues = db.GetUserLeagues(UserId);
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
+            SelectedUserLeagues = await db.GetUserLeaguesAsync(UserId);
             return Page();
         }
 

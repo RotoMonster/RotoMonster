@@ -58,5 +58,7 @@ namespace RotoMonster.Data
         // Drafts and display columns
         Task<List<DisplayColumn>> GetDisplayColumnsAsync(string userId);
         Task<Draft> AddDraftAsync(Draft draft);
+        // Articles
+        Task<Article> GetArticleAsync(int articleId);
     }
 }
