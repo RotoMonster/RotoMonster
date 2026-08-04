@@ -8,7 +8,7 @@ using System.Text;
 
 namespace RotoMonster.Data
 {
-    public interface IRMData
+    public partial interface IRMData
     {
         int ClearCache();
         int RemoveCacheItem(string cacheId);

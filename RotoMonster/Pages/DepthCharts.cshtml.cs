@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -45,7 +45,7 @@ namespace RotoMonster.Pages
         public List<Position> AllPositions { get; set; }
         public bool ShowPositionPercents { get; set; } = false;
 
-        public void OnGet(int? t, int? hid, int? l, bool? z, bool? gmb, bool? tmb)
+        public async Task OnGetAsync(int? t, int? hid, int? l, bool? z, bool? gmb, bool? tmb)
         {
             InitGet("Depth Charts");
             if (hid.GetValueOrDefault(0) > 0)
@@ -93,7 +93,7 @@ namespace RotoMonster.Pages
                 if(ShowTotalMonsterBar)
                     TotalMonsterBar=db.GetMonsterBar(playerType, season, catSetttings, scoringSystem, db.GetTotalPerValue(playerType.Id), leagueSize, userLeague.ActiveSize(playerType));
 
-                var injuries = db.GetPlayerInjuries();
+                var injuries = await db.GetPlayerInjuriesAsync();
                 var playerStatuses = db.GetActivePlayerStatuses();
                 var depthPlayers = db.GetDepthPlayers(playerType, leagueCategoriesCode, DateTime.UtcNow, false);
                 var playerDefaultPositions = db.GetUserLeagueSeasonPlayerPositions(userLeague, displaySeason);
