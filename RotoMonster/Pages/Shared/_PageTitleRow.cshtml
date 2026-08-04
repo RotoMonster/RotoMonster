@@ -1,0 +1,50 @@
+@using System.Linq
+@using RotoMonster.Models.Shared
+@model PageTitleRowViewModel
+
+<div class="page-title-row">
+
+    @if (!string.IsNullOrEmpty(Model.Title))
+    {
+        <h1 class="page-title-row-title">@Model.Title</h1>
+    }
+
+    @if (Model.UserLeagueList != null && Model.UserLeagueList.Any())
+    {
+        <span class="page-title-row-league">
+            <select name="@Model.LeagueFieldName" class="form-control" onchange="this.form.submit()">
+                @foreach (var league in Model.UserLeagueList)
+                {
+                    if (league.Value == Model.SelectedUserLeagueId.ToString())
+                    {
+                        <option value="@league.Value" selected>@league.Text</option>
+                    }
+                    else
+                    {
+                        <option value="@league.Value">@league.Text</option>
+                    }
+                }
+            </select>
+        </span>
+    }
+
+    @if (Model.ShowRefreshRosters)
+    {
+        <button type="submit" class="btn btn-secondary" asp-page-handler="@Model.RefreshHandler" title="Refresh Rosters">
+            @Html.Raw(new Icon(new IconInput { Type = IconType.RefreshRosters, Size = 16 }).Render())
+        </button>
+    }
+
+    @if (Model.ShowPlayerSearch)
+    {
+        <span class="page-title-row-search">
+            <input type="text" id="@Model.PlayerSearchId" class="form-control" placeholder="@Model.PlayerSearchPlaceholder" autocomplete="off" />
+        </span>
+    }
+
+</div>
+
+@if (Model.ShowPlayerSearch)
+{
+    <partial name="_PlayerSearchScripts" model="@Model.PlayerSearchId" />
+}

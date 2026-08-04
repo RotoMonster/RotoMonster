@@ -7,17 +7,20 @@
 
 <div class="container">
 
-    <h1>Depth Charts</h1>
+    @{
+        var titleRow = new RotoMonster.Models.Shared.PageTitleRowViewModel
+        {
+            Title = "Depth Charts",
+            UserLeagueList = (Microsoft.AspNetCore.Mvc.Rendering.SelectList)ViewBag.UserLeagueList,
+            SelectedUserLeagueId = Model.SelectedUserLeagueId
+        };
+    }
 
     <form method="post" asp-page-handler="Refresh">
+        <partial name="_PageTitleRow" model="titleRow" />
+
 
         <div class="row m-1 mb-1">
-            @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
-            {
-                <div class="col-auto p-1">
-                    <select asp-for="@Model.SelectedUserLeagueId" class="form-control" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
-                </div>
-            }
             <div class="col-auto p-1">
                 <select asp-for="@Model.SelectedTeamId" class="form-control" asp-items="ViewBag.TeamList" onchange="this.form.submit()"></select>
             </div>
