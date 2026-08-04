@@ -50,7 +50,9 @@ namespace RotoMonster
                     Configuration.GetConnectionString("RotoMonsterSharedDb"),
                     x => x.MigrationsAssembly("RotoMonster")));
 
-            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<ApplicationUser>(options =>
+                options.SignIn.RequireConfirmedAccount =
+                    Configuration.GetValue<bool>("RequireConfirmedAccount", true))
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<RMSharedDbContext>();
 

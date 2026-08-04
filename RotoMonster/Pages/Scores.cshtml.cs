@@ -77,7 +77,7 @@ namespace RotoMonster.Pages
             {
                 if (l != null)
                     SelectedUserLeagueId = l.GetValueOrDefault();
-                else
+                else if (SelectedUserLeagues != null && SelectedUserLeagues.Count > 0)
                     SelectedUserLeagueId = SelectedUserLeagues[0].Id;
                 ViewData["UserLeagueList"] = new SelectList(await db.GetTrackedUserLeaguesAsync(UserId), "Id", "ListDisplayTitle");
             }
