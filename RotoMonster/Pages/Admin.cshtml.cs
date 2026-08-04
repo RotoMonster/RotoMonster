@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,7 +41,7 @@ namespace RotoMonster.Pages
 
         public async Task<IActionResult> OnPostClearLogs()
         {
-            db.ClearLogItems();
+            await db.ClearLogItemsAsync();
 
             return RedirectToPage("/Admin");
         }
@@ -192,11 +192,11 @@ namespace RotoMonster.Pages
             return Page();
         }
 
-        public void OnGet(string filterlevel)
+        public async Task OnGetAsync(string filterlevel)
         {
             userManager.GetUserId(User);
 
-            LogItems = db.GetLogItems(filterlevel);
+            LogItems = await db.GetLogItemsAsync(filterlevel);
         }
 
     }

@@ -677,5 +677,57 @@ namespace RotoMonster.Data
 
             return defaultLeague;
         }
+        // ---------------------------------------------------------------
+        // Logs - raw ADO, not EF
+        //
+        // These bypass EF entirely and run SQL against the _Logs table, so the
+        // async form uses the reader's own async methods rather than any EF
+        // extension. Note the sync version calls OpenConnection without
+        // checking whether the connection is already open; that behaviour is
+        // preserved here rather than fixed.
+        // ---------------------------------------------------------------
+
+        public async Task<List<LogItem>> GetLogItemsAsync(string filterLevel)
+        {
+            var logItems = new List<LogItem>();
+
+            using (var command = db.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = "SELECT Id, Message, MessageTemplate, [Level], TimeStamp, Exception, Properties From _Logs ORDER BY TimeStamp DESC";
+                await db.Database.OpenConnectionAsync();
+
+                using (var result = await command.ExecuteReaderAsync())
+                {
+                    while (await result.ReadAsync())
+                    {
+                        if (filterLevel != null && filterLevel.Length > 0 && filterLevel != (string)result["Level"])
+                            continue;
+
+                        var logItem = new LogItem();
+                        logItem.Id = (int)result["Id"];
+                        logItem.Level = result["Level"] != DBNull.Value ? (string)result["Level"] : "";
+                        logItem.Message = result["Message"] != DBNull.Value ? (string)result["Message"] : "";
+                        logItem.MessageTemplate = result["MessageTemplate"] != DBNull.Value ? (string)result["MessageTemplate"] : "";
+                        logItem.TimeStamp = (DateTime)result["TimeStamp"];
+                        logItem.Exception = result["Exception"] != DBNull.Value ? (string)result["Exception"] : "";
+                        logItem.Properties = result["Properties"] != DBNull.Value ? (string)result["Properties"] : "";
+                        logItems.Add(logItem);
+                    }
+                }
+            }
+
+            return logItems;
+        }
+
+        public async Task ClearLogItemsAsync()
+        {
+            using (var command = db.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = "DELETE _Logs";
+                await db.Database.OpenConnectionAsync();
+                await command.ExecuteNonQueryAsync();
+            }
+            ClearCache();
+        }
     }
 }

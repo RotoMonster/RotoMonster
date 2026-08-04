@@ -68,5 +68,8 @@ namespace RotoMonster.Data
         Task<UserLeague> UpdateUserLeagueAsync(UserLeague userLeague);
         Task<UserLeague> AddUserLeagueAsync(UserLeague userLeague);
         Task<UserLeague> GetNewCustomUserLeagueAsync();
+        // Logs
+        Task<List<LogItem>> GetLogItemsAsync(string filterLevel);
+        Task ClearLogItemsAsync();
     }
 }
