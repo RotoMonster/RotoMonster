@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using RotoMonster.Core;
 
 namespace RotoMonster.Models.Shared
@@ -34,7 +34,8 @@ namespace RotoMonster.Models.Shared
             MonsterBarPlayer monsterBarPlayer,
             List<MonsterBarItem> monsterBarItems,
             bool isCompact = false,
-            string label = null)
+            string label = null,
+            bool isTotal = false)
         {
             var model = new MonsterBarBadgeViewModel { IsCompact = isCompact, Label = label };
 
@@ -92,6 +93,10 @@ namespace RotoMonster.Models.Shared
                 model.Cells.Add(cell);
             }
 
+            int playerId = (monsterBarPlayer.Player != null) ? monsterBarPlayer.Player.Id : 0;
+            for (int c = 0; c < model.Cells.Count; c++)
+                model.Cells[c].TooltipId = "mbtip-" + (isTotal ? "t" : "g") + "-" + playerId + "-" + c;
+
             return model;
         }
 
@@ -114,7 +119,8 @@ namespace RotoMonster.Models.Shared
                 {
                     GamesText = item.Title,
                     Description = item.Description,
-                    Group = GroupFor(item.Title)
+                    Group = GroupFor(item.Title),
+                    TooltipId = "mbtip-hdr-" + model.Cells.Count
                 });
             }
 
@@ -158,9 +164,11 @@ namespace RotoMonster.Models.Shared
         public bool IsEmpty { get; set; }
 
         /// <summary>
-        /// Matches the library's id scheme so the shared tooltip JS finds it.
+        /// Set by the factory methods from the player, the bar type and the column
+        /// index. Deliberately NOT a random guid - a random id makes every page
+        /// render different, which breaks before/after HTML comparison.
         /// </summary>
-        public string TooltipId { get; set; } = "bm-tip-" + System.Guid.NewGuid().ToString("N").Substring(0, 8);
+        public string TooltipId { get; set; }
 
         /// <summary>
         /// Header labels can arrive with HTML entities already in them (&#x27;25).

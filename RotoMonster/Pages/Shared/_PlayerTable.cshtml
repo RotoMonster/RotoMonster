@@ -516,7 +516,7 @@
                 @if (Model.MonsterBarTotal != null)
                 {
                     <td class="text-nowrap flex-nowrap">
-                        <partial name="_MonsterBarBadge" model="RotoMonster.Models.Shared.MonsterBarBadgeViewModel.From(dp.MonsterBarTotalPlayer, Model.MonsterBarTotal.MonsterBarItems)" />
+                        <partial name="_MonsterBarBadge" model="RotoMonster.Models.Shared.MonsterBarBadgeViewModel.From(dp.MonsterBarTotalPlayer, Model.MonsterBarTotal.MonsterBarItems, false, null, true)" />
                     </td>
                 }
 
