@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css?v=5" />
     <link rel="stylesheet" href="~/css/shared.css?v=3" />
-    <link rel="stylesheet" href="~/css/bm.light.css?v=1" />
+    <link rel="stylesheet" href="~/css/bm.light.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/rm.light.css" asp-append-version="true" />
     <link rel="icon" type="image/x-icon" href="https://rotomonster.com/@ViewData["sport"].ToString().ToLower()/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -163,6 +164,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/rotomonster-ui.js" asp-append-version="true"></script>
 
     @*<script>
     (function (i, s, o, g, r, a, m) {

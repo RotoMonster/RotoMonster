@@ -417,7 +417,7 @@
                                             </td>
 
                                             <td class="text-nowrap flex-nowrap">
-                                                <partial name="_DisplayMonsterBarPlayer" model="new RotoMonster.Core.DisplayMonsterBarPlayer() { IsCompact = false, MonsterBarPlayer = dp.MonsterBarGamePlayer, MonsterBarItems = ulv.MonsterBar.MonsterBarItems }" />
+                                                <partial name="_MonsterBarBadge" model="RotoMonster.Models.Shared.MonsterBarBadgeViewModel.From(dp.MonsterBarGamePlayer, ulv.MonsterBar.MonsterBarItems)" />
                                             </td>
 
                                         </tr>
@@ -520,7 +520,7 @@
                                             }
 
                                             <td class="text-nowrap flex-nowrap">
-                                                <partial name="_DisplayMonsterBarPlayer" model="new RotoMonster.Core.DisplayMonsterBarPlayer() { IsCompact = false, MonsterBarPlayer = dp.MonsterBarGamePlayer, MonsterBarItems = ulv.MonsterBar.MonsterBarItems }" />
+                                                <partial name="_MonsterBarBadge" model="RotoMonster.Models.Shared.MonsterBarBadgeViewModel.From(dp.MonsterBarGamePlayer, ulv.MonsterBar.MonsterBarItems)" />
                                             </td>
 
                                         </tr>

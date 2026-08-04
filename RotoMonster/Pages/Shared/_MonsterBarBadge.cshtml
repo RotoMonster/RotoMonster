@@ -1,0 +1,67 @@
+@model RotoMonster.Models.Shared.MonsterBarBadgeViewModel
+
+@*
+    Replaces _DisplayMonsterBarPlayer. Emits the same markup as
+    RotoMonsterUI's MonsterBarBadge component, so the shared bm.light.css
+    styles it with no RotoMonster-specific CSS at all.
+
+    The old .mbar-N / .mbarp / .mbarpc classes in site.css are no longer
+    used by this partial. Leave them in place until every call site has
+    been switched over, then they can go.
+
+    Build the model in a code block, never inline in the partial tag -
+    a nested double quote closes the HTML attribute and Razor stops
+    parsing the rest as C#.
+
+        @{ var mbar = MonsterBarBadgeViewModel.From(
+               dp.MonsterBarGamePlayer, Model.MonsterBar.MonsterBarItems); }
+        <partial name="_MonsterBarBadge" model="mbar" />
+*@
+
+@if (Model != null)
+{
+    <div class="range-badge range-badge--monster@(Model.IsHeader ? " range-badge--header" : "")">
+        @if (!string.IsNullOrEmpty(Model.Label))
+        {
+            <span class="range-badge-label">@Model.Label</span>
+        }
+        <div class="range-badge-cells">
+            @foreach (var cell in Model.Cells)
+            {
+                if (cell.IsEmpty)
+                {
+                    <span class="range-badge-cell monster-bar-cell monster-bar-cell--empty">&nbsp;</span>
+                }
+                else if (Model.IsHeader)
+                {
+                    if (!string.IsNullOrEmpty(cell.Description))
+                    {
+                        <span class="bm-tooltip-wrap">
+                            <span class="bm-tooltip-trigger" data-bm-tooltip="@cell.TooltipId">
+                                <span class="range-badge-header-cell">@cell.DecodedGamesText</span>
+                            </span>
+                            <div class="bm-tooltip-content" id="@cell.TooltipId" role="tooltip">@cell.Description</div>
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="range-badge-header-cell">@cell.DecodedGamesText</span>
+                    }
+                }
+                else if (!string.IsNullOrEmpty(cell.Description))
+                {
+                    <span class="bm-tooltip-wrap">
+                        <span class="bm-tooltip-trigger" data-bm-tooltip="@cell.TooltipId">
+                            @{ await Html.RenderPartialAsync("_MonsterBarBadgeCell", cell); }
+                        </span>
+                        <div class="bm-tooltip-content" id="@cell.TooltipId" role="tooltip">@cell.Description</div>
+                    </span>
+                }
+                else
+                {
+                    await Html.RenderPartialAsync("_MonsterBarBadgeCell", cell);
+                }
+            }
+        </div>
+    </div>
+}

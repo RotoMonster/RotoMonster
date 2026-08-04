@@ -1,0 +1,61 @@
+@model RotoMonster.Models.Shared.CustomTooltipViewModel
+
+@*
+    Razor port of RotoMonsterUI's CustomTooltip. Emits the same markup the
+    library does, so bm.light.css and rotomonster-ui.js drive it unchanged.
+
+    Trigger is CLICK by default - matching the library. Pass IsHoverTrigger
+    for hover.
+
+    Usage with plain text:
+        <partial name="_CustomTooltip" model="@(new CustomTooltipViewModel {
+            TriggerText = "?", ContentText = "Explanation here." })" />
+
+    Usage wrapping arbitrary markup - render the trigger to a string first,
+    or use the TriggerHtml property.
+*@
+
+@if (Model != null)
+{
+    <span class="bm-tooltip-wrap">
+        <span class="bm-tooltip-trigger@(Model.IsHoverTrigger ? " bm-tooltip-trigger--hover" : "")"
+              data-bm-tooltip="@Model.Id">
+            @if (!string.IsNullOrEmpty(Model.TriggerHtml))
+            {
+                @Html.Raw(Model.TriggerHtml)
+            }
+            else
+            {
+                @Model.TriggerText
+            }
+        </span>
+        @if (Model.MaxWidth.HasValue)
+        {
+            <div class="bm-tooltip-content@(Model.IsCentered ? " bm-tooltip-content--centered" : "")"
+                 id="@Model.Id" role="tooltip" style="max-width:@(Model.MaxWidth)px;">
+                @if (!string.IsNullOrEmpty(Model.ContentHtml))
+                {
+                    @Html.Raw(Model.ContentHtml)
+                }
+                else
+                {
+                    @Model.ContentText
+                }
+            </div>
+        }
+        else
+        {
+            <div class="bm-tooltip-content@(Model.IsCentered ? " bm-tooltip-content--centered" : "")"
+                 id="@Model.Id" role="tooltip">
+                @if (!string.IsNullOrEmpty(Model.ContentHtml))
+                {
+                    @Html.Raw(Model.ContentHtml)
+                }
+                else
+                {
+                    @Model.ContentText
+                }
+            </div>
+        }
+    </span>
+}

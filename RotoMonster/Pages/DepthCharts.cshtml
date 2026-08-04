@@ -141,14 +141,14 @@
                                     @if (Model.ShowGameMonsterBar)
                                     {
                                         <td class="text-nowrap flex-nowrap">
-                                            <partial name="_DisplayMonsterBarPlayer" model="new RotoMonster.Core.DisplayMonsterBarPlayer() { IsCompact = false, MonsterBarPlayer = dp.MonsterBarGamePlayer, MonsterBarItems = Model.MonsterBar.MonsterBarItems }" />
+                                            <partial name="_MonsterBarBadge" model="RotoMonster.Models.Shared.MonsterBarBadgeViewModel.From(dp.MonsterBarGamePlayer, Model.MonsterBar.MonsterBarItems)" />
                                         </td>
                                     }
 
                                     @if (Model.ShowTotalMonsterBar)
                                     {
                                         <td class="text-nowrap flex-nowrap">
-                                            <partial name="_DisplayMonsterBarPlayer" model="new RotoMonster.Core.DisplayMonsterBarPlayer() { IsCompact = false, MonsterBarPlayer = dp.MonsterBarTotalPlayer, MonsterBarItems = Model.TotalMonsterBar.MonsterBarItems }" />
+                                            <partial name="_MonsterBarBadge" model="RotoMonster.Models.Shared.MonsterBarBadgeViewModel.From(dp.MonsterBarTotalPlayer, Model.TotalMonsterBar.MonsterBarItems)" />
                                         </td>
                                     }
 
