@@ -1,4 +1,4 @@
-using RotoMonster.Core;
+﻿using RotoMonster.Core;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -55,5 +55,8 @@ namespace RotoMonster.Data
         Task<List<UserLeagueWaiverPlayer>> GetUserLeagueWaiverPlayersAsync(UserLeague userLeague);
         Task<List<GameScoringAlert>> GetGameScoringAlertsAsync(Season season, System.DateTime startDate, System.DateTime endDate);
         Task<List<PlayerGameState>> GetPlayerGameStatesAsync(System.DateTime startDate, System.DateTime endDate);
+        // Drafts and display columns
+        Task<List<DisplayColumn>> GetDisplayColumnsAsync(string userId);
+        Task<Draft> AddDraftAsync(Draft draft);
     }
 }

@@ -12,6 +12,7 @@ using RotoMonster.Core;
 using RotoMonster.Core.Libs;
 using RotoMonster.Data.Libs;
 using System;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -1884,7 +1885,7 @@ namespace RotoMonster.Data
             return teamItems;
         }
 
-        public List<SelectListItem> GetPlayerFilterSelectItems(UserLeague userLeague)
+        public async Task<List<SelectListItem>> GetPlayerFilterSelectItems(UserLeague userLeague)
         {
             var filterItems = new List<SelectListItem>();
             filterItems.Add(new SelectListItem("Top Players", "1"));
@@ -1892,7 +1893,7 @@ namespace RotoMonster.Data
             filterItems.Add(new SelectListItem("Available Players", "3"));
             filterItems.Add(new SelectListItem("My Players", "4"));
             filterItems.Add(new SelectListItem("Available+My Players", "5"));
-            foreach (var ult in GetUserLeagueTeams(userLeague))
+            foreach (var ult in await GetUserLeagueTeamsAsync(userLeague))
             {
                 long listId = ult.Id + 100; // make sure it's higher than regular filter Ids
                 filterItems.Add(new SelectListItem("Team: " + ult.Title, listId.ToString()));
@@ -3030,16 +3031,16 @@ namespace RotoMonster.Data
             return dc;
         }
 
-        public List<UserLeagueActiveRosterSpot> GetDefaultUserLeagueActiveRosterSpots()
+        public async Task<List<UserLeagueActiveRosterSpot>> GetDefaultUserLeagueActiveRosterSpots()
         {
             var userLeagueActiveRosterSpots = new List<UserLeagueActiveRosterSpot>();
 
-            foreach (var ars in (from a in db.ActiveRosterSpots.AsNoTracking()
+            foreach (var ars in await (from a in db.ActiveRosterSpots.AsNoTracking()
                                  .Include(i => i.ActiveRosterSpotPositions)
                                  .ThenInclude(t => t.Position)
                                  .ThenInclude(t => t.PlayerType)
                                  orderby a.DisplayOrder
-                                 select a))
+                                 select a).ToListAsync())
             {
                 var userLeagueActiveRosterSpot = new UserLeagueActiveRosterSpot();
                 userLeagueActiveRosterSpot.ActiveRosterSpotId = ars.Id;
@@ -3232,23 +3233,23 @@ namespace RotoMonster.Data
             return adpPlayers;
         }
 
-        public Draft GetDraft(FantasyProvider fantasyProvider, string providerLeagueId)
+        public async Task<Draft> GetDraft(FantasyProvider fantasyProvider, string providerLeagueId)
         {
-            var draft = (from d in db.Drafts
+            var draft = await (from d in db.Drafts
                          .Include(i => i.FantasyProvider)
                          .Include(i => i.Season)
                          .Include(i => i.DraftPlayers).ThenInclude(i2 => i2.Player)
                          .AsNoTracking()
                          where d.FantasyProviderId == fantasyProvider.Id && d.ProviderLeagueId == providerLeagueId
-                         select d).FirstOrDefault();
+                         select d).FirstOrDefaultAsync();
 
             if (draft != null)
             {
-                draft.DraftPlayerTypes = (from pt in db.DraftPlayerTypes.AsNoTracking()
+                draft.DraftPlayerTypes = await (from pt in db.DraftPlayerTypes.AsNoTracking()
                                           .Include(i => i.PlayerType)
                                           where pt.DraftId == draft.Id
                                           orderby pt.PlayerType.DisplayOrder
-                                          select pt).ToList();
+                                          select pt).ToListAsync();
             }
 
             return draft;
@@ -3314,9 +3315,9 @@ namespace RotoMonster.Data
             return draftPlayers;
         }
 
-        public bool IsDraftFinished(FantasyProvider fantasy, string fantasyProviderId)
+        public async Task<bool> IsDraftFinished(FantasyProvider fantasy, string fantasyProviderId)
         {
-            var isFinished = (from d in db.Drafts.AsNoTracking() where d.ProviderLeagueId == fantasyProviderId select d.IsFinished).FirstOrDefault();
+            var isFinished = await (from d in db.Drafts.AsNoTracking() where d.ProviderLeagueId == fantasyProviderId select d.IsFinished).FirstOrDefaultAsync();
 
             return isFinished;
         }
@@ -5039,10 +5040,10 @@ namespace RotoMonster.Data
             return displayColumns;
         }
 
-        public UserDisplayColumns GetUserDisplayColumns(string userId)
+        public async Task<UserDisplayColumns> GetUserDisplayColumns(string userId)
         {
             var userDisplayColumns = new UserDisplayColumns();
-            foreach (var displayColumn in (from dc in GetDisplayColumns(userId) select dc))
+            foreach (var displayColumn in (from dc in await GetDisplayColumnsAsync(userId) select dc))
                 userDisplayColumns.DisplayColumns.Add(displayColumn);
 
             return userDisplayColumns;
@@ -5069,13 +5070,13 @@ namespace RotoMonster.Data
             return displayColumns;
         }
 
-        public List<ProjectionPlayer> GetProjectionPlayers(PlayerType playerType, Season season, DateTime pastStartDate, DateTime pastEndDate, DateTime projectedStartDate, DateTime projectedEndDate, List<CategorySetting> categorySettings, string scoringSystem, PerValue perValue, int leagueSize)
+        public async Task<List<ProjectionPlayer>> GetProjectionPlayers(PlayerType playerType, Season season, DateTime pastStartDate, DateTime pastEndDate, DateTime projectedStartDate, DateTime projectedEndDate, List<CategorySetting> categorySettings, string scoringSystem, PerValue perValue, int leagueSize)
         {
             var projectionPlayers = new List<ProjectionPlayer>();
             var categories = GetCategories(playerType);
             var perGamePerValue = GetPerGamePerValue(playerType.Id);
             var perValues = GetPerValues(playerType.Id);
-            var playerStatuses = GetActivePlayerStatuses();
+            var playerStatuses = await GetActivePlayerStatusesAsync();
 
             List<StatPlayer> statPlayers = GetStatPlayers(playerType, season.Id, pastStartDate, pastEndDate, true, null, true);
             var games = GetGames(season, projectedStartDate, projectedEndDate);
@@ -5124,7 +5125,7 @@ namespace RotoMonster.Data
 
             var playerPositionPercents = GetPlayerPositionPercents(season, season.StartDate, season.EndDate);
             var measureCat = GetMeasureCategory(playerType.Id);
-            var actualPositions = GetActualPositions(playerType);
+            var actualPositions = await GetActualPositionsAsync(playerType);
 
             if (actualPositions.Count > 0)
             {
@@ -5152,7 +5153,7 @@ namespace RotoMonster.Data
                     {
                         var positionPercentOverAverage = new Dictionary<int, double>();
                         double expectedPositionMinutes = teamMinutes / (double)actualPositions.Count;
-                        foreach (var position in GetActualPositions(playerType))
+                        foreach (var position in await GetActualPositionsAsync(playerType))
                             positionPercentOverAverage[position.Id] = (totalPositionMinutes[position.Id] - expectedPositionMinutes) / expectedPositionMinutes * 100;
                         foreach (var projPlayer in (from pp in projectionPlayers where pp.SeasonPlayer.TeamId == seasonTeam.TeamId select pp))
                         {

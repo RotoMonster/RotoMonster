@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RotoMonster.Core;
 using System;
 using System.Collections.Generic;
@@ -425,6 +425,75 @@ namespace RotoMonster.Data
                           join g in db.Games.AsNoTracking() on p.GameId equals g.Id
                           where g.GameDate >= startDate && g.GameDate <= endDate
                           select p).ToListAsync();
+        }
+        // ---------------------------------------------------------------
+        // Drafts and display columns - async twins
+        //
+        // These two keep their sync versions because they have callers outside
+        // PlayerRankings: AddDraft is used by UserLeagues/Import, and
+        // GetDisplayColumns by DisplaySettings. The sync versions go once
+        // those pages are converted.
+        // ---------------------------------------------------------------
+
+        public async Task<List<DisplayColumn>> GetDisplayColumnsAsync(string userId)
+        {
+            if (userId == null)
+                return new List<DisplayColumn>();
+
+            var displayColumns = new List<DisplayColumn>();
+
+            var columns = await (from c in db.UserOptionTypes
+                                 where c.OptionGroup == "DisplayColumn"
+                                 where c.IsEnabled
+                                 orderby c.DisplayOrder
+                                 select c).ToListAsync();
+
+            var userSettings = await (from u in db.UserOptions where u.UserId == userId select u).ToListAsync();
+
+            foreach (var column in columns)
+            {
+                var displayColumn = new DisplayColumn();
+                displayColumn.UserOptionType = column;
+                var userSetting = (from u in userSettings where u.UserOptionTypeId == column.Id select u).FirstOrDefault();
+                if (userSetting != null)
+                    displayColumn.IsSelected = userSetting.ValueBool.GetValueOrDefault(false);
+                else
+                    displayColumn.IsSelected = column.DefaultValueBool.GetValueOrDefault(false);
+                displayColumns.Add(displayColumn);
+            }
+
+            return displayColumns;
+        }
+
+        /// <summary>
+        /// NOTE: two SaveChanges calls in sequence, matching the sync version.
+        /// They must stay sequential - the second depends on draft.Id being
+        /// populated by the first.
+        /// </summary>
+        public async Task<Draft> AddDraftAsync(Draft draft)
+        {
+            if (draft == null || draft.DraftPlayers.Count == 0)
+                return draft;
+
+            var match = await (from d in db.Drafts.AsNoTracking()
+                               where d.FantasyProviderId == draft.FantasyProviderId
+                                  && d.ProviderLeagueId == draft.ProviderLeagueId
+                               select d).FirstOrDefaultAsync();
+
+            if (match == null)
+            {
+                db.Drafts.Add(draft);
+                await db.SaveChangesAsync();
+
+                foreach (var pt in draft.DraftPlayerTypes)
+                {
+                    pt.DraftId = draft.Id;
+                    db.DraftPlayerTypes.Add(pt);
+                }
+                await db.SaveChangesAsync();
+            }
+
+            return draft;
         }
     }
 }

@@ -3,6 +3,7 @@ using RotoMonster.Core;
 using RotoMonster.Core.Libs;
 using RotoMonster.Data.Libs;
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text;
 
@@ -167,7 +168,7 @@ namespace RotoMonster.Data
         FantasyProvider GetDefaultFantasyProvider();
         List<ActiveRosterSpot> GetActiveRosterSpots();
         List<ActiveRosterSpotPosition> GetActiveRosterSpotPositions();
-        List<UserLeagueActiveRosterSpot> GetDefaultUserLeagueActiveRosterSpots();
+        Task<List<UserLeagueActiveRosterSpot>> GetDefaultUserLeagueActiveRosterSpots();
 
         List<Category> GetCategories(PlayerType playerType);
         List<Category> GetCategories();
@@ -179,13 +180,13 @@ namespace RotoMonster.Data
         void UpdateUserLeagueUpdatedDate(int userLeagueId, DateTime updatedDate, bool rostersUpdated);
         void DeleteUserLeague(int userLeagueId);
         Draft AddDraft(Draft draft);
-        Draft GetDraft(FantasyProvider fantasyProvider, string fantasyProviderId);
+        Task<Draft> GetDraft(FantasyProvider fantasyProvider, string fantasyProviderId);
         void DeleteDraft(int draftId);
         void DeleteDraft(FantasyProvider fantasyProvider, string providerLeagueId);
         List<Draft> GetDrafts(FantasyProvider fantasyProvider);
         List<Draft> GetDrafts(Season season);
         List<DraftPlayer> GetDraftPlayers(Draft draft);
-        bool IsDraftFinished(FantasyProvider fantasy, string fantasyProviderId);
+        Task<bool> IsDraftFinished(FantasyProvider fantasy, string fantasyProviderId);
 
         List<FantasyProviderPlayer> GetFantasyProviderPlayers(FantasyProvider fantasyProvider);
 
@@ -193,7 +194,7 @@ namespace RotoMonster.Data
 
         List<SelectListItem> GetPerValuesSelectItems(PlayerType playerType);
         List<SelectListItem> GetTeamsSelectItems(Season season);
-        List<SelectListItem> GetPlayerFilterSelectItems(UserLeague userLeague);
+        Task<List<SelectListItem>> GetPlayerFilterSelectItems(UserLeague userLeague);
         List<SelectListItem> GetProjectionSourceSelectItems();
         List<SelectListItem> GetDayOfWeekSelectItems(DateTime startDate, DateTime endDate);
 
@@ -244,7 +245,7 @@ namespace RotoMonster.Data
 
         List<DepthPlayer> GetDepthPlayers(PlayerType playerType, string categoriesCode, DateTime dateTime, bool sortByActive);
 
-        List<ProjectionPlayer> GetProjectionPlayers(
+        Task<List<ProjectionPlayer>> GetProjectionPlayers(
             PlayerType playerType,
             Season season,
             DateTime pastStartDate,
@@ -306,7 +307,7 @@ namespace RotoMonster.Data
         List<PlayerPositionPercent> GetPlayerPositionPercents(Season season, DateTime startDate, DateTime endDate, int gameId = 0);
 
         List<DisplayColumn> GetDisplayColumns(string userId);
-        UserDisplayColumns GetUserDisplayColumns(string userId);
+        Task<UserDisplayColumns> GetUserDisplayColumns(string userId);
 
         List<DisplayColumn> UpdateDisplayColumns(string userId, List<DisplayColumn> displayColumns);
 
