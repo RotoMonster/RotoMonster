@@ -95,7 +95,7 @@ namespace RotoMonster.Pages.UserLeagues
             return RedirectToPage("./Import");
         }
 
-        public IActionResult OnPostCustomLeague()
+        public async Task<IActionResult> OnPostCustomLeagueAsync()
         {
             //var providerPlayers = db.GetFantasyProviderPlayers(db.GetFantasyProvider("yahoo"));
             //if (UserAuth.MustRefreshYahoo)
@@ -117,10 +117,10 @@ namespace RotoMonster.Pages.UserLeagues
             //{
             //}
 
-            var newUserLeague = db.GetNewCustomUserLeague();
+            var newUserLeague = await db.GetNewCustomUserLeagueAsync();
             newUserLeague.UserId = UserId;
             if (newUserLeague != null)
-                db.AddUserLeague(newUserLeague);
+                await db.AddUserLeagueAsync(newUserLeague);
             //Draft draft = sharedDb.ImportDraft(UserAuth, league, providerPlayers, db.GetDefaultSeason().YahooId, logger);
             //db.AddDraft(draft);
             //AddMessage("You have imported the Yahoo! league " + league.Title);
@@ -253,12 +253,12 @@ namespace RotoMonster.Pages.UserLeagues
             return Page();
         }
 
-        public IActionResult OnPostImportFanTrax()
+        public async Task<IActionResult> OnPostImportFanTraxAsync()
         {
-            return OnGetImportLeague(FanTraxLeagueId, "FanTrax");
+            return await OnGetImportLeagueAsync(FanTraxLeagueId, "FanTrax");
         }
 
-        public IActionResult OnGetImportLeague(string id, string provider)
+        public async Task<IActionResult> OnGetImportLeagueAsync(string id, string provider)
         {
             UserLeague league = null;
 
@@ -283,9 +283,9 @@ namespace RotoMonster.Pages.UserLeagues
                 catch
                 {
                 }
-                db.AddUserLeague(league);
+                await db.AddUserLeagueAsync(league);
                 Draft draft = sharedDb.ImportDraft(UserAuth, league, providerPlayers, db.GetDefaultSeason().YahooId, logger);
-                db.AddDraft(draft);
+                await db.AddDraftAsync(draft);
                 AddMessage("You have imported the Yahoo! league " + league.Title);
             }
 
@@ -306,9 +306,9 @@ namespace RotoMonster.Pages.UserLeagues
                 if (league.MyProviderTeamId.Length==0 && league.UserLeagueTeams.Count > 0)
                     league.MyProviderTeamId = league.UserLeagueTeams.First().ProviderId;
 
-                db.AddUserLeague(league);
+                await db.AddUserLeagueAsync(league);
                 Draft draft = fanTrax.ImportDraft(UserAuth, league, providerPlayers);
-                db.AddDraft(draft);
+                await db.AddDraftAsync(draft);
                 AddMessage("You have imported the FanTrax league " + league.Title + ". Make sure to edit the league to set your team.");
             }
 
@@ -318,7 +318,7 @@ namespace RotoMonster.Pages.UserLeagues
                 league = espn.ImportUserLeague(db.Sport, UserAuth, db.GetDefaultSeason(), id, db.GetActiveRosterSpots(), db.GetCategories());
                 var missingPlayers = new List<UserLeagueMissingPlayer>();
                 league.UserLeagueTeams = espn.GetUserLeagueTeams(UserAuth, db.Sport, db.GetDefaultSeason(), league, providerPlayers, db.GetPlayers(), missingPlayers);
-                db.AddUserLeague(league);
+                await db.AddUserLeagueAsync(league);
                 // Draft draft = fanTrax.ImportDraft(UserAuth, league, providerPlayers);
                 // db.AddDraft(draft);
                 AddMessage("You have imported the ESPN league " + league.Title);
