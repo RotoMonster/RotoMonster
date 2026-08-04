@@ -304,5 +304,90 @@ namespace RotoMonster.Data
                 }
             }
         }
+        // ---------------------------------------------------------------
+        // Display categories
+        // ---------------------------------------------------------------
+
+        /// <summary>
+        /// Async twin rather than an in-place conversion, because five pages call
+        /// the sync version and only Players is converted so far. The sync one
+        /// goes once the other four are done.
+        /// </summary>
+        public async Task<List<UserDisplayCategory>> GetUserDisplayCategoriesAsync(string userId, UserLeague userLeague)
+        {
+            if (userId == null)
+                return GetDefaultDisplayCategories();
+
+            var userDisplayCategories = await (from udc in db.UserDisplayCategories.AsNoTracking()
+                                               .Include(i => i.Category).ThenInclude(i => i.PlayerType)
+                                               .Include(i => i.Category).ThenInclude(i => i.CategoryPerValues)
+                                               where udc.UserId == userId
+                                               orderby udc.DisplayOrder ascending
+                                               select udc).ToListAsync();
+
+            if (userLeague == null)
+                return userDisplayCategories;
+
+            var filteredUserDisplayCategories = new List<UserDisplayCategory>();
+            foreach (var userDisplayCategory in userDisplayCategories)
+            {
+                var match = (from c in userLeague.UserLeagueCategories
+                             where c.CategoryId == userDisplayCategory.CategoryId
+                             select c).FirstOrDefault();
+                if (match == null)
+                    filteredUserDisplayCategories.Add(userDisplayCategory);
+            }
+
+            return filteredUserDisplayCategories;
+        }
+
+        public async Task<List<UserDisplayCategory>> GetUserDisplayCategoriesAsync(string userId, UserLeague userLeague, PlayerType playerType)
+        {
+            if (userId == null)
+                return (from dc in GetDefaultDisplayCategories()
+                        where dc.Category.PlayerType.Id == playerType.Id
+                        orderby dc.Category.DisplayOrder
+                        select dc).ToList();
+
+            var userDisplayCategories = await (from udc in db.UserDisplayCategories.AsNoTracking()
+                                               .Include(i => i.Category).ThenInclude(i => i.PlayerType)
+                                               .Include(i => i.Category).ThenInclude(i => i.CategoryPerValues)
+                                               where udc.UserId == userId && udc.Category.PlayerType.Id == playerType.Id
+                                               orderby udc.DisplayOrder ascending
+                                               select udc).ToListAsync();
+
+            foreach (var lcat in (from ulc in userLeague.UserLeagueCategories
+                                  where ulc.Category.PlayerType.Id == playerType.Id
+                                  select ulc))
+            {
+                if (userDisplayCategories.Find(dc => dc.CategoryId == lcat.CategoryId) == null)
+                {
+                    var userDisplayCategory = new UserDisplayCategory();
+                    userDisplayCategory.Category = lcat.Category;
+                    userDisplayCategory.CategoryId = lcat.CategoryId;
+                    userDisplayCategory.DisplayOrder = lcat.Category.DisplayOrder;
+                    userDisplayCategories.Add(userDisplayCategory);
+                }
+            }
+
+            return (from dc in userDisplayCategories orderby dc.Category.DisplayOrder select dc).ToList();
+        }
+
+        /// <summary>
+        /// Filters the already-async status list. No query of its own.
+        ///
+        /// The sync version has exactly one caller, so this could have been an
+        /// in-place conversion rather than a twin. Kept as a twin only because
+        /// its sync form is still referenced from IRMData.
+        /// </summary>
+        public async Task<PlayerStatus> GetPlayerActivePlayerStatusAsync(int playerId)
+        {
+            var statuses = await GetActivePlayerStatusesAsync();
+
+            return (from ps in statuses
+                    where ps.PlayerId == playerId
+                    orderby ps.DateAdded descending
+                    select ps).FirstOrDefault();
+        }
     }
 }

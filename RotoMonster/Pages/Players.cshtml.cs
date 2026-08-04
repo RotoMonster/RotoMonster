@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -51,7 +51,7 @@ namespace RotoMonster.Pages
             });
         }
 
-        public IActionResult OnGet(int playerId, int? l)
+        public async Task<IActionResult> OnGetAsync(int playerId, int? l)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace RotoMonster.Pages
                 if (UserId != null)
                 {
                     SelectedUserLeagueId = l.GetValueOrDefault();
-                    ViewData["UserLeagueList"] = new SelectList(db.GetTrackedUserLeagues(UserId), "Id", "ListDisplayTitle");
+                    ViewData["UserLeagueList"] = new SelectList(await db.GetTrackedUserLeaguesAsync(UserId), "Id", "ListDisplayTitle");
 
                     if (SearchTerm != null && SearchTerm.Length > 0)
                     {
@@ -78,12 +78,12 @@ namespace RotoMonster.Pages
 
                     OwnedInUserLeagues = new List<UserLeague>();
                     AvailableInUserLeagues = new List<UserLeague>();
-                    foreach (var userLeague in db.GetTrackedUserLeagues(UserId))
+                    foreach (var userLeague in await db.GetTrackedUserLeaguesAsync(UserId))
                     {
                         if (userLeague.TrackLeague)
                         {
                             bool owned = false;
-                            foreach (var teamPlayer in db.GetUserLeagueTeamPlayers(userLeague))
+                            foreach (var teamPlayer in await db.GetUserLeagueTeamPlayersAsync(userLeague))
                             {
                                 if (teamPlayer.PlayerId == playerId)
                                 {
@@ -99,7 +99,7 @@ namespace RotoMonster.Pages
                     }
                 }
 
-                SelectedUserLeague = db.SelectUserLeague(UserId, l == null ? db.GetDefaultUserLeague() : db.GetUserLeague(l.GetValueOrDefault()));
+                SelectedUserLeague = await db.SelectUserLeagueAsync(UserId, l == null ? await db.GetDefaultUserLeagueAsync() : await db.GetUserLeagueAsync(l.GetValueOrDefault()));
                 SelectedUserLeagueId = SelectedUserLeague.Id;
 
                 SeasonPlayer = db.GetSeasonPlayer(playerId);
@@ -116,7 +116,7 @@ namespace RotoMonster.Pages
 
                     CategoriesString categoryString = SelectedUserLeague.GetCategoriesString(SeasonPlayer.PlayerType);
                     if (categoryString == null)
-                        categoryString=  db.GetDefaultUserLeague().GetCategoriesString(SeasonPlayer.PlayerType);
+                        categoryString=  (await db.GetDefaultUserLeagueAsync()).GetCategoriesString(SeasonPlayer.PlayerType);
 
                     if (categoryString == null)
                         return Page();
@@ -124,11 +124,11 @@ namespace RotoMonster.Pages
                     Player = SeasonPlayer.Player;
                     var ops = db.GetOwnershipPlayersWithChange(categoryString.Code, DateTime.UtcNow, 24);
                     OwnershipPlayer = (from op in ops where op.PlayerId == SeasonPlayer.PlayerId select op).FirstOrDefault();
-                    PlayerStatus = db.GetPlayerActivePlayerStatus(Player.Id);
+                    PlayerStatus = await db.GetPlayerActivePlayerStatusAsync(Player.Id);
                     HistoryTableModel.Sport = db.Sport;
                     HistoryTableModel.PlayerType = SeasonPlayer.PlayerType;
                     HistoryTableModel.CategorySettings = db.GetUserLeagueCategorySettings(SelectedUserLeague, SeasonPlayer.PlayerType);
-                    HistoryTableModel.UserDisplayCategories = db.GetUserDisplayCategories(UserId, SelectedUserLeague, SeasonPlayer.PlayerType);
+                    HistoryTableModel.UserDisplayCategories = await db.GetUserDisplayCategoriesAsync(UserId, SelectedUserLeague, SeasonPlayer.PlayerType);
                     HistoryTableModel.DisplayPerValue = db.GetDefaultDisplayPerValue(SeasonPlayer.PlayerTypeId);
                     HistoryTableModel.GamesCategoryId = db.GetGamesCategory(SeasonPlayer.PlayerTypeId).Id;
                     HistoryTableModel.BeforeCategories = db.GetBeforeDisplayCategories(SeasonPlayer.PlayerType);

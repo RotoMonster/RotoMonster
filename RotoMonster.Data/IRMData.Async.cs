@@ -45,5 +45,10 @@ namespace RotoMonster.Data
 
         // Display player fill
         Task FillDisplayPlayerUserLeagueTeamsAsync(UserLeague userLeague, List<DisplayPlayer> displayPlayers);
+
+        // Display categories
+        Task<List<UserDisplayCategory>> GetUserDisplayCategoriesAsync(string userId, UserLeague userLeague);
+        Task<List<UserDisplayCategory>> GetUserDisplayCategoriesAsync(string userId, UserLeague userLeague, PlayerType playerType);
+        Task<PlayerStatus> GetPlayerActivePlayerStatusAsync(int playerId);
     }
 }
