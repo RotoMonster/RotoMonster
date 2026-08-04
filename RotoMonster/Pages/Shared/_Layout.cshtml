@@ -151,6 +151,7 @@
 
     <footer>
         @RenderSection("footer", required: false)
+        <div class="me-2 mt-2">@Html.Raw(new RotoMonsterUI.YahooAttribution().Render())</div>
         <div class="text-muted text-end me-2 mt-2">
             &copy; @DateTime.Today.Year RotoMonster LLC
             @*            <small class="font-monospace">

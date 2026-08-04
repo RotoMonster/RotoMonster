@@ -1,0 +1,118 @@
+@page
+@model RotoMonster.Pages.ComponentsModel
+@using RotoMonsterUI
+@{
+    ViewData["pagetitle"] = "Components";
+}
+
+@*
+    Preview page for the RotoMonsterUI components Ken listed as candidates to
+    move into RotoMonster. Everything here uses DUMMY DATA - the point is to
+    prove each component renders correctly inside RotoMonster's own layout and
+    stylesheet chain, not to be a real page.
+
+    Nothing links here. Reach it at /Components.
+
+    Once Ken says where each component belongs, the call moves onto the real
+    page and the section here can go.
+*@
+
+<div class="container">
+    <h1>Component Preview</h1>
+    <p class="text-muted">
+        Library components rendering inside RotoMonster. Dummy data throughout.
+    </p>
+
+    <hr />
+
+    <h3>SystemMessage</h3>
+    <p class="text-muted small">
+        RotoMonster has <code>_Messages.cshtml</code> which does the same job from
+        TempData. This is the library's version for comparison.
+    </p>
+    @foreach (var type in new[] { SystemMessageType.Info, SystemMessageType.Success, SystemMessageType.Warning, SystemMessageType.Error })
+    {
+        <div class="mb-2">
+            @Html.Raw(new SystemMessage(new SystemMessageInput
+            {
+                Type = type,
+                Text = type.ToString() + " - this is a sample system message."
+            }).Render())
+        </div>
+    }
+
+    <hr />
+
+    <h3>PlayerStatBadge</h3>
+    @Html.Raw(new PlayerStatBadge(new PlayerStatBadgeInput
+    {
+        Stats = new List<PlayerStatBadgeItem>
+        {
+            new PlayerStatBadgeItem { Label = "AVG", Value = ".312" },
+            new PlayerStatBadgeItem { Label = "HR", Value = "24" },
+            new PlayerStatBadgeItem { Label = "RBI", Value = "78" },
+            new PlayerStatBadgeItem { Label = "OPS", Value = ".921" }
+        }
+    }).Render())
+
+    <hr />
+
+    <h3>IconButton</h3>
+    <div class="d-flex gap-2 flex-wrap align-items-center">
+        @Html.Raw(new IconButton("Refresh", IconType.RefreshRosters).Render())
+        @Html.Raw(new IconButton("Settings", IconType.Settings).Render())
+        @Html.Raw(new IconButton("Next", IconType.Next).Render())
+        @Html.Raw(new IconButton("Delete", IconType.Trash).WithIconOnly().Render())
+    </div>
+
+    <hr />
+
+    <h3>PuntCategoryControl</h3>
+    <p class="text-muted small">
+        Has a Service, so this is display only for now - clicking does not post back.
+    </p>
+    @Html.Raw(new PuntCategoryControl(new PuntCategoryInput
+    {
+        Id = "puntdemo",
+        Categories = Model.DemoCategories,
+        SelectedIds = new List<int> { 2, 5 }
+    }).Render())
+
+    <hr />
+
+    <h3>CustomTooltip</h3>
+    <p class="text-muted small">
+        Razor version, not the library call. Click the trigger.
+    </p>
+    <partial name="_CustomTooltip" model="@(new RotoMonster.Models.Shared.CustomTooltipViewModel
+    {
+        TriggerText = "Click me",
+        ContentText = "This tooltip is rendered by the Razor partial and driven by the shared rotomonster-ui.js."
+    })" />
+
+    <hr />
+
+    <h3>MonsterBar header row</h3>
+    <p class="text-muted small">
+        Built but not wired into any real table yet.
+    </p>
+    @{
+        var mbarHeader = RotoMonster.Models.Shared.MonsterBarBadgeViewModel.Header(Model.DemoMonsterBarItems);
+    }
+    <partial name="_MonsterBarBadge" model="mbarHeader" />
+
+    <hr />
+
+    <h3>Not included</h3>
+    <ul class="text-muted small">
+        <li>
+            <strong>LineupCard</strong> - composes <code>DisplayPlayerInput</code>, and Ken's
+            7-29 decision was that RotoMonster uses its own DisplayPlayer rather than the
+            library's. So this one is not a straight move and needs his call first.
+        </li>
+        <li>
+            <strong>DateNavControl, PlayerSearch, LeagueSettings</strong> - RotoMonster already
+            has its own equivalents, so these are replacements rather than additions.
+        </li>
+    </ul>
+</div>
