@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model RotoMonster.Pages.ComponentsModel
 @using RotoMonsterUI
 @{
@@ -103,16 +103,72 @@
 
     <hr />
 
-    <h3>Not included</h3>
+    <h3>DateNavControl</h3>
+    <p class="text-muted small">
+        Has a Service. RotoMonster has <code>_GameDatesHeader.cshtml</code>, which is a
+        different shape - a row of day checkboxes rather than a single-date pager.
+    </p>
+    @Html.Raw(new DateNavControl(new DateNavControlInput
+    {
+        Id = "datenavdemo",
+        SelectedDate = System.DateTime.Today,
+        OriginalDate = System.DateTime.Today,
+        GameCount = 8
+    }).Render())
+
+    <hr />
+
+    <h3>LeagueSettings</h3>
+    @Html.Raw(new LeagueSettings(new LeagueSettingsInput
+    {
+        ScoringType = LeagueScoringType.Roto,
+        NumTeams = 12,
+        PlayersPerTeam = 23,
+        Categories = Model.DemoLeagueCategories
+    }).Render())
+
+    <hr />
+
+    <h3>PlayerSearch</h3>
+    <p class="text-muted small">
+        Has a Service. RotoMonster has jQuery UI autocomplete in
+        <code>_PlayerSearchScripts.cshtml</code> hitting <code>./api/postapi/search</code>;
+        this one filters a list passed in. Ken: "RotoMonster has one, but yours is better."
+    </p>
+    @Html.Raw(new PlayerSearch(new PlayerSearchInput
+    {
+        Id = "playersearchdemo",
+        AvailablePlayers = Model.DemoSearchPlayers
+    }).Render())
+
+    <hr />
+
+    <h3>LineupCard</h3>
+    <p class="text-muted small">
+        Takes <code>DisplayPlayerInput</code> for its players, but does NOT render the
+        library's DisplayPlayer - it only uses the data. So this is not in conflict with
+        using RotoMonster's own DisplayPlayer.
+    </p>
+    @Html.Raw(new LineupCard(Model.DemoLineupCard).Render())
+
+    <hr />
+
+    <h3>Notes for Ken</h3>
     <ul class="text-muted small">
         <li>
-            <strong>LineupCard</strong> - composes <code>DisplayPlayerInput</code>, and Ken's
-            7-29 decision was that RotoMonster uses its own DisplayPlayer rather than the
-            library's. So this one is not a straight move and needs his call first.
+            All ten components from the list now render here. Four have a Service
+            (DateNavControl, PlayerSearch, PuntCategoryControl, and posting from
+            LineupCard) and are display-only for now.
         </li>
         <li>
-            <strong>DateNavControl, PlayerSearch, LeagueSettings</strong> - RotoMonster already
-            has its own equivalents, so these are replacements rather than additions.
+            <strong>DateNavControl, PlayerSearch, LeagueSettings</strong> overlap
+            existing RotoMonster code rather than filling a gap, so these are
+            replacements and need a call on which version survives.
+        </li>
+        <li>
+            <strong>Placement is the open question.</strong> Only YahooAttribution
+            (footer) and CustomTooltip are on real pages. The rest are proven to render
+            but have nowhere assigned yet.
         </li>
     </ul>
 </div>
