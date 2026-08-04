@@ -389,5 +389,42 @@ namespace RotoMonster.Data
                     orderby ps.DateAdded descending
                     select ps).FirstOrDefault();
         }
+        // ---------------------------------------------------------------
+        // Waivers, scoring alerts, game states
+        // ---------------------------------------------------------------
+
+        public async Task<List<UserLeagueWaiverPlayer>> GetUserLeagueWaiverPlayersAsync(UserLeague userLeague)
+        {
+            if (userLeague == null)
+                return new List<UserLeagueWaiverPlayer>();
+
+            return await (from p in db.UserLeagueWaiverPlayers
+                          where p.UserLeagueId == userLeague.Id
+                          select p).ToListAsync();
+        }
+
+        public async Task<List<GameScoringAlert>> GetGameScoringAlertsAsync(Season season, DateTime startDate, DateTime endDate)
+        {
+            return await (from s in db.GameScoringAlerts
+                          .Include(i => i.Game)
+                          .Include(i => i.Player).ThenInclude(i2 => i2.PlayerDefaultPositions)
+                          .Include(i => i.Team)
+                          .Include(i => i.Category)
+                          where !s.Game.IsFinished && s.Game.GameDate >= startDate && s.Game.GameDate <= endDate
+                          orderby s.ScoringDate descending, s.Category.DisplayOrder ascending
+                          select s).ToListAsync();
+        }
+
+        public async Task<List<PlayerGameState>> GetPlayerGameStatesAsync(DateTime startDate, DateTime endDate)
+        {
+            return await (from p in db.PlayerGameStates.AsNoTracking()
+                          .Include(i => i.Player)
+                          .Include(i => i.Team)
+                          .Include(i => i.Game)
+                          .Include(i => i.PlayerGameStateType)
+                          join g in db.Games.AsNoTracking() on p.GameId equals g.Id
+                          where g.GameDate >= startDate && g.GameDate <= endDate
+                          select p).ToListAsync();
+        }
     }
 }

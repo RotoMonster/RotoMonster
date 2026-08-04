@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RotoMonster.Pages
 {
@@ -68,7 +69,7 @@ namespace RotoMonster.Pages
             });
         }
 
-        public void OnGet(DateTime date, int? g, int? l, bool? top, int? hid)
+        public async Task OnGetAsync(DateTime date, int? g, int? l, bool? top, int? hid)
         {
             InitGet("Scores");
 
@@ -78,7 +79,7 @@ namespace RotoMonster.Pages
                     SelectedUserLeagueId = l.GetValueOrDefault();
                 else
                     SelectedUserLeagueId = SelectedUserLeagues[0].Id;
-                ViewData["UserLeagueList"] = new SelectList(db.GetTrackedUserLeagues(UserId), "Id", "ListDisplayTitle");
+                ViewData["UserLeagueList"] = new SelectList(await db.GetTrackedUserLeaguesAsync(UserId), "Id", "ListDisplayTitle");
             }
 
             if (hid.GetValueOrDefault(0) > 0)
@@ -99,15 +100,15 @@ namespace RotoMonster.Pages
                     gameId = 0;
             }
 
-            UserLeague userLeague = db.SelectUserLeague(UserId, db.GetUserLeague(UserId, SelectedUserLeagueId));
+            UserLeague userLeague = await db.SelectUserLeagueAsync(UserId, await db.GetUserLeagueAsync(UserId, SelectedUserLeagueId));
             if (userLeague == null)
-                userLeague = db.GetDefaultUserLeague();
+                userLeague = await db.GetDefaultUserLeagueAsync();
 
             var playerDefaultPositions = db.GetUserLeagueSeasonPlayerPositions(userLeague, season);
             List<OwnershipPlayer> trendingPlayers = db.GetTrendingPlayers();
-            var waiverPlayers = db.GetUserLeagueWaiverPlayers(userLeague);
-            var injuries = db.GetPlayerInjuries();
-            var playerStatuses = db.GetActivePlayerStatuses();
+            var waiverPlayers = await db.GetUserLeagueWaiverPlayersAsync(userLeague);
+            var injuries = await db.GetPlayerInjuriesAsync();
+            var playerStatuses = await db.GetActivePlayerStatusesAsync();
 
             ScheduleGames = db.GetGames(season, SelectedDate, SelectedDate);
 
@@ -129,7 +130,7 @@ namespace RotoMonster.Pages
             foreach (var playerType in db.GetPlayerTypes())
             {
                 monsterBars[playerType.Id] = db.GetMonsterBar(playerType, season, userLeague.GetCategorySettings(playerType), userLeague.ScoringSystem, db.GetPerGamePerValue(playerType.Id), db.GetUserLeagueLeagueSize(userLeague, playerType), userLeague.ActiveSize(playerType));
-                ownershipPlayerLists[playerType.Id] = db.GetOwnershipPlayersWithChange(db.GetUserLeagueCategoryCode(userLeague, playerType), DateTime.UtcNow, 24);
+                ownershipPlayerLists[playerType.Id] = db.GetOwnershipPlayersWithChange(await db.GetUserLeagueCategoryCodeAsync(userLeague, playerType), DateTime.UtcNow, 24);
             }
 
             if (gameId > 0)
@@ -153,7 +154,7 @@ namespace RotoMonster.Pages
                     boxScoreModel.TeamPlayerTableModels[team] = new Dictionary<PlayerType, PlayerTableModel>();
                     foreach (var playerType in db.GetPlayerTypes())
                     {
-                        var depthPlayers = db.GetDepthPlayers(playerType, db.GetUserLeagueCategoryCode(userLeague, playerType), DateTime.UtcNow, false);
+                        var depthPlayers = db.GetDepthPlayers(playerType, await db.GetUserLeagueCategoryCodeAsync(userLeague, playerType), DateTime.UtcNow, false);
                         var playerTableModel = new PlayerTableModel();
                         playerTableModel.DisplayPerValue = db.GetTotalPerValue(playerType.Id);
                         playerTableModel.ShowTrending = true;
@@ -165,7 +166,7 @@ namespace RotoMonster.Pages
                         playerTableModel.CategorySettings = userLeague.GetCategorySettings(playerType);
                         playerTableModel.PlayerType = playerType;
                         playerTableModel.DisplayPerValue = db.GetTotalPerValue(playerType.Id);
-                        playerTableModel.UserDisplayCategories = db.GetUserDisplayCategories(UserId, userLeague, playerType);
+                        playerTableModel.UserDisplayCategories = await db.GetUserDisplayCategoriesAsync(UserId, userLeague, playerType);
                         playerTableModel.GamesCategoryId = db.GetGamesCategory(playerType.Id).Id;
                         playerTableModel.BeforeCategories = db.GetBeforeDisplayCategories(playerType);
                         playerTableModel.AfterCategories = db.GetAfterDisplayCategories(playerType);
@@ -227,7 +228,7 @@ namespace RotoMonster.Pages
                                       select dp).ToList();
                         playerTableModel.DisplayPlayers = sorted;
 
-                        db.FillDisplayPlayerUserLeagueTeams(userLeague, playerTableModel.DisplayPlayers);
+                        await db.FillDisplayPlayerUserLeagueTeamsAsync(userLeague, playerTableModel.DisplayPlayers);
                     }
                 }
 

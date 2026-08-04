@@ -50,5 +50,10 @@ namespace RotoMonster.Data
         Task<List<UserDisplayCategory>> GetUserDisplayCategoriesAsync(string userId, UserLeague userLeague);
         Task<List<UserDisplayCategory>> GetUserDisplayCategoriesAsync(string userId, UserLeague userLeague, PlayerType playerType);
         Task<PlayerStatus> GetPlayerActivePlayerStatusAsync(int playerId);
+
+        // Waivers, scoring alerts, game states
+        Task<List<UserLeagueWaiverPlayer>> GetUserLeagueWaiverPlayersAsync(UserLeague userLeague);
+        Task<List<GameScoringAlert>> GetGameScoringAlertsAsync(Season season, System.DateTime startDate, System.DateTime endDate);
+        Task<List<PlayerGameState>> GetPlayerGameStatesAsync(System.DateTime startDate, System.DateTime endDate);
     }
 }
