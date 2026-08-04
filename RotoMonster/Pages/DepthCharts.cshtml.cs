@@ -58,11 +58,11 @@ namespace RotoMonster.Pages
             if (UserId != null)
             {
                 SelectedUserLeagueId = l.GetValueOrDefault();
-                ViewData["UserLeagueList"] = new SelectList(db.GetTrackedUserLeagues(UserId), "Id", "ListDisplayTitle");
+                ViewData["UserLeagueList"] = new SelectList(await db.GetTrackedUserLeaguesAsync(UserId), "Id", "ListDisplayTitle");
             }
-            UserLeague userLeague = db.SelectUserLeague(UserId, db.GetUserLeague(UserId, SelectedUserLeagueId));
+            UserLeague userLeague = await db.SelectUserLeagueAsync(UserId, await db.GetUserLeagueAsync(UserId, SelectedUserLeagueId));
             if (userLeague == null)
-                userLeague = db.GetDefaultUserLeague();
+                userLeague = await db.GetDefaultUserLeagueAsync();
 
             var fantasyProvider = (userLeague != null ? userLeague.FantasyProvider : db.GetDefaultFantasyProvider());
             var positionSource = db.GetPositionSource(fantasyProvider);
@@ -84,7 +84,7 @@ namespace RotoMonster.Pages
                 string scoringSystem = db.GetUserLeagueScoringSystem(userLeague);
                 int leagueSize = db.GetUserLeagueLeagueSize(userLeague, playerType);
                 var defCode = db.GetDefaultCategoriesString(playerType).Code;
-                string leagueCategoriesCode = userLeague != null ? db.GetUserLeagueCategoryCode(userLeague, playerType) : defCode;
+                string leagueCategoriesCode = userLeague != null ? await db.GetUserLeagueCategoryCodeAsync(userLeague, playerType) : defCode;
 
                 List<OwnershipPlayer> ownershipPlayers = db.GetOwnershipPlayersWithChange(leagueCategoriesCode, DateTime.UtcNow, 24);
 
@@ -94,14 +94,14 @@ namespace RotoMonster.Pages
                     TotalMonsterBar=db.GetMonsterBar(playerType, season, catSetttings, scoringSystem, db.GetTotalPerValue(playerType.Id), leagueSize, userLeague.ActiveSize(playerType));
 
                 var injuries = await db.GetPlayerInjuriesAsync();
-                var playerStatuses = db.GetActivePlayerStatuses();
+                var playerStatuses = await db.GetActivePlayerStatusesAsync();
                 var depthPlayers = db.GetDepthPlayers(playerType, leagueCategoriesCode, DateTime.UtcNow, false);
                 var playerDefaultPositions = db.GetUserLeagueSeasonPlayerPositions(userLeague, displaySeason);
                 var positionSourcePositions = (from pp in db.GetPositionSourcePositions(db.GetPositionSource(userLeague.FantasyProvider)) where pp.PlayerType.Id == playerType.Id select pp).ToList();
                 var playerPositionPercents = db.GetPlayerPositionPercents(season, season.StartDate, season.UpdatedDate);
                 ShowPositionPercents=(playerPositionPercents.Count>0);
 
-                AllPositions = db.GetActualPositions(playerType);
+                AllPositions = await db.GetActualPositionsAsync(playerType);
 
                 foreach (var seasonTeam in (from tm in displaySeason.SeasonTeams where tm.Team.Code!="FA" orderby tm.Team.Name select tm))
                 {
@@ -141,7 +141,7 @@ namespace RotoMonster.Pages
                                 depthChartTeamModel.DisplayPlayers.Add(displayPlayer);
                         }
 
-                        db.FillDisplayPlayerUserLeagueTeams(userLeague, depthChartTeamModel.DisplayPlayers);
+                        await db.FillDisplayPlayerUserLeagueTeamsAsync(userLeague, depthChartTeamModel.DisplayPlayers);
 
                         depthChartTeamModel.DisplayPlayers=(from dp in depthChartTeamModel.DisplayPlayers
                                                             orderby
