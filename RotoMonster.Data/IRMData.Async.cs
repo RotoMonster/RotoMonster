@@ -60,5 +60,13 @@ namespace RotoMonster.Data
         Task<Draft> AddDraftAsync(Draft draft);
         // Articles
         Task<Article> GetArticleAsync(int articleId);
+        // Writes - display settings and user leagues
+        Task<int> CommitAsync();
+        Task<List<DisplayColumn>> UpdateDisplayColumnsAsync(string userId, List<DisplayColumn> displayColumns);
+        Task<List<UserDisplayCategory>> UpdateUserDisplayCategoriesAsync(string userId, List<UserDisplayCategory> userDisplayCategories);
+        Task DeleteUserLeagueAsync(int userLeagueId);
+        Task<UserLeague> UpdateUserLeagueAsync(UserLeague userLeague);
+        Task<UserLeague> AddUserLeagueAsync(UserLeague userLeague);
+        Task<UserLeague> GetNewCustomUserLeagueAsync();
     }
 }

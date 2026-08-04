@@ -61,7 +61,7 @@ namespace RotoMonster.Pages.UserLeagues
 
             //Stream stream = await "https://fantasy.espn.com/basketball/draft?leagueId=50604361&seasonId=2022&teamId=10&memberId={EA381B6B-B5AC-443D-B164-B27D3ECAF8C9}".GetStreamAsync();
 
-            UserLeague = db.GetUserLeague(UserId, id.GetValueOrDefault(0));
+            UserLeague = await db.GetUserLeagueAsync(UserId, id.GetValueOrDefault(0));
 
             ViewData["TeamSelectList"] = new SelectList(UserLeague.UserLeagueTeams, "ProviderId", "Title");
             if (UserLeague.MyProviderTeamId.Length > 0)
@@ -205,7 +205,7 @@ namespace RotoMonster.Pages.UserLeagues
                 }
             }
 
-            db.UpdateUserLeague(UserLeague);
+            await db.UpdateUserLeagueAsync(UserLeague);
 
             TempData["message"] = "Your settings have been saved.";
 

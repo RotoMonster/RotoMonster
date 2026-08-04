@@ -31,9 +31,9 @@ namespace RotoMonster.Pages.UserLeagues
             UserId = userManager.GetUserId(contextAccessor.HttpContext.User);
         }
 
-        public IActionResult OnGet(int id)
+        public async Task<IActionResult> OnGetAsync(int id)
         {
-            var userLeagues = db.GetUserLeagues(UserId);
+            var userLeagues = await db.GetUserLeaguesAsync(UserId);
             UserLeague = (from u in userLeagues where u.Id == id select u).FirstOrDefault();
             if (UserLeague == null)
                 return RedirectToPage("./NotFound");
@@ -41,11 +41,11 @@ namespace RotoMonster.Pages.UserLeagues
             return Page();
         }
 
-        public IActionResult OnPost(int id)
+        public async Task<IActionResult> OnPostAsync(int id)
         {
 
-            db.DeleteUserLeague(id);
-            db.Commit();
+            await db.DeleteUserLeagueAsync(id);
+            await db.CommitAsync();
 
             TempData["Message"] = "League deleted";
             return RedirectToPage("./Index");

@@ -503,5 +503,179 @@ namespace RotoMonster.Data
         {
             return await (from a in db.Articles where a.Id == articleId select a).FirstOrDefaultAsync();
         }
+        // ---------------------------------------------------------------
+        // Writes - display settings and user leagues
+        //
+        // Where the sync version loops over a query while removing, these
+        // materialize with ToListAsync first. Same effect; async cannot
+        // enumerate a live query and mutate inside the loop.
+        // ---------------------------------------------------------------
+
+        public async Task<int> CommitAsync()
+        {
+            return await db.SaveChangesAsync();
+        }
+
+        public async Task<List<DisplayColumn>> UpdateDisplayColumnsAsync(string userId, List<DisplayColumn> displayColumns)
+        {
+            var userOptions = await (from u in db.UserOptions.Include(i => i.UserOptionType)
+                                     where u.UserId == userId && u.UserOptionType.OptionGroup == "DisplayColumn"
+                                     select u).ToListAsync();
+
+            foreach (var userOption in userOptions)
+                db.Remove(userOption);
+            await db.SaveChangesAsync();
+
+            foreach (var displayColumn in displayColumns)
+            {
+                var userOption = new UserOption();
+                userOption.UserId = userId;
+                userOption.UserOptionTypeId = displayColumn.UserOptionType.Id;
+                userOption.ValueBool = displayColumn.IsSelected;
+                db.Add(userOption);
+            }
+            await db.SaveChangesAsync();
+
+            return displayColumns;
+        }
+
+        public async Task<List<UserDisplayCategory>> UpdateUserDisplayCategoriesAsync(string userId, List<UserDisplayCategory> userDisplayCategories)
+        {
+            var existing = await (from udc in db.UserDisplayCategories where udc.UserId == userId select udc).ToListAsync();
+            foreach (var u in existing)
+                db.UserDisplayCategories.Remove(u);
+            await db.SaveChangesAsync();
+
+            foreach (var udc in userDisplayCategories)
+                db.UserDisplayCategories.Add(udc);
+            await db.SaveChangesAsync();
+
+            return userDisplayCategories;
+        }
+
+        /// <summary>
+        /// Hard delete across six child tables then the league itself. The order
+        /// and the two-stage SaveChanges match the sync version exactly.
+        /// </summary>
+        public async Task DeleteUserLeagueAsync(int userLeagueId)
+        {
+            foreach (var ulc in await (from x in db.UserLeagueCategories where x.UserLeagueId == userLeagueId select x).ToListAsync())
+                db.Remove(ulc);
+            foreach (var ars in await (from x in db.UserLeagueActiveRosterSpots where x.UserLeagueId == userLeagueId select x).ToListAsync())
+                db.Remove(ars);
+            foreach (var pt in await (from x in db.UserLeaguePlayerTypes where x.UserLeagueId == userLeagueId select x).ToListAsync())
+                db.Remove(pt);
+            foreach (var err in await (from x in db.UserLeagueImportErrors where x.UserLeagueId == userLeagueId select x).ToListAsync())
+                db.Remove(err);
+            foreach (var o in await (from x in db.UserLeagueMissingPlayers where x.UserLeagueId == userLeagueId select x).ToListAsync())
+                db.Remove(o);
+            foreach (var o in await (from x in db.UserLeagueWaiverPlayers where x.UserLeagueId == userLeagueId select x).ToListAsync())
+                db.Remove(o);
+            await db.SaveChangesAsync();
+
+            UserLeague ul = await (from u in db.UserLeagues where u.Id == userLeagueId select u).FirstOrDefaultAsync();
+            if (ul != null)
+            {
+                db.UserLeagues.Remove(ul);
+                await db.SaveChangesAsync();
+            }
+        }
+
+        public async Task<UserLeague> UpdateUserLeagueAsync(UserLeague userLeague)
+        {
+            userLeague.FillUserLeagueCategoriesCode(GetCategories());
+            db.Update(userLeague);
+            await db.SaveChangesAsync();
+            UpdateUserLeagueUpdatedDate(userLeague.Id, DateTime.UtcNow, false);
+
+            foreach (var ulc in await (from x in db.UserLeagueCategories where x.UserLeagueId == userLeague.Id select x).ToListAsync())
+                db.Remove(ulc);
+            foreach (var ars in await (from x in db.UserLeagueActiveRosterSpots where x.UserLeagueId == userLeague.Id select x).ToListAsync())
+                db.Remove(ars);
+            foreach (var pt in await (from x in db.UserLeaguePlayerTypes where x.UserLeagueId == userLeague.Id select x).ToListAsync())
+                db.Remove(pt);
+            await db.SaveChangesAsync();
+
+            foreach (var ulc in userLeague.UserLeagueCategories)
+            {
+                ulc.UserLeagueId = userLeague.Id;
+                db.UserLeagueCategories.Add(ulc);
+            }
+            foreach (var ars in userLeague.UserLeagueActiveRosterSpots)
+            {
+                ars.UserLeagueId = userLeague.Id;
+                db.UserLeagueActiveRosterSpots.Add(ars);
+            }
+            foreach (var pt in userLeague.UserLeaguePlayerTypes)
+            {
+                pt.UserLeagueId = userLeague.Id;
+                pt.CategoriesStringId = GetCategoriesString(pt.CategoriesCode1).Id;
+                db.UserLeaguePlayerTypes.Add(pt);
+            }
+
+            await db.SaveChangesAsync();
+
+            return userLeague;
+        }
+
+        public async Task<UserLeague> AddUserLeagueAsync(UserLeague userLeague)
+        {
+            userLeague.CreatedDate = DateTime.UtcNow;
+            userLeague.FillUserLeagueCategoriesCode(GetCategories());
+            db.UserLeagues.Add(userLeague);
+            await db.SaveChangesAsync();
+            UpdateUserLeagueUpdatedDate(userLeague.Id, userLeague.CreatedDate.GetValueOrDefault(), false);
+
+            foreach (var ulc in userLeague.UserLeagueCategories)
+            {
+                ulc.UserLeagueId = userLeague.Id;
+                db.UserLeagueCategories.Add(ulc);
+            }
+            foreach (var ars in userLeague.UserLeagueActiveRosterSpots)
+            {
+                ars.UserLeague = null;
+                ars.UserLeagueId = userLeague.Id;
+                db.UserLeagueActiveRosterSpots.Add(ars);
+            }
+            foreach (var ult in userLeague.UserLeagueTeams)
+            {
+                ult.UserLeague = null;
+                ult.Id = 0;
+                ult.UserLeagueId = userLeague.Id;
+                db.UserLeagueTeams.Add(ult);
+            }
+            foreach (var pt in userLeague.UserLeaguePlayerTypes)
+            {
+                pt.UserLeague = null;
+                pt.UserLeagueId = userLeague.Id;
+                pt.CategoriesStringId = GetCategoriesString(pt.CategoriesCode1).Id;
+                db.UserLeaguePlayerTypes.Add(pt);
+            }
+            foreach (var err in userLeague.UserLeagueImportErrors)
+            {
+                err.UserLeague = null;
+                err.UserLeagueId = userLeague.Id;
+                db.UserLeagueImportErrors.Add(err);
+            }
+            await db.SaveChangesAsync();
+
+            return userLeague;
+        }
+
+        public async Task<UserLeague> GetNewCustomUserLeagueAsync()
+        {
+            var defaultLeague = await GetDefaultUserLeagueAsync();
+            defaultLeague.Id = 0;
+            defaultLeague.Title = "New Custom League";
+            defaultLeague.DisplayTitle = defaultLeague.Title;
+            defaultLeague.ProviderLeagueId = "";
+            defaultLeague.IsProLeague = false;
+
+            defaultLeague.UserLeagueTeams.Clear();
+
+            defaultLeague.FantasyProvider = null;
+
+            return defaultLeague;
+        }
     }
 }

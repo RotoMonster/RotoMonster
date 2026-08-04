@@ -28,12 +28,12 @@ namespace RotoMonster.Pages
         {
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
             InitGet("Display Settings");
 
             var displayCategories = db.GetDisplayCategories();
-            var userDisplayCategories = db.GetUserDisplayCategories(UserId, null);
+            var userDisplayCategories = await db.GetUserDisplayCategoriesAsync(UserId, null);
 
             if (userDisplayCategories != null)
             {
@@ -49,7 +49,7 @@ namespace RotoMonster.Pages
                 }
             }
 
-            var displayColumns = db.GetDisplayColumns(UserId);
+            var displayColumns = await db.GetDisplayColumnsAsync(UserId);
             DisplayColumnSelects = new DisplayColumnSelect[displayColumns.Count];
             for (int i = 0; i < DisplayColumnSelects.Count(); i++)
             {
@@ -61,7 +61,7 @@ namespace RotoMonster.Pages
             }
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
             var userDisplayCategories = new List<UserDisplayCategory>();
             foreach (var selectDisplayCategory in DisplayCategorySelects)
@@ -75,9 +75,9 @@ namespace RotoMonster.Pages
                     userDisplayCategories.Add(userDisplayCategory);
                 }
             }
-            db.UpdateUserDisplayCategories(UserId, userDisplayCategories);
+            await db.UpdateUserDisplayCategoriesAsync(UserId, userDisplayCategories);
 
-            var inDisplayColumns = db.GetDisplayColumns(UserId);
+            var inDisplayColumns = await db.GetDisplayColumnsAsync(UserId);
             var outDisplayColumns = new List<DisplayColumn>();
             foreach (var selectDisplayColumn in DisplayColumnSelects)
             {
@@ -86,7 +86,7 @@ namespace RotoMonster.Pages
                 displayColumn.IsSelected = selectDisplayColumn.Selected;
                 outDisplayColumns.Add(displayColumn);
             }
-            db.UpdateDisplayColumns(UserId, outDisplayColumns);
+            await db.UpdateDisplayColumnsAsync(UserId, outDisplayColumns);
 
             AddMessage("Your settings have been saved.");
 
