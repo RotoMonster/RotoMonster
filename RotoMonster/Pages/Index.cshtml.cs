@@ -45,7 +45,7 @@ namespace RotoMonster.Pages
         {
         }
 
-        public void OnGet(DateTime date)
+        public async Task OnGetAsync(DateTime date)
         {
             InitGet("");
 
@@ -74,7 +74,7 @@ namespace RotoMonster.Pages
 
             RecentArticles = (from a in db.GetRecentArticles(1) where !a.IsAutomated select a).ToList();
 
-            SelectedUserLeagues = db.GetTrackedUserLeagues(UserId);
+            SelectedUserLeagues = await db.GetTrackedUserLeaguesAsync(UserId);
 
             List<OwnershipPlayer> ownershipPlayers = null;
             UserLeague userLeague = null;
@@ -84,9 +84,9 @@ namespace RotoMonster.Pages
                 ownershipPlayers = db.GetAllDefaultOwnershipPlayers(DateTime.UtcNow);
             }
             else
-                userLeague = db.GetDefaultUserLeague();
+                userLeague = await db.GetDefaultUserLeagueAsync();
 
-            var playerStatuses = db.GetActivePlayerStatuses();
+            var playerStatuses = await db.GetActivePlayerStatusesAsync();
             MonsterBotLib monsterBotLib = new MonsterBotLib();
 
             FillFrontGameScoreValues();
@@ -163,7 +163,7 @@ namespace RotoMonster.Pages
                 }
             }
 
-            var gameScoringAlerts = db.GetGameScoringAlerts(season, liveStartDate, liveEndDate);
+            var gameScoringAlerts = await db.GetGameScoringAlertsAsync(season, liveStartDate, liveEndDate);
 
             if (gameScoringAlerts.Count > 0)
             {
@@ -197,7 +197,7 @@ namespace RotoMonster.Pages
             UserLeagueViews = new List<UserLeagueView>();
             foreach (var ul in SelectedUserLeagues)
             {
-                var allUserLeagueTeamPlayers = db.GetUserLeagueTeamPlayers(ul);
+                var allUserLeagueTeamPlayers = await db.GetUserLeagueTeamPlayersAsync(ul);
 
                 var leagueDepthPlayers = new List<DepthPlayer>();
                 if (userLeague != null)
@@ -252,7 +252,7 @@ namespace RotoMonster.Pages
                     {
                         foreach (var pt in db.GetPlayerTypes())
                         {
-                            foreach (var op in db.GetOwnershipPlayersWithChange(db.GetUserLeagueCategoryCode(ul, pt), DateTime.UtcNow, 24))
+                            foreach (var op in db.GetOwnershipPlayersWithChange(await db.GetUserLeagueCategoryCodeAsync(ul, pt), DateTime.UtcNow, 24))
                             {
                                 var seasonPlayer = (from sp in seasonPlayers where sp.PlayerId == op.PlayerId && sp.PlayerTypeId == pt.Id select sp).FirstOrDefault();
                                 if (seasonPlayer != null)
@@ -348,7 +348,7 @@ namespace RotoMonster.Pages
                                    seasonPlayers,
                                    playerStatuses,
                                    db.GetUserLeagueSeasonPlayerPositions(ul, season),
-                                   db.GetPlayerGameStates(liveUpcomingStartDate, liveUpcomingEndDate),
+                                   await db.GetPlayerGameStatesAsync(liveUpcomingStartDate, liveUpcomingEndDate),
                                    ScheduleGames
                                    );
                                 userLeagueView.MonsterBotPlayers = monsterBotLib.GetNonOKMonsterBotPlayers(monsterBotPlayers, Sport, ul);
@@ -359,9 +359,9 @@ namespace RotoMonster.Pages
             }
         }
 
-        public IActionResult OnGetUpdateRosters(int id)
+        public async Task<IActionResult> OnGetUpdateRostersAsync(int id)
         {
-            UserLeague userLeague = db.GetUserLeague(UserId, id);
+            UserLeague userLeague = await db.GetUserLeagueAsync(UserId, id);
             RefreshRosters(userLeague);
 
             TempData["test"] = 1;
@@ -370,13 +370,13 @@ namespace RotoMonster.Pages
             return RedirectToPage("./Index");
         }
 
-        public IActionResult OnGetUpdateAllRosters()
+        public async Task<IActionResult> OnGetUpdateAllRostersAsync()
         {
             foreach (var ul in SelectedUserLeagues)
             {
                 if (!ul.TrackLeague)
                     continue;
-                UserLeague userLeague = db.GetUserLeague(UserId, ul.Id);
+                UserLeague userLeague = await db.GetUserLeagueAsync(UserId, ul.Id);
                 RefreshRosters(userLeague);
             }
 
