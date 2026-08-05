@@ -26,11 +26,20 @@
             <span class="range-badge-label">@Model.Label</span>
         }
         <div class="range-badge-cells">
+            @{
+                var cellIndex = 0;
+                var lastIndex = Model.Cells.Count - 1;
+            }
             @foreach (var cell in Model.Cells)
             {
+                var posPrefix = Model.IsHeader ? "monster-bar-header-cell" : "monster-bar-cell";
+                var pos = (cellIndex == 0 ? posPrefix + "--first " : "") + (cellIndex == lastIndex ? posPrefix + "--last" : "");
+                cell.PositionClass = pos;
+                cellIndex++;
+
                 if (cell.IsEmpty)
                 {
-                    <span class="range-badge-cell monster-bar-cell monster-bar-cell--empty">&nbsp;</span>
+                    <span class="range-badge-cell monster-bar-cell monster-bar-cell--empty @pos">&nbsp;</span>
                 }
                 else if (Model.IsHeader)
                 {
@@ -38,14 +47,14 @@
                     {
                         <span class="bm-tooltip-wrap">
                             <span class="bm-tooltip-trigger" data-bm-tooltip="@cell.TooltipId">
-                                <span class="range-badge-header-cell">@cell.DecodedGamesText</span>
+                                <span class="range-badge-header-cell @pos">@cell.DecodedGamesText</span>
                             </span>
                             <div class="bm-tooltip-content" id="@cell.TooltipId" role="tooltip">@cell.Description</div>
                         </span>
                     }
                     else
                     {
-                        <span class="range-badge-header-cell">@cell.DecodedGamesText</span>
+                        <span class="range-badge-header-cell @pos">@cell.DecodedGamesText</span>
                     }
                 }
                 else if (!string.IsNullOrEmpty(cell.Description))

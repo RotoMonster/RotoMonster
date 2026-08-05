@@ -8,7 +8,7 @@
 
 @if (!string.IsNullOrEmpty(Model.BackgroundColor))
 {
-    <span class="range-badge-cell monster-bar-cell range-badge-cell--shaded @Model.EmphasisClass @Model.GroupClass"
+    <span class="range-badge-cell monster-bar-cell range-badge-cell--shaded @Model.EmphasisClass @Model.PositionClass"
           style="background:@Model.BackgroundColor;">
         <span class="monster-bar-games">@Model.GamesText</span>
         @if (!string.IsNullOrEmpty(Model.MeasureText))
@@ -19,7 +19,7 @@
 }
 else
 {
-    <span class="range-badge-cell monster-bar-cell @Model.EmphasisClass @Model.GroupClass">
+    <span class="range-badge-cell monster-bar-cell @Model.EmphasisClass @Model.PositionClass">
         <span class="monster-bar-games">@Model.GamesText</span>
         @if (!string.IsNullOrEmpty(Model.MeasureText))
         {

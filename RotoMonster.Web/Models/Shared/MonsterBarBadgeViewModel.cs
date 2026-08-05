@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using RotoMonster.Core;
 
 namespace RotoMonster.Models.Shared
@@ -152,6 +152,8 @@ namespace RotoMonster.Models.Shared
         public string Description { get; set; }
 
         public string GamesText { get; set; }
+
+        public string PositionClass { get; set; }
 
         public string MeasureText { get; set; }
 

@@ -163,9 +163,7 @@
     --chart-series-2: #378add;
     --chart-series-3: #1d9e75;
 
-    --monster-bar-border-projection: #6366f1;
-    --monster-bar-border-last-season: #94a3b8;
-    --monster-bar-border-current-season: #e66000;
+    --monster-bar-border: rgba(148, 163, 184, 0.55);
     --monster-bar-header-bg: #ffffff;
     --monster-bar-header-border: rgba(148, 163, 184, 0.55);
     --monster-bar-header-text: #1e293b;
@@ -5050,10 +5048,28 @@ a.modern-filter-btn:hover {
     --range-badge-cell-width: 38px;
 }
 
+.range-badge--monster .range-badge-cells {
+    gap: 0;
+}
+
 .range-badge--monster .range-badge-cell {
     width: 100%;
     gap: 2px;
     padding: 0 3px;
+    border-radius: 0;
+    border-left-width: 0;
+    border-color: var(--monster-bar-border);
+}
+
+.range-badge--monster .monster-bar-cell--first {
+    border-left-width: 1px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.range-badge--monster .monster-bar-cell--last {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
 }
 .range-badge--monster .monster-bar-measure {
     font-size: 10px;
@@ -5076,7 +5092,6 @@ a.modern-filter-btn:hover {
 
 .range-badge--monster .monster-bar-cell--empty {
     background: none;
-    border-color: transparent;
 }
 
 .tweet-card-keywords {
@@ -5115,27 +5130,27 @@ a.modern-filter-btn:hover {
     font-size: 10px;
     font-weight: 700;
     border: 1px solid var(--monster-bar-header-border);
-    border-radius: 4px;
+    border-left-width: 0;
+    border-radius: 0;
     box-sizing: border-box;
     background: var(--monster-bar-header-bg);
     color: var(--monster-bar-header-text);
     white-space: nowrap;
 }
 
+.range-badge--header .monster-bar-header-cell--first {
+    border-left-width: 1px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.range-badge--header .monster-bar-header-cell--last {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
 .range-badge--header .range-badge-label {
     color: var(--monster-bar-header-label);
-}
-
-.range-badge--monster .monster-bar-cell--projection {
-    border-color: var(--monster-bar-border-projection);
-}
-
-.range-badge--monster .monster-bar-cell--last-season {
-    border-color: var(--monster-bar-border-last-season);
-}
-
-.range-badge--monster .monster-bar-cell--current-season {
-    border-color: var(--monster-bar-border-current-season);
 }
 
 .custom-values {

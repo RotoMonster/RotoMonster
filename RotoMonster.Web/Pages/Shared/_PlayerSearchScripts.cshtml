@@ -9,6 +9,13 @@
                 $.getJSON('/api/postapi/search', { term: request.term }, function (data) {
                     response(data.slice(0, 12));
                 });
+            },
+            select: function (event, ui) {
+                var input = this;
+                input.value = ui.item.value;
+                var form = $(input).closest('form');
+                if (form.length) form.submit();
+                return false;
             }
         });
     });
