@@ -1,22 +1,29 @@
-﻿@{
-    string[,] msgArray = new string[,] { { "messages", "alert-success" }, { "errormessages", "alert-danger" }, { "warningmessages", "alert-warning" } };
+@{
+    var msgGroups = new[]
+    {
+        new { Key = "messages", Type = SystemMessageType.Success },
+        new { Key = "errormessages", Type = SystemMessageType.Error },
+        new { Key = "warningmessages", Type = SystemMessageType.Warning }
+    };
 }
 
-@for (int i = 0; i < msgArray.Length / 2; i++)
+@foreach (var group in msgGroups)
 {
-    var listId = msgArray[i, 0];
-    var css = msgArray[i, 1];
-    @if (TempData[listId] != null)
+    if (TempData[group.Key] != null)
     {
-        var messages = TempData[listId] as IEnumerable<string>;
-        if (messages.Count() > 0)
+        var messages = TempData[group.Key] as IEnumerable<string>;
+        if (messages != null)
         {
-            <div class="alert @css ms-3 me-3">
-                @foreach (var msg in messages)
-                {
-                    <div>@msg</div>
-                }
-            </div>
+            foreach (var msg in messages)
+            {
+                <div class="ms-3 me-3">
+                    @Html.Raw(new SystemMessage(new SystemMessageInput
+                    {
+                        Type = group.Type,
+                        Text = System.Net.WebUtility.HtmlEncode(msg)
+                    }).Render())
+                </div>
+            }
         }
     }
 }

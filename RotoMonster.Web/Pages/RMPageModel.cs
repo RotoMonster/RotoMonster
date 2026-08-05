@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -123,31 +123,18 @@ namespace RotoMonster.Pages
 
         private int AddMessageToList(string listId, string msg)
         {
-            try
-            {
-                if (TempData != null && TempData[listId] == null)
-                    TempData[listId] = new List<string>();
-            }
-            catch
-            {
+            if (TempData == null) return 0;
 
-            }
+            var list = new List<string>();
 
-            try
-            {
-                var list = (List<string>)TempData[listId];
-                if (list != null)
-                {
-                    list.Add(msg);
-                    return list.Count();
-                }
-                else
-                    return 0;
-            }
-            catch
-            {
-                return 0;
-            }
+            var existing = TempData[listId];
+            if (existing is IEnumerable<string> current)
+                list.AddRange(current);
+
+            list.Add(msg);
+
+            TempData[listId] = list;
+            return list.Count;
         }
 
         public int AddMessage(string msg)
