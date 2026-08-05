@@ -1,4 +1,4 @@
-﻿@using RotoMonster.Models.Shared
+@using RotoMonster.Models.Shared
 @model RotoMonster.Models.Shared.PlayerTableModel
 
 @{
@@ -22,9 +22,13 @@
                 @if (Model.ShowMonsterBot)
                 {
                     <th class="tdc">
-                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="MonsterBot Recommendation">
+                        @{ var tipId1 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipId1">
                             <partial name="_IconMonsterBot" />
                         </span>
+<div class="bm-tooltip-content" id="@tipId1" role="tooltip">MonsterBot Recommendation</div>
+</span>
                     </th>
                 }
 
@@ -48,31 +52,40 @@
                 @if (Model.ShowInjuries)
                 {
                     <th class="text-center">
-                        <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="top"
-                                title="Injuries"
-                                asp-route-sort="INJ">
+                        @{ var tipId2 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                asp-route-sort="INJ" data-bm-tooltip="@tipId2">
                             Inj
                         </button>
+<div class="bm-tooltip-content" id="@tipId2" role="tooltip">Injuries</div>
+</span>
                     </th>
                 }
 
                 @if (Model.MonsterBarGame != null)
                 {
                     <th class="tdc">
-                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="@Model.MonsterBarGame.Tooltip">
+                        @{ var tipId3 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipId3">
                             @Model.MonsterBarGame.ColumnTitle(false)<small class="ms-1">game</small>
                         </span>
+<div class="bm-tooltip-content" id="@tipId3" role="tooltip">@Model.MonsterBarGame.Tooltip</div>
+</span>
                     </th>
                 }
 
                 @if (Model.MonsterBarTotal != null)
                 {
                     <th class="tdc">
-                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="@Model.MonsterBarTotal.Tooltip">
+                        @{ var tipId4 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipId4">
                             @Model.MonsterBarTotal.ColumnTitle(false)<small class="ms-1">total</small>
                         </span>
+<div class="bm-tooltip-content" id="@tipId4" role="tooltip">@Model.MonsterBarTotal.Tooltip</div>
+</span>
                     </th>
                 }
 
@@ -84,20 +97,22 @@
                 @if (!Model.IsPlayerHistory)
                 {
                     <th class="text-nowrap">
-                        <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="top"
-                                title="Change in Ownership Percent"
-                                asp-route-sort="OWNCHANGE">
+                        @{ var tipId5 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                asp-route-sort="OWNCHANGE" data-bm-tooltip="@tipId5">
                             +-
                         </button>
-                        <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="top"
-                                title="Ownership Percent"
-                                asp-route-sort="OWN">
+<div class="bm-tooltip-content" id="@tipId5" role="tooltip">Change in Ownership Percent</div>
+</span>
+                        @{ var tipId6 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                asp-route-sort="OWN" data-bm-tooltip="@tipId6">
                             Own%
                         </button>
+<div class="bm-tooltip-content" id="@tipId6" role="tooltip">Ownership Percent</div>
+</span>
                     </th>
 
                     @if (isUser)
@@ -105,31 +120,34 @@
                         @if (Model.ShowTrending && Model.ShowTrending)
                         {
                             <th class="text-nowrap">
-                                <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="Ownership trend for all leagues"
-                                        asp-route-sort="TREND">
+                                @{ var tipId7 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                        asp-route-sort="TREND" data-bm-tooltip="@tipId7">
                                     Trend
                                 </button>
+<div class="bm-tooltip-content" id="@tipId7" role="tooltip">Ownership trend for all leagues</div>
+</span>
                             </th>
                         }
 
                         <th class="text-nowrap">
-                            <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Change in Active Percent"
-                                    asp-route-sort="ACTIVECHANGE">
+                            @{ var tipId8 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                    asp-route-sort="ACTIVECHANGE" data-bm-tooltip="@tipId8">
                                 +-
                             </button>
-                            <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Active Percent"
-                                    asp-route-sort="ACTIVE">
+<div class="bm-tooltip-content" id="@tipId8" role="tooltip">Change in Active Percent</div>
+</span>
+                            @{ var tipId9 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                    asp-route-sort="ACTIVE" data-bm-tooltip="@tipId9">
                                 Act%
                             </button>
+<div class="bm-tooltip-content" id="@tipId9" role="tooltip">Active Percent</div>
+</span>
                         </th>
                     }
 
@@ -152,13 +170,14 @@
                         continue;
 
                     <th>
-                        <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="top"
-                                title="@pv.Title"
-                                asp-route-sort="PV_@pv.Id">
+                        @{ var tipId10 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                asp-route-sort="PV_@pv.Id" data-bm-tooltip="@tipId10">
                             @pv.ColumnTitle
                         </button>
+<div class="bm-tooltip-content" id="@tipId10" role="tooltip">@pv.Title</div>
+</span>
                     </th>
                 }
 
@@ -167,39 +186,42 @@
                     @if (Model.ExtraColumnTitle1.Length > 0)
                     {
                         <th class="tdc">
-                            <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="@Model.ExtraColumnDescription1"
-                                    asp-route-sort="EXTRAVALUE1">
+                            @{ var tipId11 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                    asp-route-sort="EXTRAVALUE1" data-bm-tooltip="@tipId11">
                                 @Model.ExtraColumnTitle1
                             </button>
+<div class="bm-tooltip-content" id="@tipId11" role="tooltip">@Model.ExtraColumnDescription1</div>
+</span>
                         </th>
                     }
 
                     @if (Model.ExtraColumnTitle2.Length > 0)
                     {
                         <th class="tdc">
-                            <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="@Model.ExtraColumnDescription2"
-                                    asp-route-sort="EXTRAVALUE2">
+                            @{ var tipId12 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                    asp-route-sort="EXTRAVALUE2" data-bm-tooltip="@tipId12">
                                 @Model.ExtraColumnTitle2
                             </button>
+<div class="bm-tooltip-content" id="@tipId12" role="tooltip">@Model.ExtraColumnDescription2</div>
+</span>
                         </th>
                     }
 
                     @if (Model.ExtraColumnTitle3.Length > 0)
                     {
                         <th class="tdc">
-                            <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="@Model.ExtraColumnDescription3"
-                                    asp-route-sort="EXTRAVALUE3">
+                            @{ var tipId13 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                    asp-route-sort="EXTRAVALUE3" data-bm-tooltip="@tipId13">
                                 @Model.ExtraColumnTitle3
                             </button>
+<div class="bm-tooltip-content" id="@tipId13" role="tooltip">@Model.ExtraColumnDescription3</div>
+</span>
                         </th>
                     }
                 }
@@ -207,13 +229,14 @@
                 @if (!Model.IsPlayerHistory && Model.ShowPositionalValue)
                 {
                     <th class="text-nowrap">
-                        <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="top"
-                                title="Position Value"
-                                asp-route-sort="POSVALUE">
+                        @{ var tipId14 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                asp-route-sort="POSVALUE" data-bm-tooltip="@tipId14">
                             PosV
                         </button>
+<div class="bm-tooltip-content" id="@tipId14" role="tooltip">Position Value</div>
+</span>
                         <partial name="_PositionBoostTable" model="Model.PositionBoostHashModel" />
                     </th>
                 }
@@ -266,35 +289,38 @@
                     @if (Model.ShowProjections)
                     {
                         <th class="tdc">
-                            <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Analysis Games"
-                                    asp-route-sort="AGAMES">
+                            @{ var tipId15 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                    asp-route-sort="AGAMES" data-bm-tooltip="@tipId15">
                                 &#35;
                             </button>
+<div class="bm-tooltip-content" id="@tipId15" role="tooltip">Analysis Games</div>
+</span>
                         </th>
 
                         <th>
-                            <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="The rough estimate projected total value over the anlaysis period"
-                                    asp-route-sort="PROJV">
+                            @{ var tipId16 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                    asp-route-sort="PROJV" data-bm-tooltip="@tipId16">
                                 ProjV
                             </button>
+<div class="bm-tooltip-content" id="@tipId16" role="tooltip">The rough estimate projected total value over the anlaysis period</div>
+</span>
                         </th>
 
                         @if (Model.ShowProjectionPercents)
                         {
                             <th class="text-nowrap">
-                                <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="Shows where a player may be over/under projected"
-                                        asp-route-sort="PROJVINFO">
+                                @{ var tipId17 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                        asp-route-sort="PROJVINFO" data-bm-tooltip="@tipId17">
                                     ProjV Info
                                 </button>
+<div class="bm-tooltip-content" id="@tipId17" role="tooltip">Shows where a player may be over/under projected</div>
+</span>
                             </th>
                         }
                     }
@@ -349,13 +375,14 @@
                     @if (Model.ShowAdp)
                     {
                         <th>
-                            <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Average Draft Pick for Analysis Drafts"
-                                    asp-route-sort="ADP">
+                            @{ var tipId18 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                    asp-route-sort="ADP" data-bm-tooltip="@tipId18">
                                 ADP
                             </button>
+<div class="bm-tooltip-content" id="@tipId18" role="tooltip">Average Draft Pick for Analysis Drafts</div>
+</span>
                         </th>
                         <th>Draft%</th>
                         <th>Range</th>
@@ -364,26 +391,28 @@
                     @if (Model.ShowAllAdp)
                     {
                         <th>
-                            <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Average Draft Pick for All Drafts"
-                                    asp-route-sort="ALLADP">
+                            @{ var tipId19 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                    asp-route-sort="ALLADP" data-bm-tooltip="@tipId19">
                                 AllADP
                             </button>
+<div class="bm-tooltip-content" id="@tipId19" role="tooltip">Average Draft Pick for All Drafts</div>
+</span>
                         </th>
                     }
 
                     @if (Model.ShowDefaultAdp)
                     {
                         <th>
-                            <button class="btn btn-sm btn-link text-white p-0 m-0"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Default Average Draft Pick"
-                                    asp-route-sort="DADP">
+                            @{ var tipId20 = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
+                                    asp-route-sort="DADP" data-bm-tooltip="@tipId20">
                                 dADP
                             </button>
+<div class="bm-tooltip-content" id="@tipId20" role="tooltip">Default Average Draft Pick</div>
+</span>
                         </th>
                         <th>Draft%</th>
                         <th>Range</th>
