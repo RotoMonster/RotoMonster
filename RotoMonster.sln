@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.6.11822.322 stable
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RotoMonster", "RotoMonster\RotoMonster.csproj", "{1EC5D746-C24F-4867-8096-BB3DB253DF69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RotoMonster.Web", "RotoMonster.Web\RotoMonster.Web.csproj", "{1EC5D746-C24F-4867-8096-BB3DB253DF69}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RotoMonster.Core", "RotoMonster.Core\RotoMonster.Core.csproj", "{CEE930AB-15FF-46FF-9308-34DC8BF83278}"
 EndProject
