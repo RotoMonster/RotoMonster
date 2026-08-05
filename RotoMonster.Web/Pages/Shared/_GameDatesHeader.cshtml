@@ -1,4 +1,4 @@
-﻿@model RotoMonster.Models.Shared.GameDatesHeaderModel
+@model RotoMonster.Models.Shared.GameDatesHeaderModel
 
 @{
     int days = Convert.ToInt32((Model.EndDate - Model.StartDate).TotalDays) + 1;
@@ -6,13 +6,15 @@
 
 <div class="d-flex justify-content-center">
     <div class="game-day">
-        <button class="btn btn-sm btn-link text-white p-0 m-0"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="@Model.Tooltip"
+        @{ var tipId = Context.NextTooltipId(); }
+        <span class="bm-tooltip-wrap">
+        <button class="btn btn-sm btn-link text-white p-0 m-0 bm-tooltip-trigger bm-tooltip-trigger--hover"
+                data-bm-tooltip="@tipId"
                 asp-route-sort="@Model.SortId">
             <partial name="_SmallDate" model="Model.StartDate" />
         </button>
+        <div class="bm-tooltip-content" id="@tipId" role="tooltip">@Model.Tooltip</div>
+        </span>
     </div>
 
     @{

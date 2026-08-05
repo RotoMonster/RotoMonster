@@ -5,10 +5,11 @@
     IconType stateIcon;
     var hasIcon = Enum.TryParse(stateType.Icon, out stateIcon);
 
-    <span class="me-1 badge"
-          data-bs-toggle="tooltip"
-          data-bs-placement="top"
-          title="@stateType.Title"
+    var tipId = Context.NextTooltipId();
+
+    <span class="bm-tooltip-wrap">
+    <span class="me-1 badge bm-tooltip-trigger bm-tooltip-trigger--hover"
+          data-bm-tooltip="@tipId"
           style="color:white;background-color:#@stateType.TextColor">
         @if (hasIcon)
         {
@@ -22,5 +23,7 @@
         {
             @Html.Raw(new Icon(new IconInput { Type = IconType.Lock, Size = 13, Color = "#fff" }).Render())
         }
+    </span>
+    <div class="bm-tooltip-content" id="@tipId" role="tooltip">@stateType.Title</div>
     </span>
 }

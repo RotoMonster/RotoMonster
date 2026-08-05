@@ -1,4 +1,4 @@
-﻿@model RotoMonster.Core.DisplayPlayer
+@model RotoMonster.Core.DisplayPlayer
 
 @if (Model.UserLeagueTeam != null)
 {
@@ -7,32 +7,40 @@
     }
     else if (Model.IsIR)
     {
-        <span class="ms-1"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              title="Injured Reserve">IR</span>
+        var tipId = Context.NextTooltipId();
+        <span class="bm-tooltip-wrap">
+        <span class="ms-1 bm-tooltip-trigger bm-tooltip-trigger--hover"
+              data-bm-tooltip="@tipId">IR</span>
+        <div class="bm-tooltip-content" id="@tipId" role="tooltip">Injured Reserve</div>
+        </span>
     }
     else
     {
-        <span class="ms-1"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              title="Bench">BN</span>
+        var tipId = Context.NextTooltipId();
+        <span class="bm-tooltip-wrap">
+        <span class="ms-1 bm-tooltip-trigger bm-tooltip-trigger--hover"
+              data-bm-tooltip="@tipId">BN</span>
+        <div class="bm-tooltip-content" id="@tipId" role="tooltip">Bench</div>
+        </span>
     }
 
     @if (Model.IsMyLastPlayer)
     {
-        <span class="ms-1"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              title="Your last owned player">@Html.Raw(new Icon(new IconInput { Type = IconType.ArrowDown, Size = 16 }).Render())</span>
+        var tipId = Context.NextTooltipId();
+        <span class="bm-tooltip-wrap">
+        <span class="ms-1 bm-tooltip-trigger bm-tooltip-trigger--hover"
+              data-bm-tooltip="@tipId">@Html.Raw(new Icon(new IconInput { Type = IconType.ArrowDown, Size = 16 }).Render())</span>
+        <div class="bm-tooltip-content" id="@tipId" role="tooltip">Your last owned player</div>
+        </span>
     }
 }
 
 else if (Model.IsWaiver)
 {
-    <span class="text-black"
-          data-bs-toggle="tooltip"
-          data-bs-placement="top"
-          title="On Waiver Wire" style="color:black;">WW</span>
+    var tipId = Context.NextTooltipId();
+    <span class="bm-tooltip-wrap">
+    <span class="text-black bm-tooltip-trigger bm-tooltip-trigger--hover"
+          data-bm-tooltip="@tipId" style="color:black;">WW</span>
+    <div class="bm-tooltip-content" id="@tipId" role="tooltip">On Waiver Wire</div>
+    </span>
 }

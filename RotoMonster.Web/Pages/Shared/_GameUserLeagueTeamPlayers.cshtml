@@ -1,4 +1,4 @@
-﻿@model RotoMonster.Models.Shared.GameUserLeagueTeamPlayersModel
+@model RotoMonster.Models.Shared.GameUserLeagueTeamPlayersModel
 
 @if (Model.GameUserLeagueTeamPlayers.Count > 0)
 {
@@ -10,11 +10,14 @@
         tooltip += " " + tp.UserLeagueTeamPlayer.Player.ForwardName;
     }
 
-    <span class="badge"
-      data-bs-toggle="tooltip"
-      data-bs-placement="top"
-      title="@tooltip"
+    var tipId = Context.NextTooltipId();
+
+    <span class="bm-tooltip-wrap">
+    <span class="badge bm-tooltip-trigger bm-tooltip-trigger--hover"
+      data-bm-tooltip="@tipId"
       style="background-color:@colorCode">
         @Model.GameUserLeagueTeamPlayers.Count
+    </span>
+    <div class="bm-tooltip-content" id="@tipId" role="tooltip">@tooltip</div>
     </span>
 }
