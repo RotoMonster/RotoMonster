@@ -1,9 +1,11 @@
-﻿@model RotoMonster.Core.Category
+@model RotoMonster.Core.Category
 
-<button class="btn btn-sm btn-link text-white p-0 m-0"
-        data-bs-toggle="tooltip"
-        data-bs-placement="top"
-        title="@Model.Title"
+@{ var tipId = Context.NextTooltipId(); }
+<span class="bm-tooltip-wrap">
+<button class="btn btn-sm btn-link text-white p-0 m-0 bm-tooltip-trigger bm-tooltip-trigger--hover"
+        data-bm-tooltip="@tipId"
         asp-route-sort="@Model.Id">
     @Model.Abbreviation
 </button>
+<div class="bm-tooltip-content" id="@tipId" role="tooltip">@Model.Title</div>
+</span>
