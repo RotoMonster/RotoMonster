@@ -1,4 +1,4 @@
-﻿@model List<RotoMonster.Core.DisplayPlayer>
+@model List<RotoMonster.Core.DisplayPlayer>
 
 @if (Model != null && Model.Count > 0)
 {
@@ -14,7 +14,11 @@
         }
         depthTT += "</div>";
     }
-    <span data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="@depthTT" class="text-primary">
+    var tipId = Context.NextTooltipId();
+<span class="bm-tooltip-wrap">
+<span class="bm-tooltip-trigger bm-tooltip-trigger--hover text-primary" data-bm-tooltip="@tipId">
         @Html.Raw(new Icon(new IconInput { Type = IconType.ArrowUp, Size = 16 }).Render())
     </span>
+<div class="bm-tooltip-content" id="@tipId" role="tooltip">@Html.Raw(depthTT)</div>
+</span>
 }

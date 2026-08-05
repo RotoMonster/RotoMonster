@@ -1,11 +1,15 @@
-﻿@model RotoMonster.Core.MonsterBotPlayer
+@model RotoMonster.Core.MonsterBotPlayer
 
 @if (Model != null)
 {
     @foreach (var c in Model.MonsterBotPlayerComments)
     {
-        <span data-bs-toggle="tooltip" data-bs-placement="top" title="@c.Text">
+        var tipId = Context.NextTooltipId();
+<span class="bm-tooltip-wrap">
+<span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipId">
             <i class="@c.Icon @c.Color"></i>
         </span>
+<div class="bm-tooltip-content" id="@tipId" role="tooltip">@c.Text</div>
+</span>
     }
 }

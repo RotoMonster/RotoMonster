@@ -1,4 +1,4 @@
-﻿@using RotoMonster.Core.Libs
+@using RotoMonster.Core.Libs
 @model RotoMonster.Core.Article
 
 @{
@@ -11,9 +11,13 @@
         <h5 class="card-title">
             @if (Model.IsAutomated)
             {
-                <span class="me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Article is automated">
+                var tipId = Context.NextTooltipId();
+<span class="bm-tooltip-wrap">
+<span class="bm-tooltip-trigger bm-tooltip-trigger--hover me-1" data-bm-tooltip="@tipId">
                     @Html.Raw(new Icon(new IconInput { Type = IconType.WandMagic, Size = 16 }).Render())
                 </span>
+<div class="bm-tooltip-content" id="@tipId" role="tooltip">Article is automated</div>
+</span>
             }
             <a href="#@collapseId" data-bs-toggle="collapse">@Model.Title</a>
         </h5>

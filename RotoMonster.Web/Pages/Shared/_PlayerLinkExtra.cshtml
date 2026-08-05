@@ -30,9 +30,13 @@
     string articleText = Model.DisplayPlayer.RecentArticles.First().Title;
     if (Model.DisplayPlayer.RecentArticles.Count > 1)
         articleText += " (+" + (Model.DisplayPlayer.RecentArticles.Count - 1).ToString() + ")";
-    <a asp-page="/Articles" asp-route-playerid="@Model.Player.Id" class="small" data-bs-toggle="tooltip" data-bs-placement="top" title="@articleText">
+    var tipId = Context.NextTooltipId();
+<span class="bm-tooltip-wrap">
+<a asp-page="/Articles" asp-route-playerid="@Model.Player.Id" class="bm-tooltip-trigger bm-tooltip-trigger--hover small" data-bm-tooltip="@tipId">
         <partial name="_IconArticle" />
     </a>
+<div class="bm-tooltip-content" id="@tipId" role="tooltip">@articleText</div>
+</span>
 }
 
 @if (Model.PlayerGameState != null)

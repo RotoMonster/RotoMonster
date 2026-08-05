@@ -1,4 +1,4 @@
-﻿@model RotoMonster.Core.PlayerStatus
+@model RotoMonster.Core.PlayerStatus
 
 @{
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
@@ -15,10 +15,11 @@
     if (Model.EstimatedReturnDate != null)
         txt += " - est. return " + Model.EstimatedReturnDate.GetValueOrDefault().Month.ToString() + "/" + Model.EstimatedReturnDate.GetValueOrDefault().Day.ToString();
 
-    <span class="badge" style="margin-left: 3px; @colorLib.GetPlayerStatusTypeStyle(Model.PlayerStatusType)"
-      data-bs-toggle="tooltip"
-      data-bs-placement="top"
-      title="@txt">
+    string tipId = "bm-tip-status-" + Model.Id;
+
+    <span class="bm-tooltip-wrap">
+    <span class="badge bm-tooltip-trigger bm-tooltip-trigger--hover" style="margin-left: 3px; @colorLib.GetPlayerStatusTypeStyle(Model.PlayerStatusType)"
+      data-bm-tooltip="@tipId">
         @Model.PlayerStatusType.TextFormat.Replace("{t}", "")
         @if (Model.EstimatedGamesToMiss!=null && Model.EstimatedGamesToMiss.Count>1)
         {
@@ -31,5 +32,7 @@
                 <partial name="_Timespan" model="Model.TimeSince" />
             </small>
         }
+    </span>
+    <div class="bm-tooltip-content" id="@tipId" role="tooltip">@txt</div>
     </span>
 }

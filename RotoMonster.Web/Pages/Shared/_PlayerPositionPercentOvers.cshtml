@@ -1,19 +1,27 @@
-﻿@model RotoMonster.Models.Shared.PlayerPositionPercentsModel
+@model RotoMonster.Models.Shared.PlayerPositionPercentsModel
 @if (Model.PlayerPositionPercentOvers != null)
 {
     <div class="ppos">
         <div style="background-color:#@Model.EstimatedUpsideColorCode; color:#bfbfbf;">
             @if (Model.EstimatedUpside >= 0)
             {
-                <span data-bs-toggle="tooltip" data-bs-placement="top" title="@Math.Abs(Model.EstimatedUpside)% upside">
+                var tipId = Context.NextTooltipId();
+<span class="bm-tooltip-wrap">
+<span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipId">
                     <partial name="_IconUpside" />
                 </span>
+<div class="bm-tooltip-content" id="@tipId" role="tooltip">@Math.Abs(Model.EstimatedUpside)% upside</div>
+</span>
             }
             else
             {
-                <span data-bs-toggle="tooltip" data-bs-placement="top" title="@Math.Abs(Model.EstimatedUpside)% downside">
+                var tipId = Context.NextTooltipId();
+<span class="bm-tooltip-wrap">
+<span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipId">
                     <partial name="_IconDownside" />
                 </span>
+<div class="bm-tooltip-content" id="@tipId" role="tooltip">@Math.Abs(Model.EstimatedUpside)% downside</div>
+</span>
             }
         </div>
 
