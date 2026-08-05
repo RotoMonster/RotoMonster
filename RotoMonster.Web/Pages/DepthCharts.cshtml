@@ -1,4 +1,4 @@
-﻿@page
+@page
 @using RotoMonster.Models.Shared;
 @model RotoMonster.Pages.DepthChartsModel
 @{
@@ -72,16 +72,24 @@
                                 @if (Model.ShowGameMonsterBar)
                                 {
                                     <th class="tdc">
-                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="@Model.MonsterBar.Tooltip">
+                                        @{ var tipIdG = ViewContext.HttpContext.NextTooltipId(); }
+                                        <span class="bm-tooltip-wrap">
+                                        <span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipIdG">
                                             @Model.MonsterBar.ColumnTitle(false)<small class="ms-1">game</small>
+                                        </span>
+                                        <div class="bm-tooltip-content" id="@tipIdG" role="tooltip">@Model.MonsterBar.Tooltip</div>
                                         </span>
                                     </th>
                                 }
                                 @if (Model.ShowTotalMonsterBar)
                                 {
                                     <th class="tdc">
-                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="@Model.TotalMonsterBar.Tooltip">
+                                        @{ var tipIdT = ViewContext.HttpContext.NextTooltipId(); }
+                                        <span class="bm-tooltip-wrap">
+                                        <span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipIdT">
                                             @Model.TotalMonsterBar.ColumnTitle(false)<small class="ms-1">total</small>
+                                        </span>
+                                        <div class="bm-tooltip-content" id="@tipIdT" role="tooltip">@Model.TotalMonsterBar.Tooltip</div>
                                         </span>
                                     </th>
                                 }
