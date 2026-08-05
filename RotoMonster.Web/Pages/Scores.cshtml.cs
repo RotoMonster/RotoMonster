@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RotoMonster.Core;
-using RotoMonster.Core.PartialViewModels;
+using RotoMonster.Models.Shared;
 using RotoMonster.Data;
 using System;
 using System.Collections.Generic;

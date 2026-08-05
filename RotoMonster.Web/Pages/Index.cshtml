@@ -83,7 +83,7 @@
                                         </td>
 
                                         <td class="ps-1 pe-1">
-                                            <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp}" />
+                                            <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=dp}" />
                                         </td>
 
                                         <td>
@@ -105,7 +105,7 @@
                                         </td>
 
                                         <td class="tdc">
-                                            <partial name="_GameState" model="new RotoMonster.Core.PartialViewModels.GameStateViewModel(){Game=dp.Game,Sport=Model.Sport}" />
+                                            <partial name="_GameState" model="new RotoMonster.Models.Shared.GameStateViewModel(){Game=dp.Game,Sport=Model.Sport}" />
                                         </td>
 
                                         @if (dp.NoWaiverOwnershipPlayer != null)
@@ -172,7 +172,7 @@
                                 {
                                     <tr>
                                         <td class="ps-1 pe-1">
-                                            <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp}" />
+                                            <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=dp}" />
                                         </td>
 
                                         <td class="tdc text-nowrap">
@@ -246,7 +246,7 @@
                                 {
                                     <tr>
                                         <td class="ps-1 pe-1">
-                                            <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp}" />
+                                            <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=dp}" />
                                         </td>
 
                                         @if (dp.OwnershipPlayer != null)
@@ -266,12 +266,12 @@
                                             @{
                                                 var gamePlayers = (from gp in Model.OwnedGameUserLeagueTeamPlayers where gp.UserLeagueTeamPlayer.PlayerId == dp.SeasonPlayer.PlayerId select gp).ToList();
                                             }
-                                            <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Core.PartialViewModels.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=gamePlayers,UseOwnColor=true}" />
+                                            <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Models.Shared.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=gamePlayers,UseOwnColor=true}" />
 
                                             @{
                                                 var activePlayers = (from gp in Model.ActiveGameUserLeagueTeamPlayers where gp.UserLeagueTeamPlayer.PlayerId == dp.SeasonPlayer.PlayerId select gp).ToList();
                                             }
-                                            <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Core.PartialViewModels.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=activePlayers,UseOwnColor=false}" />
+                                            <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Models.Shared.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=activePlayers,UseOwnColor=false}" />
                                         </td>
                                     </tr>
                                 }
@@ -324,7 +324,7 @@
                                             </td>
 
                                             <td class="pe-1 ps-1">
-                                                <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp,SelectedUserLeague=ulv.UserLeague}" />
+                                                <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=dp,SelectedUserLeague=ulv.UserLeague}" />
                                             </td>
 
                                             @if (dp.OwnershipPlayer != null)
@@ -398,13 +398,13 @@
                                             }
 
                                             <td class="tdr text-nowrap" style="background-color:#@dp.ValuePlayer.LeagueValueColor;">
-                                                <partial name="_DisplayValuePlayer" model="new RotoMonster.Core.PartialViewModels.ValuePlayerModel() {ValuePlayer=dp.ValuePlayer,ShowMPG=true}" />
+                                                <partial name="_DisplayValuePlayer" model="new RotoMonster.Models.Shared.ValuePlayerModel() {ValuePlayer=dp.ValuePlayer,ShowMPG=true}" />
                                             </td>
 
                                             @if (dp.Game != null)
                                             {
                                                 <td class="tdc">
-                                                    <partial name="_GameState" model="new RotoMonster.Core.PartialViewModels.GameStateViewModel() {ShowCompact=true,Game=dp.Game,Sport=Model.Sport,Team=dp.SeasonPlayer.Team}" />
+                                                    <partial name="_GameState" model="new RotoMonster.Models.Shared.GameStateViewModel() {ShowCompact=true,Game=dp.Game,Sport=Model.Sport,Team=dp.SeasonPlayer.Team}" />
                                                 </td>
                                             }
                                             else
@@ -413,7 +413,7 @@
                                             }
 
                                             <td class="pe-1 ps-1">
-                                                <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp,SelectedUserLeague=ulv.UserLeague}" />
+                                                <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=dp,SelectedUserLeague=ulv.UserLeague}" />
                                             </td>
 
                                             <td class="text-nowrap flex-nowrap">
@@ -456,7 +456,7 @@
                                 {
                                     <div class="ms-2">
                                         <partial name="_MonsterBotPlayer" model="mbp" />
-                                        <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=mbp.DisplayPlayer,SelectedUserLeague=ulv.UserLeague}" />
+                                        <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=mbp.DisplayPlayer,SelectedUserLeague=ulv.UserLeague}" />
                                     </div>
                                 }
                             </div>
@@ -472,7 +472,7 @@
                                         <tr>
 
                                             <td class="pe-1 ps-1">
-                                                <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp,SelectedUserLeague=ulv.UserLeague}" />
+                                                <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=dp,SelectedUserLeague=ulv.UserLeague}" />
                                             </td>
 
                                             <td class="tdc text-nowrap">

@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RotoMonster.Core.PartialViewModels;
+using RotoMonster.Models.Shared;
+using RotoMonster.Core;
 
-namespace RotoMonster.Core.PartialViewModels
+namespace RotoMonster.Models.Shared
 {
     public class BoxScoreModel
     {

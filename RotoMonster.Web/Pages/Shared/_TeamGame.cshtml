@@ -1,4 +1,4 @@
-﻿@model RotoMonster.Core.PartialViewModels.TeamGameModel
+﻿@model RotoMonster.Models.Shared.TeamGameModel
 
 @{
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
@@ -7,7 +7,7 @@
 @if (Model.Game != null)
 {
     <div class="float-start me-1" style="margin-top:2px;">
-        <partial name="_GameState" model="new RotoMonster.Core.PartialViewModels.GameStateViewModel(){Game=Model.Game,Sport=Model.Sport,Team=Model.Team,ShowOpponent=false};" />
+        <partial name="_GameState" model="new RotoMonster.Models.Shared.GameStateViewModel(){Game=Model.Game,Sport=Model.Sport,Team=Model.Team,ShowOpponent=false};" />
     </div>
 
     @if (Model.Game.PercentComplete == 0)

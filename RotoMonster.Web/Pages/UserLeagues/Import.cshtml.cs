@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RotoMonster.Core;
 using RotoMonster.Core.Libs;
-using RotoMonster.Core.PartialViewModels;
+using RotoMonster.Models.Shared;
 using RotoMonster.Data;
 
 namespace RotoMonster.Pages.UserLeagues

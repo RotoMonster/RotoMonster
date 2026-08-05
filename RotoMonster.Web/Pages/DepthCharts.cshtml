@@ -1,5 +1,5 @@
 ﻿@page
-@using RotoMonster.Core.PartialViewModels;
+@using RotoMonster.Models.Shared;
 @model RotoMonster.Pages.DepthChartsModel
 @{
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
@@ -118,7 +118,7 @@
                                     </td>
 
                                     <td class="ps-1 pe-1 text-nowrap">
-                                        <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp}" />
+                                        <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=dp}" />
                                     </td>
 
                                     @if (dp.OwnershipPlayer != null)

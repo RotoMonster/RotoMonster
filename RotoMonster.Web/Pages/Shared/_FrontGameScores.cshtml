@@ -1,4 +1,4 @@
-﻿@using RotoMonster.Core.PartialViewModels
+﻿@using RotoMonster.Models.Shared
 @model FrontGameScoresModel
 @{
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
@@ -33,18 +33,18 @@
                     {
                         <tr>
                             <td>
-                                <partial name="_TeamGame" model="new RotoMonster.Core.PartialViewModels.TeamGameModel() {Sport=Model.Sport,Game=game,Team=game.AwayTeam}" />
+                                <partial name="_TeamGame" model="new RotoMonster.Models.Shared.TeamGameModel() {Sport=Model.Sport,Game=game,Team=game.AwayTeam}" />
                             </td>
                             <td class="tdc">
                                 @{
                                     var gamePlayers = (from gp in Model.OwnedGameUserLeagueTeamPlayers where gp.Game.Id == game.Id select gp).ToList();
                                 }
-                                <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Core.PartialViewModels.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=gamePlayers,UseOwnColor=true}" />
+                                <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Models.Shared.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=gamePlayers,UseOwnColor=true}" />
 
                                 @{
                                     var activePlayers = (from gp in Model.ActiveGameUserLeagueTeamPlayers where gp.Game.Id == game.Id select gp).ToList();
                                 }
-                                <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Core.PartialViewModels.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=activePlayers,UseOwnColor=false}" />
+                                <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Models.Shared.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=activePlayers,UseOwnColor=false}" />
                             </td>
                         </tr>
                     }

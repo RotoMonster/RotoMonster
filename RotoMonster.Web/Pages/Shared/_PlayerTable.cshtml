@@ -1,5 +1,5 @@
-﻿@using RotoMonster.Core.PartialViewModels
-@model RotoMonster.Core.PartialViewModels.PlayerTableModel
+﻿@using RotoMonster.Models.Shared
+@model RotoMonster.Models.Shared.PlayerTableModel
 
 @{
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
@@ -312,7 +312,7 @@
                 {
                     <th>
                         @{
-                            RotoMonster.Core.PartialViewModels.GameDatesHeaderModel gameDatesHeaderModel = new RotoMonster.Core.PartialViewModels.GameDatesHeaderModel(0, Model.DateSelects) { StreamSelects = Model.StreamSelects };
+                            RotoMonster.Models.Shared.GameDatesHeaderModel gameDatesHeaderModel = new RotoMonster.Models.Shared.GameDatesHeaderModel(0, Model.DateSelects) { StreamSelects = Model.StreamSelects };
                             gameDatesHeaderModel.StartIndex = 0;
                             gameDatesHeaderModel.Title = "This";
                             gameDatesHeaderModel.StartDate = Model.RemainingWeekStartDate;
@@ -329,7 +329,7 @@
                 {
                     <th>
                         @{
-                            RotoMonster.Core.PartialViewModels.GameDatesHeaderModel gameDatesHeaderModel = new RotoMonster.Core.PartialViewModels.GameDatesHeaderModel(1, Model.DateSelects) { StreamSelects = Model.StreamSelects };
+                            RotoMonster.Models.Shared.GameDatesHeaderModel gameDatesHeaderModel = new RotoMonster.Models.Shared.GameDatesHeaderModel(1, Model.DateSelects) { StreamSelects = Model.StreamSelects };
                             gameDatesHeaderModel.Title = "Next";
                             gameDatesHeaderModel.StartDate = Model.NextWeekStartDate;
                             gameDatesHeaderModel.EndDate = Model.NextWeekEndDate;
@@ -466,7 +466,7 @@
                 <td class="text-nowrap @titleCss">
                     @if (dp.DisplayTitle == "")
                     {
-                        <partial name="_PlayerLinkExtra" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {DisplayPlayer=dp, Player=dp.SeasonPlayer.Player,SelectedUserLeague=Model.SelectedUserLeague,PlayerGameState=dp.PlayerGameState}" />
+                        <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=dp, Player=dp.SeasonPlayer.Player,SelectedUserLeague=Model.SelectedUserLeague,PlayerGameState=dp.PlayerGameState}" />
                     }
                     else
                     {
@@ -634,7 +634,7 @@
                         {
                             <td class="tdr text-nowrap" style="background-color:#@dp.ExtraValuePlayer1.LeagueValueColor;">
                                 <partial name="_DisplayValuePlayer"
-                                         model="new RotoMonster.Core.PartialViewModels.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer1,ShowGames=!Model.Sport.IsNFL }" />
+                                         model="new RotoMonster.Models.Shared.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer1,ShowGames=!Model.Sport.IsNFL }" />
                             </td>
                         }
                         else
@@ -648,7 +648,7 @@
                         if (dp.ExtraValuePlayer2 != null)
                         {
                             <td class="tdr text-nowrap" style="background-color:#@dp.ExtraValuePlayer2.LeagueValueColor;">
-                                <partial name="_DisplayValuePlayer" model="new RotoMonster.Core.PartialViewModels.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer2,ShowGames=!Model.Sport.IsNFL }" />
+                                <partial name="_DisplayValuePlayer" model="new RotoMonster.Models.Shared.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer2,ShowGames=!Model.Sport.IsNFL }" />
                             </td>
                         }
                         else
@@ -662,7 +662,7 @@
                         {
                             <td class="tdr text-nowrap" style="background-color:#@dp.ExtraValuePlayer3.LeagueValueColor;">
                                 <partial name="_DisplayValuePlayer"
-                                         model="new RotoMonster.Core.PartialViewModels.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer3}" />
+                                         model="new RotoMonster.Models.Shared.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer3}" />
                             </td>
                         }
                         else
@@ -716,7 +716,7 @@
                                 @if (dp.Game != null)
                                 {
                                     <div class="tdnw">
-                                        <partial name="_TeamGame" model="new RotoMonster.Core.PartialViewModels.TeamGameModel() {Sport=Model.Sport,Game=dp.Game,DisplayPlayer=dp,Team=dp.SeasonPlayer.Team}" />
+                                        <partial name="_TeamGame" model="new RotoMonster.Models.Shared.TeamGameModel() {Sport=Model.Sport,Game=dp.Game,DisplayPlayer=dp,Team=dp.SeasonPlayer.Team}" />
                                     </div>
                                 }
                             </td>
@@ -794,7 +794,7 @@
                 {
                     <td class="small">
                         <partial name="_GameDates"
-                                 model="new RotoMonster.Core.PartialViewModels.GameDatesModel(){ TeamGames=dp.TeamGames, PlayerGameDates=dp.PlayerGameDates, StartDate = Model.RemainingWeekStartDate, EndDate = Model.RemainingWeekEndDate }" />
+                                 model="new RotoMonster.Models.Shared.GameDatesModel(){ TeamGames=dp.TeamGames, PlayerGameDates=dp.PlayerGameDates, StartDate = Model.RemainingWeekStartDate, EndDate = Model.RemainingWeekEndDate }" />
                     </td>
                 }
 
@@ -802,7 +802,7 @@
                 {
                     <td class="small">
                         <partial name="_GameDates"
-                                 model="new RotoMonster.Core.PartialViewModels.GameDatesModel(){TeamGames=dp.TeamGames,PlayerGameDates=dp.PlayerGameDates,StartDate = Model.NextWeekStartDate, EndDate = Model.NextWeekEndDate }" />
+                                 model="new RotoMonster.Models.Shared.GameDatesModel(){TeamGames=dp.TeamGames,PlayerGameDates=dp.PlayerGameDates,StartDate = Model.NextWeekStartDate, EndDate = Model.NextWeekEndDate }" />
                     </td>
                 }
 

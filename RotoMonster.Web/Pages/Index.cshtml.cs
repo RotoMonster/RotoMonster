@@ -12,7 +12,7 @@ using RotoMonster.Core;
 using RotoMonster.Core.Libs;
 using RotoMonster.Data;
 using System.Web.Services;
-using RotoMonster.Core.PartialViewModels;
+using RotoMonster.Models.Shared;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RotoMonster.Pages

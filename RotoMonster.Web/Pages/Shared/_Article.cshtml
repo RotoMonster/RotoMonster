@@ -31,7 +31,7 @@
                         @foreach (var articlePlayer in Model.ArticlePlayers)
                         {
                             <span class="ms-1 me-1">
-                                <partial name="_PlayerLink" model="new RotoMonster.Core.PartialViewModels.PlayerLinkModel() {Player=articlePlayer.Player,SelectedUserLeague=null,PlayerGameState=null}" />
+                                <partial name="_PlayerLink" model="new RotoMonster.Models.Shared.PlayerLinkModel() {Player=articlePlayer.Player,SelectedUserLeague=null,PlayerGameState=null}" />
                             </span>
                         }
                     </div>

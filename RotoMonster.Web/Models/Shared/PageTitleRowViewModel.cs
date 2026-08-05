@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
+using RotoMonster.Core;
 
 namespace RotoMonster.Models.Shared
 {

@@ -1,4 +1,5 @@
 using System;
+using RotoMonster.Core;
 
 namespace RotoMonster.Models.Shared
 {

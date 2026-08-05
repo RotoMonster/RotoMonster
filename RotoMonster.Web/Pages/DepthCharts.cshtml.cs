@@ -19,7 +19,7 @@ using Microsoft.Extensions.Logging;
 using NuGet.Packaging.Signing;
 using RotoMonster.Core;
 using RotoMonster.Core.Libs;
-using RotoMonster.Core.PartialViewModels;
+using RotoMonster.Models.Shared;
 using RotoMonster.Data;
 using RotoMonster.NFL.Migrations.Migrations;
 using RotoMonster.Pages.Shared;

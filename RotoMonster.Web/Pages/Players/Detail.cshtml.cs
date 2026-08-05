@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RotoMonster.Core;
-using RotoMonster.Core.PartialViewModels;
+using RotoMonster.Models.Shared;
 using RotoMonster.Data;
 using RotoMonster.Pages;
 using RotoMonster.Pages.Shared;
