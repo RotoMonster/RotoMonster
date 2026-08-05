@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model IndexModel
 @{
     ViewData["Title"] = "";
@@ -131,8 +131,12 @@
                                                 {
                                                     tt += "<div>" + ul.DisplayTitle + "<div>";
                                                 }
-                                                <span class="badge bg-success" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="@tt">
+                                                var tipTt1 = ViewContext.HttpContext.NextTooltipId();
+                                                <span class="bm-tooltip-wrap">
+                                                <span class="badge bg-success bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipTt1">
                                                     @dp.OwnedInUserLeagues.Count
+                                                </span>
+                                                <div class="bm-tooltip-content" id="@tipTt1" role="tooltip">@Html.Raw(tt)</div>
                                                 </span>
                                             }
                                         </td>
@@ -144,8 +148,12 @@
                                                 {
                                                     tt += "<div>" + ul.DisplayTitle + "<div>";
                                                 }
-                                                <span class="badge bg-info" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="@tt">
+                                                var tipTt2 = ViewContext.HttpContext.NextTooltipId();
+                                                <span class="bm-tooltip-wrap">
+                                                <span class="badge bg-info bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipTt2">
                                                     @dp.AvailableInUserLeagues.Count
+                                                </span>
+                                                <div class="bm-tooltip-content" id="@tipTt2" role="tooltip">@Html.Raw(tt)</div>
                                                 </span>
                                             }
                                         </td>
@@ -207,8 +215,12 @@
                                                 {
                                                     tt += "<div>" + ul.DisplayTitle + "<div>";
                                                 }
-                                                <span class="badge bg-success" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="@tt">
+                                                var tipTt3 = ViewContext.HttpContext.NextTooltipId();
+                                                <span class="bm-tooltip-wrap">
+                                                <span class="badge bg-success bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipTt3">
                                                     @dp.OwnedInUserLeagues.Count
+                                                </span>
+                                                <div class="bm-tooltip-content" id="@tipTt3" role="tooltip">@Html.Raw(tt)</div>
                                                 </span>
                                             }
                                         </td>
@@ -220,8 +232,12 @@
                                                 {
                                                     tt += "<div>" + ul.DisplayTitle + "<div>";
                                                 }
-                                                <span class="badge bg-info" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="@tt">
+                                                var tipTt4 = ViewContext.HttpContext.NextTooltipId();
+                                                <span class="bm-tooltip-wrap">
+                                                <span class="badge bg-info bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipTt4">
                                                     @dp.AvailableInUserLeagues.Count
+                                                </span>
+                                                <div class="bm-tooltip-content" id="@tipTt4" role="tooltip">@Html.Raw(tt)</div>
                                                 </span>
                                             }
                                         </td>
@@ -371,8 +387,12 @@
                                         <th>Game</th>
                                         <th>Player</th>
                                         <th class="tdc">
-                                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="@ulv.MonsterBar.Tooltip">
+                                            @{ var tipMb = ViewContext.HttpContext.NextTooltipId(); }
+                                            <span class="bm-tooltip-wrap">
+                                            <span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipMb">
                                                 @ulv.MonsterBar.ColumnTitle(false)
+                                            </span>
+                                            <div class="bm-tooltip-content" id="@tipMb" role="tooltip">@ulv.MonsterBar.Tooltip</div>
                                             </span>
                                         </th>
                                     </tr>
@@ -435,11 +455,19 @@
                                 @foreach (var analysisPlayerType in ulv.UserLeagueTeamAnalysis.UserLeagueTeamAnalysisPlayerTypes)
                                 {
                                     <div class="small ps-1">
-                                        <span class="me-1 ps-1" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="Average ownership %" style="background-color:#@colorLib.OwnershipGetPercentColor(analysisPlayerType.AverageOwnershipPercent)">
+                                        @{ var tipOwn = ViewContext.HttpContext.NextTooltipId(); }
+                                        <span class="bm-tooltip-wrap">
+                                        <span class="me-1 ps-1 bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipOwn" style="background-color:#@colorLib.OwnershipGetPercentColor(analysisPlayerType.AverageOwnershipPercent)">
                                             @String.Format("{0:##0}% avg own", analysisPlayerType.AverageOwnershipPercent)
                                         </span>
-                                        <span class="me-1 ps-1" data-bs-toggle="tooltip" data-bs-placement="top" data-html="true" title="Average active %" style="background-color:#@colorLib.ActiveGetPercentColor(analysisPlayerType.AverageActivePercent)">
+                                        <div class="bm-tooltip-content" id="@tipOwn" role="tooltip">Average ownership %</div>
+                                        </span>
+                                        @{ var tipAct = ViewContext.HttpContext.NextTooltipId(); }
+                                        <span class="bm-tooltip-wrap">
+                                        <span class="me-1 ps-1 bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipAct" style="background-color:#@colorLib.ActiveGetPercentColor(analysisPlayerType.AverageActivePercent)">
                                             @String.Format("{0:##0}% avg active", analysisPlayerType.AverageActivePercent)
+                                        </span>
+                                        <div class="bm-tooltip-content" id="@tipAct" role="tooltip">Average active %</div>
                                         </span>
                                         @analysisPlayerType.PlayerType.DisplayTitle
                                     </div>

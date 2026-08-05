@@ -1,4 +1,4 @@
-﻿@page "{playerId:int?}"
+@page "{playerId:int?}"
 
 @model PlayersModel
 @{
@@ -93,8 +93,12 @@
                             string note = "";
                             foreach (var userLeague in Model.OwnedInUserLeagues)
                                 note += "[" + userLeague.DisplayTitle + "]";
-                            <span class="badge bg-success" data-bs-toggle="tooltip" data-html="true" title="@note">
+                            var tipNote1 = ViewContext.HttpContext.NextTooltipId();
+                            <span class="bm-tooltip-wrap">
+                            <span class="badge bg-success bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipNote1">
                                 Yours in  @Model.OwnedInUserLeagues.Count
+                            </span>
+                            <div class="bm-tooltip-content" id="@tipNote1" role="tooltip">@Html.Raw(note)</div>
                             </span>
                         }
                         @if (Model.AvailableInUserLeagues != null && Model.AvailableInUserLeagues.Count > 0)
@@ -102,8 +106,12 @@
                             string note = "";
                             foreach (var userLeague in Model.AvailableInUserLeagues)
                                 note += "[" + userLeague.DisplayTitle + "]";
-                            <span class="badge bg-primary" data-bs-toggle="tooltip" data-html="true" title="@note">
+                            var tipNote2 = ViewContext.HttpContext.NextTooltipId();
+                            <span class="bm-tooltip-wrap">
+                            <span class="badge bg-primary bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipNote2">
                                 Available in @Model.AvailableInUserLeagues.Count
+                            </span>
+                            <div class="bm-tooltip-content" id="@tipNote2" role="tooltip">@Html.Raw(note)</div>
                             </span>
                         }
                     </div>
