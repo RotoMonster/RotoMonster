@@ -6,7 +6,7 @@ namespace RotoMonster.Core
 {
     public static class RMCss
     {
-        public const string DataTable = "table table-sm small table-hover table-responsive-sm table-bordered table-condensed td-small";
-        public const string DataTableTHead = "table-dark";
+        public const string DataTable = "table table-sm small table-hover table-bordered td-small";
+        public const string DataTableTHead = "rm-data-table-head";
     }
 }
