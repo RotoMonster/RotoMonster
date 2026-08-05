@@ -185,3 +185,68 @@ select {
 .td-small td {
     padding: 2px 3px 2px 3px;
 }
+/* Nav player search - the shared sheet styles navbar inputs for a dark navbar */
+.navbar input#navPlayerSearch {
+    width: 260px;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+    background: #ffffff;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.navbar input#navPlayerSearch::placeholder {
+    color: var(--color-text-tertiary);
+    opacity: 1;
+}
+
+.navbar input#navPlayerSearch:focus {
+    outline: none;
+    color: var(--color-text-primary);
+    background: #ffffff;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(var(--brand-primary-rgb), 0.15);
+}
+
+/* jQuery UI autocomplete sits under the navbar without this */
+.ui-autocomplete {
+    z-index: 1100;
+}
+
+/* Autocomplete dropdown - match the library's completion list */
+.ui-autocomplete {
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 0.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    font-size: 0.85rem;
+    list-style: none;
+}
+.ui-autocomplete .ui-menu-item-wrapper {
+    padding: 0.4rem 0.7rem;
+    border-radius: 5px;
+    border: none;
+    color: var(--color-text-primary);
+}
+.ui-autocomplete .ui-menu-item-wrapper.ui-state-active {
+    background: var(--brand-primary);
+    color: #ffffff;
+    margin: 0;
+}
+
+/* Keep the logo from being squeezed by the search box */
+.navbar .navbar-brand {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.navbar input#navPlayerSearch {
+    width: 200px;
+    max-width: 100%;
+    flex-shrink: 1;
+}

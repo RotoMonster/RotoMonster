@@ -1,4 +1,4 @@
-﻿@using RotoMonster.Core
+@using RotoMonster.Core
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,6 +35,10 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <partial name="_LoginPartial" />
+                    <form method="get" asp-page="/Players" class="d-flex align-items-center me-3">
+                        <input type="search" id="navPlayerSearch" name="SearchTerm" class="form-control"
+                               placeholder="Search players" autocomplete="off" />
+                    </form>
                     <ul class="navbar-nav flex-grow-1">
 
                         <li class="nav-item dropdown">
@@ -165,6 +169,7 @@
 
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/rotomonster-ui.js" asp-append-version="true"></script>
+    <partial name="_PlayerSearchScripts" model='"navPlayerSearch"' />
 
     @*<script>
     (function (i, s, o, g, r, a, m) {

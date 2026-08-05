@@ -1,10 +1,15 @@
-﻿@model string
+@model string
 
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script>
     $(function () {
         $("#@Model").autocomplete({
-            source: './api/postapi/search'
+            minLength: 2,
+            source: function (request, response) {
+                $.getJSON('/api/postapi/search', { term: request.term }, function (data) {
+                    response(data.slice(0, 12));
+                });
+            }
         });
     });
 </script>
