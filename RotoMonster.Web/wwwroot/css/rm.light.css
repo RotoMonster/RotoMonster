@@ -123,6 +123,8 @@ select {
 }
 
 .rm-data-table-head {
+    --bs-table-bg: #212529;
+    --bs-table-color: #fff;
     background-color: #212529;
     color: #fff;
 }

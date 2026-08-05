@@ -14,7 +14,6 @@ namespace RotoMonster.Pages
     {
         public List<Helper> Helpers { get; set; }
         public List<PlayerType> PlayerTypes { get; set; }
-        public DisplayMonsterBarPlayer DisplayMonsterBarPlayer { get; set; }
 
         public HelpModel(IConfiguration config, IRMData db, IRMSharedData sharedDb, UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor, ILogger<PageModel> logger)
             : base(config, db, sharedDb, userManager, contextAccessor, logger)
