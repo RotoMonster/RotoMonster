@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
@@ -190,7 +190,16 @@ namespace RotoMonster.Data
 
         public List<string> AutoCompletePlayerSearch(string term)
         {
+            var seasonPlayerIds = new HashSet<int>();
+            var season = GetDefaultSeason();
+            if (season != null)
+            {
+                foreach (var sp in GetAllSeasonPlayers(season))
+                    seasonPlayerIds.Add(sp.PlayerId);
+            }
+
             var query = (from p in GetPlayerByName(term)
+                         where seasonPlayerIds.Count == 0 || seasonPlayerIds.Contains(p.Id)
                          orderby p.LastName, p.FirstName
                          select p.FirstName + " " + p.LastName).Take(50).ToList();
 
