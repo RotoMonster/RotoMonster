@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model RotoMonster.Pages.AdminModel
 @{
     ViewData["Title"] = "Admin Menu";
@@ -11,8 +11,8 @@
 </p>
 
 <form method="post">
-    <button type="submit" class="btn btn-link" asp-page-handler="ClearCache">Clear Cache</button>
-    <button type="submit" class="btn btn-link" asp-page-handler="ClearLogs">Clear Logs</button>
+    <button type="submit" class="btn btn-link" data-bm-confirm="Clear the cache?" asp-page-handler="ClearCache">Clear Cache</button>
+    <button type="submit" class="btn btn-link" data-bm-confirm="Clear all log entries?" asp-page-handler="ClearLogs">Clear Logs</button>
     <button type="submit" class="btn btn-link" asp-page-handler="ImportUserAuths">Import User Auths</button>
     @*    <button type="submit" class="btn btn-link" asp-page-handler="ImportUsers">Import Users</button>
     *@

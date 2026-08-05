@@ -1,4 +1,4 @@
-﻿@using RotoMonster.Core
+@using RotoMonster.Core
 @model Player
 
 <div class="card mt-3">
@@ -17,7 +17,7 @@
         <a class="btn btn-primary" asp-page="./Edit" asp-route-playerId="@Model.Id">
             Edit
         </a>
-        <a class="btn btn-danger" asp-page="./Delete" asp-route-playerId="@Model.Id">
+        <a class="btn btn-danger" data-bm-confirm="Delete this player?" asp-page="./Delete" asp-route-playerId="@Model.Id">
             Delete
         </a>
     </div>

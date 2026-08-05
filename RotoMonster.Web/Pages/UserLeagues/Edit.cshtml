@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model RotoMonster.Pages.UserLeagues.EditModel
 
 @{
@@ -35,7 +35,7 @@
                 <input type="submit" value="Save" asp-page-handler="Save" class="btn btn-primary" />
                 @*<input type="submit" value="Refresh Settings" asp-page-handler="Refresh" class="btn btn-secondary" />*@
                 <a class="btn btn-secondary" asp-page="/Index">Back to Home</a>
-                <a class="btn btn-danger" asp-page="./Delete" asp-route-id="@Model.UserLeague.Id">Delete</a>
+                <a class="btn btn-danger" data-bm-confirm="Delete this league? This cannot be undone." asp-page="./Delete" asp-route-id="@Model.UserLeague.Id">Delete</a>
 
             </div>
 

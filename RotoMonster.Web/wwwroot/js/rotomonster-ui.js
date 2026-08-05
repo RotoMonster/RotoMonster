@@ -1439,3 +1439,18 @@ document.addEventListener('click', function (e) {
         }
     });
 })();
+
+// Confirm-before-action. Any element carrying data-bm-confirm prompts first.
+// Capture phase, so this runs BEFORE the element's own onclick or form submit.
+document.addEventListener('click', function (e) {
+    var trigger = e.target.closest && e.target.closest('[data-bm-confirm]');
+    if (!trigger) return;
+
+    var message = trigger.getAttribute('data-bm-confirm');
+    if (!message) return;
+
+    if (!window.confirm(message)) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+}, true);
