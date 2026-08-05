@@ -161,10 +161,6 @@ namespace RotoMonster.Data
 
         public IEnumerable<Player> GetPlayerByName(string name)
         {
-            string cacheId = "GetPlayerByName" + name;
-            if (CacheItemExists(cacheId))
-                return (IEnumerable<Player>)GetCacheItem(cacheId);
-
             IEnumerable<Player> query = null;
             if (name != null)
             {
@@ -182,8 +178,6 @@ namespace RotoMonster.Data
             {
                 query = (from p in db.Players.AsNoTracking() select p).Take(0);
             }
-
-            AddCacheItem(cacheId, query);
 
             return query;
         }
