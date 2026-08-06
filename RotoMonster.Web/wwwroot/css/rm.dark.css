@@ -181,3 +181,53 @@ a {
 td.tdleft {
     border-left-color: var(--color-border);
 }
+
+/* ---- Card surfaces --------------------------------------------------
+   The text-colour fix above assumed cards were dark. Front-page cards
+   are, because they carry `.bg` - but Depth Charts' do not, so they kept
+   Bootstrap's white and went light-on-light.
+
+   Setting both the variable and the property: Bootstrap 5.3 reads
+   --bs-card-bg, earlier 5.x hardcodes #fff, and the version here has not
+   been pinned. Cards sit one step lighter than the page so they read as
+   raised. */
+
+.card {
+    --bs-card-bg: var(--color-bg-secondary);
+    --bs-card-color: var(--color-text-primary);
+    --bs-card-border-color: var(--color-border);
+    --bs-card-cap-bg: rgba(255, 255, 255, 0.04);
+    --bs-card-cap-color: var(--color-text-primary);
+    background-color: var(--color-bg-secondary);
+}
+
+.card-header {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-bottom-color: var(--color-border);
+}
+
+/* alert-light is used for the MonsterBot Recommendations panel. */
+.alert-light {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+}
+
+/* ---- Position colours -----------------------------------------------
+   bm.mlb.dark.css carries the same --pos-* values as the light sheet -
+   they were chosen for a white page. The darker ones disappear here.
+   Lifted toward the same hue rather than replaced, so the colour coding
+   still reads the same. C and 3B are already bright and unchanged.
+
+   This is a library gap, not a RotoMonster one: Baseball Monster's dark
+   mode has it too. Overriding locally so the shared sheet is untouched. */
+
+:root {
+    --pos-1b: #4ec94e;   /* was #339900 */
+    --pos-2b: #7b7bff;   /* was #4d4dff */
+    --pos-ss: #ff5c5c;   /* was #cc0000 */
+    --pos-of: #cc66ff;   /* was #aa00ff */
+    --pos-sp: #e0913f;   /* was #b35600 */
+    --pos-rp: #ff4db8;   /* was #e6008a */
+    --pos-cl: #ff4db8;   /* was #e6008a */
+}
