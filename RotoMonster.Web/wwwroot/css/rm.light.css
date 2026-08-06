@@ -393,3 +393,83 @@ select {
     padding: 0.85rem 0;
     margin-bottom: 1rem;
 }
+
+/* Depth Charts team cards. auto-fill means the column count follows the window
+   with no breakpoints; align-items:start stops a short team being stretched to
+   match the tallest card in its row. */
+/* Wrapping flex, NOT grid. Grid gives every column the same width, but these
+   cards vary - "Show Total Monster Bar" adds a whole second bar column - so
+   any fixed column width clips one of the two states. At natural width a card
+   is never narrower than its table, so nothing is cut off and nothing needs to
+   scroll. Flex also wraps uneven heights without leaving the holes floats do. */
+.rm-depth-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin-top: 1.25rem;
+}
+
+.rm-depth-grid > .card {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+    /* Only these two - transitioning `all` would also animate the border
+       colour, which is set inline per card. */
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.rm-depth-grid > .card:hover {
+    /* Deliberately small. A big lift on a page this dense reads as noise. */
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rm-depth-grid > .card {
+        transition: box-shadow 0.18s ease;
+    }
+
+    /* Shadow still deepens, so hover stays legible without movement. */
+    .rm-depth-grid > .card:hover {
+        transform: none;
+    }
+}
+
+.rm-depth-grid .card-header {
+    padding: 0 0 0.5rem 0;
+    margin-bottom: 0.5rem;
+}
+
+.rm-depth-grid .card-body {
+    padding: 0;
+}
+
+/* ---- Outline buttons ------------------------------------------------
+   rm.light.css restyles .btn with a transparent border, which leaves
+   btn-outline-dark with nothing to show - the button rows on Rankings
+   rendered as plain text. Appended last so it wins over that .btn rule.
+
+   rm.dark.css loads after this file and carries its own version, so dark
+   mode is unaffected. */
+
+.btn-outline-dark {
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    background-color: transparent;
+}
+
+.btn-outline-dark:hover,
+.btn-outline-dark:focus,
+.btn-outline-dark:active {
+    border-color: var(--brand-primary);
+    background-color: rgba(var(--brand-primary-rgb), 0.10);
+    color: var(--color-text-primary);
+}
+
+.btn-outline-dark:disabled,
+.btn-outline-dark.disabled {
+    color: var(--color-text-tertiary);
+    border-color: var(--color-border);
+    opacity: 0.65;
+}

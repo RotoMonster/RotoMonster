@@ -5,7 +5,7 @@
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
 }
 
-<div class="container">
+<div class="container-fluid px-4">
 
     @* _PageTitleRow removed: its title moved to the header block, its league
        dropdown moved to _Layout and its search is off, so it rendered as an
@@ -45,10 +45,12 @@
 
     </form>
 
-    <div class="clearfix">
+    @* Grid rather than floats: floats wrap raggedly when cards differ in
+       height. auto-fill reflows without breakpoints. *@
+    <div class="rm-depth-grid">
         @foreach (var depthChartTeamModel in Model.DepthChartTeamModels)
         {
-            <div class="float-start card mt-3 me-3 p-2" style="border-color:#@ViewData["LogoColor"];">
+            <div class="card p-2" style="border-color:#@ViewData["LogoColor"];">
                 <div class="card-header">
                     <h2>@depthChartTeamModel.Team.Name</h2>
                 </div>
