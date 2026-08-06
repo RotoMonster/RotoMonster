@@ -104,7 +104,10 @@ namespace RotoMonster.Models.Shared
         /// Header row above a column of badges. Column labels come from the item
         /// descriptions so the header reads "Last Season" rather than "LS".
         /// </summary>
-        public static MonsterBarBadgeViewModel Header(List<MonsterBarItem> monsterBarItems, string label = null)
+        public static MonsterBarBadgeViewModel Header(
+            List<MonsterBarItem> monsterBarItems,
+            string label = null,
+            string idPrefix = "hdr")
         {
             var model = new MonsterBarBadgeViewModel { IsHeader = true, Label = label };
 
@@ -120,7 +123,7 @@ namespace RotoMonster.Models.Shared
                     GamesText = item.Title,
                     Description = item.Description,
                     Group = GroupFor(item.Title),
-                    TooltipId = "mbtip-hdr-" + model.Cells.Count
+                    TooltipId = "mbtip-" + idPrefix + "-" + model.Cells.Count
                 });
             }
 

@@ -69,10 +69,12 @@
                         @{ var tipId3 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipId3">
-                            @Model.MonsterBarGame.ColumnTitle(false)<small class="ms-1">game</small>
+                            <small>game</small>
                         </span>
 <div class="bm-tooltip-content" id="@tipId3" role="tooltip">@Model.MonsterBarGame.Tooltip</div>
 </span>
+                        @{ var mbarHeaderGame = RotoMonster.Models.Shared.MonsterBarBadgeViewModel.Header(Model.MonsterBarGame.MonsterBarItems, null, "hdr-g"); }
+                        <partial name="_MonsterBarBadge" model="mbarHeaderGame" />
                     </th>
                 }
 
@@ -82,10 +84,12 @@
                         @{ var tipId4 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipId4">
-                            @Model.MonsterBarTotal.ColumnTitle(false)<small class="ms-1">total</small>
+                            <small>total</small>
                         </span>
 <div class="bm-tooltip-content" id="@tipId4" role="tooltip">@Model.MonsterBarTotal.Tooltip</div>
 </span>
+                        @{ var mbarHeaderTotal = RotoMonster.Models.Shared.MonsterBarBadgeViewModel.Header(Model.MonsterBarTotal.MonsterBarItems, null, "hdr-t"); }
+                        <partial name="_MonsterBarBadge" model="mbarHeaderTotal" />
                     </th>
                 }
 
