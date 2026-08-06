@@ -18,19 +18,32 @@
     </div>
 
     <div id="ShowSettings" class="collapse">
-        @Model.PlayerTableModel.CategorySettings.Count
-        [
-        @foreach (var cs in Model.PlayerTableModel.CategorySettings)
+        @if (Model.PlayerTableModel.SelectedUserLeague != null)
         {
-            <span class="ps-1 pe-1">
-                @cs.Category.Abbreviation
-                @if (cs.PointsPerStat != 0)
+                var leagueSettings = new RotoMonsterUI.LeagueSettingsInput
                 {
-                    @cs.PointsPerStat
+                    ScoringType = Model.PlayerTableModel.SelectedUserLeague.LeagueType == "H"
+                        ? RotoMonsterUI.LeagueScoringType.H2H
+                        : RotoMonsterUI.LeagueScoringType.Roto,
+                    NumTeams = Model.PlayerTableModel.SelectedUserLeague.NumberOfTeams,
+                    PlayersPerTeam = Model.PlayerTableModel.SelectedUserLeague.PlayersPerTeam
+                };
+
+                if (Model.PlayerTableModel.CategorySettings != null)
+                {
+                    foreach (var cs in Model.PlayerTableModel.CategorySettings)
+                    {
+                        if (cs.Category == null) continue;
+
+                        leagueSettings.Categories.Add(new RotoMonsterUI.LeagueSettingsCategory
+                        {
+                            Abbreviation = cs.Category.Abbreviation,
+                            IsActive = cs.IsActive
+                        });
+                    }
                 }
-            </span>
+            @Html.Raw(new RotoMonsterUI.LeagueSettings(leagueSettings).Render())
         }
-        ]
     </div>
 
     <div id="ShowAnalysis" class="collapse">

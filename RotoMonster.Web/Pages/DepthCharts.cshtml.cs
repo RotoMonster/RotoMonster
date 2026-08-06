@@ -64,6 +64,12 @@ namespace RotoMonster.Pages
             if (userLeague == null)
                 userLeague = await db.GetDefaultUserLeagueAsync();
 
+            if (UserId != null && userLeague != null && SelectedUserLeagues != null
+                && SelectedUserLeagues.Any(tracked => tracked.Id == userLeague.Id))
+            {
+                SelectedUserLeagueId = userLeague.Id;
+            }
+
             var fantasyProvider = (userLeague != null ? userLeague.FantasyProvider : db.GetDefaultFantasyProvider());
             var positionSource = db.GetPositionSource(fantasyProvider);
 

@@ -330,6 +330,12 @@ namespace RotoMonster.Pages
             if (userLeague == null)
                 userLeague = await db.GetDefaultUserLeagueAsync();
 
+            if (UserId != null && userLeague != null && SelectedUserLeagues != null
+                && SelectedUserLeagues.Any(tracked => tracked.Id == userLeague.Id))
+            {
+                SelectedUserLeagueId = userLeague.Id;
+            }
+
             if (false)
             {
                 if (userLeague != null && UserId != null)
