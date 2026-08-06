@@ -323,10 +323,24 @@ namespace RotoMonster.Data
                 }
             }
 
-            if (selectThisUserLeague != null)
+            if (selectThisUserLeague != null && userId != null)
             {
-                selectThisUserLeague.LastSelectedDate = DateTime.UtcNow;
-                await db.SaveChangesAsync();
+                var latest = await (from x in db.UserLeagues
+                                    where x.UserId == userId
+                                    select x.LastSelectedDate).MaxAsync();
+
+                if (selectThisUserLeague.LastSelectedDate == null
+                    || (latest != null && selectThisUserLeague.LastSelectedDate < latest))
+                {
+                    var now = DateTime.UtcNow;
+                    var leagueId = selectThisUserLeague.Id;
+
+                    await db.UserLeagues
+                        .Where(x => x.Id == leagueId)
+                        .ExecuteUpdateAsync(s => s.SetProperty(x => x.LastSelectedDate, now));
+
+                    selectThisUserLeague.LastSelectedDate = now;
+                }
             }
 
             if (selectThisUserLeague == null)
