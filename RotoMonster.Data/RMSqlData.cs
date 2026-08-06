@@ -3403,23 +3403,7 @@ namespace RotoMonster.Data
 
         public List<PlayerInjury> GetPlayerInjuries()
         {
-            if (db.PlayerInjuries.Count() == 0)
-            {
-                return new List<PlayerInjury>();
-            }
-
-            List<PlayerInjury> playerInjuries;
-            DateTime? maxDate = db.PlayerInjuries.Max(p => p.DownloadDate);
-            if (maxDate != null)
-            {
-                playerInjuries = (from p in db.PlayerInjuries select p).ToList();
-            }
-            else
-            {
-                return new List<PlayerInjury>();
-            }
-
-            return playerInjuries;
+            return (from p in db.PlayerInjuries select p).ToList();
         }
 
         public void UpdateUserLeagueUpdatedDate(int userLeagueId, DateTime updatedDate, bool rostersUpdated)

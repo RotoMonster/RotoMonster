@@ -77,13 +77,6 @@ namespace RotoMonster.Data
         /// </summary>
         public async Task<List<PlayerInjury>> GetPlayerInjuriesAsync()
         {
-            if (await db.PlayerInjuries.CountAsync() == 0)
-                return new List<PlayerInjury>();
-
-            DateTime? maxDate = await db.PlayerInjuries.MaxAsync(p => p.DownloadDate);
-            if (maxDate == null)
-                return new List<PlayerInjury>();
-
             return await (from p in db.PlayerInjuries select p).ToListAsync();
         }
 
