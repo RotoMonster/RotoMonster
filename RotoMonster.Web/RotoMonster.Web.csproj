@@ -35,6 +35,9 @@
 	  <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="10.0.8" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.8" />
 	  <PackageReference Include="System.Web.Services.Description" Version="10.0.652802" />
+	  <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+	  <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
+	  <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
