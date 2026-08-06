@@ -6,11 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Extensions.Hosting;
-using Serilog.Enrichers;
-using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
 
 namespace RotoMonster
 {
@@ -18,22 +13,6 @@ namespace RotoMonster
     {
         public static void Main(string[] args)
         {
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build();
-
-            // Log.Logger = (Serilog.ILogger)new LoggerConfiguration().ReadFrom.Configuration(configuration).CreateLogger();
-
-            //Log.Logger = new LoggerConfiguration()
-            //    .MinimumLevel.Warning()
-            //    .Enrich.With(new ThreadNameEnricher())
-            //    .WriteTo.Console(outputTemplate: "{Timestamp:HH:mm} [{Level}] ({ThreadId}) {Message}{NewLine}{Exception}")
-            //    .CreateLogger();
-
-            // var outputTemplate = "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message}{NewLine}in method {MemberName} at {FilePath}:{LineNumber}{NewLine}{Exception}{NewLine}";
-            //Log.Logger = (Serilog.ILogger)new LoggerConfiguration().ReadFrom.Configuration(configuration)
-            //    .WriteTo.Console(LogEventLevel.Warning, outputTemplate, theme: AnsiConsoleTheme.Literate)
-            //    .CreateLogger();
-
             CreateHostBuilder(args).Build().Run();
         }
 
