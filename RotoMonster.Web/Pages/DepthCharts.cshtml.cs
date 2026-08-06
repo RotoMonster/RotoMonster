@@ -33,7 +33,6 @@ namespace RotoMonster.Pages
         {
         }
 
-        [BindProperty] public int SelectedUserLeagueId { get; set; }
         [BindProperty] public int SelectedTeamId { get; set; }
         [BindProperty][Display(Name = "Hide 0% Players")] public bool HideZeroPlayers { get; set; } = true;
         [BindProperty][Display(Name = "Show Game Monster Bar")] public bool ShowGameMonsterBar { get; set; } = true;

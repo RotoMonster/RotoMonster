@@ -1,0 +1,463 @@
+/* 
+ * Basketball Monster - NBA Colors Override
+ * Version: bm.nba.2026-05-20.01.dark.css
+ * Theme: Dark with ORANGE GLOW
+ * 
+ * Usage: Load AFTER bm.2026-05-20.01.dark.css
+ * Example:
+ *   <link rel="stylesheet" href="bm.dark.2026-05-20.01.css" />
+ *   <link rel="stylesheet" href="bm.nba.dark.2026-05-20.01.css" />
+ */
+
+ :root {
+    --brand-primary: #ff8833;
+    --brand-primary-rgb: 255, 136, 51;
+    --brand-primary-light: #f97316;
+    --brand-primary-dark: #ea580c;
+    --brand-accent: #ff8c42;
+    --table-header-bg: #4a2410;
+
+    /* POSITION COLORS - Basketball */
+    --pos-g: #0099FF;
+    --pos-f: #339900;
+    --pos-c: #0000cc;
+    --pos-pg: #cc0000;
+    --pos-sg: #ff6600;
+    --pos-sf: #660099;
+    --pos-pf: #ff0099;
+
+    --game-winner-border: #ff8c42;
+
+    --color-link: #fed7aa;
+    --color-link-hover: #ffffff;
+
+    --season-progress-fill: var(--brand-primary);
+}
+
+/* Update SVG dropdown arrows to orange */
+.modern-filter-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23FF6B00' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+}
+
+/* Enhanced orange glow effects */
+.navbar-dark {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4), 0 0 30px rgba(255, 107, 0, 0.15);
+}
+
+.navbar-brand:hover img {
+    filter: drop-shadow(0 0 10px #FF6B00);
+}
+
+.nav-link:hover {
+    text-shadow: 0 0 8px #ff8c42;
+}
+
+.navbar input.form-control:focus {
+    border-color: #ff8c42;
+    box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.3), 0 0 20px rgba(255, 140, 66, 0.2);
+}
+
+.nav-item.text-light .nav-link {
+    box-shadow: 0 0 15px rgba(255, 107, 0, 0.4);
+}
+
+.nav-item.text-light .nav-link:hover {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.6);
+}
+
+.page-header {
+    box-shadow: 0 20px 40px rgba(255, 107, 0, 0.3), 0 0 60px rgba(255, 107, 0, 0.2);
+}
+
+.page-header h1 {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 140, 66, 0.3);
+}
+
+.modern-filter-container {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 107, 0, 0.05);
+}
+
+.modern-filter-section-title {
+    text-shadow: 0 0 10px rgba(255, 107, 0, 0.2);
+}
+
+.modern-filter-select:hover {
+    box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+}
+
+.modern-filter-select:focus {
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2), 0 0 20px rgba(255, 107, 0, 0.3);
+}
+
+.modern-filter-toggle input[type="checkbox"]:checked + .modern-filter-toggle-switch {
+    box-shadow: 0 0 15px rgba(255, 107, 0, 0.5), inset 0 0 10px rgba(255, 107, 0, 0.3);
+}
+
+.modern-filter-badge:not([data-pos]):hover {
+    box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+}
+
+.modern-filter-badge:not([data-pos]).active {
+    box-shadow: 0 3px 10px rgba(255, 107, 0, 0.4), 0 0 20px rgba(255, 107, 0, 0.4);
+}
+
+.modern-filter-btn-primary {
+    box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+}
+
+.modern-filter-btn-primary:hover {
+    box-shadow: 0 3px 10px rgba(255, 107, 0, 0.4), 0 0 25px rgba(255, 107, 0, 0.5);
+}
+
+.modern-filter-btn-secondary:hover {
+    box-shadow: 0 0 15px rgba(255, 107, 0, 0.2);
+}
+
+.dropdown-item:hover {
+    box-shadow: 0 0 15px rgba(255, 107, 0, 0.4);
+}
+
+.filter-controls label:hover {
+    box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+}
+
+.filter-controls input[type="radio"]:checked + label,
+.filter-controls input[type="checkbox"]:checked + label {
+    box-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+}
+
+.card-based:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 107, 0, 0.15);
+}
+
+.player-status-item:hover {
+    box-shadow: 0 0 15px rgba(255, 107, 0, 0.2);
+}
+
+footer a:hover {
+    text-shadow: 0 0 10px #FF6B00;
+}
+
+/* Page title with orange background spanning full width */
+.page-title {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-light) 100%);
+    color: white;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 2rem 0;
+    padding: 1.5rem 1rem;
+    box-shadow: 0 4px 12px rgba(255, 107, 0, 0.4);
+    border-radius: 8px;
+}
+
+/* ============================================
+   TRADE ANALYSIS STYLES
+   ============================================ */
+
+.trade-analysis-container {
+    background: var(--color-bg-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 107, 0, 0.05);
+}
+
+.trade-controls-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.trade-controls-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.trade-controls-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.trade-controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.trade-transfer-container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: start;
+    margin-bottom: 1.5rem;
+}
+
+.trade-player-list {
+    background: rgba(15, 23, 42, 0.6);
+    border: 2px solid var(--color-border);
+    border-radius: 10px;
+    min-height: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.trade-player-list-header {
+    background: linear-gradient(135deg, var(--brand-primary-dark) 0%, var(--brand-primary) 100%);
+    color: white;
+    padding: 0.75rem 1rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 8px 8px 0 0;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(255, 107, 0, 0.3);
+}
+
+.trade-player-list-body {
+    padding: 0.5rem;
+}
+
+.trade-player-item {
+    padding: 0.6rem 0.75rem;
+    margin: 0.25rem 0;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    border-radius: 6px;
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.trade-player-item:hover {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+    transform: translateX(3px);
+}
+
+.trade-player-item.selected {
+    background: linear-gradient(135deg, rgba(255, 107, 0, 0.3) 0%, rgba(255, 107, 0, 0.15) 100%);
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 20px rgba(255, 107, 0, 0.4);
+}
+
+.trade-transfer-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    justify-content: center;
+    padding: 1rem 0;
+}
+
+.trade-transfer-btn {
+    background: rgba(30, 41, 59, 0.9);
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 60px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.trade-transfer-btn:hover {
+    background: var(--brand-primary);
+    border-color: var(--brand-accent);
+    color: white;
+    box-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+    transform: scale(1.05);
+}
+
+.trade-transfer-btn:active {
+    transform: scale(0.98);
+}
+
+.trade-transfer-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: rgba(30, 41, 59, 0.5);
+}
+
+.trade-transfer-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--color-border);
+}
+
+.trade-clear-btn {
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    color: #ef4444;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.trade-clear-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+.trade-analyze-btn {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-light) 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.85rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 107, 0, 0.4), 0 0 20px rgba(255, 107, 0, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.trade-analyze-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 0, 0.5), 0 0 30px rgba(255, 107, 0, 0.4);
+}
+
+.trade-analyze-btn:active {
+    transform: translateY(0);
+}
+
+.trade-player-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.trade-player-list::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 10px;
+}
+
+.trade-player-list::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 10px;
+}
+
+.trade-player-list::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-primary);
+}
+
+@media (max-width: 992px) {
+    .trade-transfer-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .trade-transfer-buttons {
+        flex-direction: row;
+        order: -1;
+    }
+
+    .trade-player-list {
+        min-height: 250px;
+        max-height: 300px;
+    }
+}
+
+/* ============================================
+   CALENDAR PICKER - ORANGE OVERRIDES
+   ============================================ */
+
+.cal-date-chip.active {
+    border-color: #FF6B00;
+    color: #ff8c42;
+    background: rgba(255, 107, 0, 0.15);
+    box-shadow: 0 0 12px rgba(255, 107, 0, 0.25);
+}
+
+.cal-day--today {
+    border: 1.5px solid #FF6B00;
+    color: #ff8c42;
+}
+
+.cal-day--today:hover:not(.cal-day--selected) {
+    background: rgba(255, 107, 0, 0.15);
+}
+
+.cal-day--selected {
+    background: #FF6B00;
+    color: white;
+}
+
+.cal-day--in-range {
+    background: rgba(255, 107, 0, 0.15);
+    color: #ff8c42;
+}
+
+.cal-quick-btn:hover {
+    background: rgba(255, 107, 0, 0.1);
+    border-color: #FF6B00;
+    color: #ff8c42;
+}
+
+.cal-quick-btn.green:hover {
+    background: rgba(255, 107, 0, 0.15);
+    border-color: #FF6B00;
+    color: #ff8c42;
+}
+
+.cal-arrow-sep {
+    color: #ff8c42;
+    opacity: 0.8;
+}
+
+.rankings-table a, .modern-stats-table a { color: var(--color-link); }
+.rankings-table a:hover, .modern-stats-table a:hover { color: var(--color-link-hover); text-shadow: none; }
+
+.page-header {
+    padding: 0.75rem 1rem;
+    padding-left: 1.5rem;
+    padding-bottom: 1rem;
+    text-align: left;
+    border-radius: 0 0 20px 20px;
+    margin-bottom: 1rem;
+}
+.page-header h1 {
+    padding: 0;
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin-bottom: 0;
+}
+.page-header .subtitle {
+    margin: 0;
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.card-based h2 { color: #FF6B00; }
+.card-based h3 { color: #E5E5E5; }
+
+.modern-filter-section-title {
+    color: #ff8c42;
+}
+
+.lineup-card-player-name a {
+    color: var(--color-link);
+}
+
+.lineup-card-player-name a:hover {
+    color: var(--color-link-hover);
+}
+
+.listItem { cursor: pointer; font-size: 0.875rem; color: #e2e8f0; border-radius: 6px; }

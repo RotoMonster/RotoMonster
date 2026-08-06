@@ -1,0 +1,478 @@
+/* 
+ * Baseball Monster - MLB Colors Override
+ * Version: bm.mlb.2025-02-09.01.dark.css
+ * Theme: Dark with GREEN GLOW
+ * 
+ * Usage: Load AFTER bm.2025-01-30.01.dark.css
+ * Example:
+ *   <link rel="stylesheet" href="bm_dark_2025-01-30_01.css" />
+ *   <link rel="stylesheet" href="bm_mlb_dark_2025-02-09_01.css" />
+ */
+
+ :root {
+    /* BASEBALL BRAND COLORS WITH GLOW */
+    --brand-primary: #2d7a3e;        /* Baseball green */
+    --brand-primary-light: #3d9b4f;
+    --brand-primary-dark: #1e5a2d;
+    --brand-accent: #4ade80;         /* Bright green accent */
+    --brand-primary-rgb: 45, 122, 62; 
+    --table-header-bg: #1a4d28;
+    
+    /* POSITION COLORS - Baseball positions */
+    --pos-c: #1aa3ff;
+    --pos-1b: #339900;
+    --pos-2b: #4d4dff;
+    --pos-ss: #cc0000;
+    --pos-3b: #ff6600;
+    --pos-of: #aa00ff;
+    --pos-dh: #94a3b8;
+    --pos-sp: #b35600;
+    --pos-rp: #e6008a;
+    --pos-cl: #e6008a;
+    --pos-ph: #94a3b8;
+
+    --game-winner-border: #4ade80;
+
+    --color-hitter-category: #3B82F6;
+    --color-pitcher-category: #F59E0B;
+
+    --color-link: #a7f3d0;
+    --color-link-hover: #ffffff;
+
+    --season-progress-fill: var(--color-hitter-category);
+}
+
+/* Update SVG dropdown arrows to green */
+.modern-filter-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%232d7a3e' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+}
+
+/* Enhanced green glow effects */
+.navbar-dark {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4), 0 0 30px rgba(45, 122, 62, 0.15);
+}
+
+.navbar-brand:hover img {
+    filter: drop-shadow(0 0 10px #2d7a3e);
+}
+
+.nav-link:hover {
+    text-shadow: 0 0 8px #4ade80;
+}
+
+.navbar input.form-control:focus {
+    border-color: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.3), 0 0 20px rgba(74, 222, 128, 0.2);
+}
+
+.nav-item.text-light .nav-link {
+    box-shadow: 0 0 15px rgba(45, 122, 62, 0.4);
+}
+
+.nav-item.text-light .nav-link:hover {
+    box-shadow: 0 0 20px rgba(61, 155, 79, 0.6);
+}
+
+.page-header {
+    box-shadow: 0 20px 40px rgba(45, 122, 62, 0.3), 0 0 60px rgba(45, 122, 62, 0.2);
+}
+
+.page-header h1 {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 30px rgba(74, 222, 128, 0.3);
+}
+
+.modern-filter-container {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(45, 122, 62, 0.05);
+}
+
+.modern-filter-section-title {
+    text-shadow: 0 0 10px rgba(45, 122, 62, 0.2);
+}
+
+.modern-filter-select:hover {
+    box-shadow: 0 0 15px rgba(45, 122, 62, 0.3);
+}
+
+.modern-filter-select:focus {
+    box-shadow: 0 0 0 3px rgba(45, 122, 62, 0.2), 0 0 20px rgba(45, 122, 62, 0.3);
+}
+
+.modern-filter-toggle input[type="checkbox"]:checked + .modern-filter-toggle-switch {
+    box-shadow: 0 0 15px rgba(45, 122, 62, 0.5), inset 0 0 10px rgba(45, 122, 62, 0.3);
+}
+
+.modern-filter-badge:not([data-pos]):hover {
+    box-shadow: 0 0 15px rgba(45, 122, 62, 0.3);
+}
+
+.modern-filter-badge:not([data-pos]).active {
+    box-shadow: 0 3px 10px rgba(45, 122, 62, 0.4), 0 0 20px rgba(45, 122, 62, 0.4);
+}
+
+.modern-filter-btn-primary {
+    box-shadow: 0 0 15px rgba(45, 122, 62, 0.3);
+}
+
+.modern-filter-btn-primary:hover {
+    box-shadow: 0 3px 10px rgba(45, 122, 62, 0.4), 0 0 25px rgba(45, 122, 62, 0.5);
+}
+
+.modern-filter-btn-secondary:hover {
+    box-shadow: 0 0 15px rgba(45, 122, 62, 0.2);
+}
+
+.dropdown-item:hover {
+    box-shadow: 0 0 15px rgba(45, 122, 62, 0.4);
+}
+
+.filter-controls label:hover {
+    box-shadow: 0 0 15px rgba(45, 122, 62, 0.3);
+}
+
+.filter-controls input[type="radio"]:checked + label,
+.filter-controls input[type="checkbox"]:checked + label {
+    box-shadow: 0 0 20px rgba(45, 122, 62, 0.5);
+}
+
+.card-based:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(45, 122, 62, 0.15);
+}
+
+.player-status-item:hover {
+    box-shadow: 0 0 15px rgba(45, 122, 62, 0.2);
+}
+
+footer a:hover {
+    text-shadow: 0 0 10px #2d7a3e;
+}
+
+/* Page title with green background spanning full width */
+.page-title {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-light) 100%);
+    color: white;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 2rem 0;
+    padding: 1.5rem 1rem;
+    box-shadow: 0 4px 12px rgba(45, 122, 62, 0.4);
+    border-radius: 8px;
+}
+
+/* ============================================
+   TRADE ANALYSIS STYLES
+   ============================================ */
+
+/* Main trade analysis container */
+.trade-analysis-container {
+    background: var(--color-bg-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(45, 122, 62, 0.05);
+}
+
+/* Trade controls section (value settings, display, etc) */
+.trade-controls-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.trade-controls-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.trade-controls-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.trade-controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Transfer lists container */
+.trade-transfer-container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: start;
+    margin-bottom: 1.5rem;
+}
+
+/* Individual player list */
+.trade-player-list {
+    background: rgba(15, 23, 42, 0.6);
+    border: 2px solid var(--color-border);
+    border-radius: 10px;
+    min-height: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.trade-player-list-header {
+    background: linear-gradient(135deg, var(--brand-primary-dark) 0%, var(--brand-primary) 100%);
+    color: white;
+    padding: 0.75rem 1rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 8px 8px 0 0;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(45, 122, 62, 0.3);
+}
+
+.trade-player-list-body {
+    padding: 0.5rem;
+}
+
+.trade-player-item {
+    padding: 0.6rem 0.75rem;
+    margin: 0.25rem 0;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    border-radius: 6px;
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.trade-player-item:hover {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 15px rgba(45, 122, 62, 0.3);
+    transform: translateX(3px);
+}
+
+.trade-player-item.selected {
+    background: linear-gradient(135deg, rgba(45, 122, 62, 0.3) 0%, rgba(45, 122, 62, 0.15) 100%);
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 20px rgba(45, 122, 62, 0.4);
+}
+
+/* Transfer buttons */
+.trade-transfer-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    justify-content: center;
+    padding: 1rem 0;
+}
+
+.trade-transfer-btn {
+    background: rgba(30, 41, 59, 0.9);
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 60px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.trade-transfer-btn:hover {
+    background: var(--brand-primary);
+    border-color: var(--brand-accent);
+    color: white;
+    box-shadow: 0 0 20px rgba(45, 122, 62, 0.5);
+    transform: scale(1.05);
+}
+
+.trade-transfer-btn:active {
+    transform: scale(0.98);
+}
+
+.trade-transfer-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: rgba(30, 41, 59, 0.5);
+}
+
+.trade-transfer-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--color-border);
+}
+
+/* Clear button */
+.trade-clear-btn {
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    color: #ef4444;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.trade-clear-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+/* Analyze button */
+.trade-analyze-btn {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-light) 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.85rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(45, 122, 62, 0.4), 0 0 20px rgba(45, 122, 62, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.trade-analyze-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(45, 122, 62, 0.5), 0 0 30px rgba(45, 122, 62, 0.4);
+}
+
+.trade-analyze-btn:active {
+    transform: translateY(0);
+}
+
+/* Scrollbar styling for player lists */
+.trade-player-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.trade-player-list::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 10px;
+}
+
+.trade-player-list::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 10px;
+}
+
+.trade-player-list::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .trade-transfer-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .trade-transfer-buttons {
+        flex-direction: row;
+        order: -1;
+    }
+    
+    .trade-player-list {
+        min-height: 250px;
+        max-height: 300px;
+    }
+}
+
+/* ============================================
+   CALENDAR PICKER - GREEN OVERRIDES
+   ============================================ */
+
+   .cal-date-chip.active {
+    border-color: #2d7a3e;
+    color: #4ade80;
+    background: rgba(45, 122, 62, 0.15);
+    box-shadow: 0 0 12px rgba(45, 122, 62, 0.25);
+}
+
+.cal-day--today {
+    border: 1.5px solid #2d7a3e;
+    color: #4ade80;
+}
+
+.cal-day--today:hover:not(.cal-day--selected) {
+    background: rgba(45, 122, 62, 0.15);
+}
+
+.cal-day--selected {
+    background: #2d7a3e;
+    color: white;
+}
+
+.cal-day--in-range {
+    background: rgba(45, 122, 62, 0.15);
+    color: #4ade80;
+}
+
+.cal-quick-btn:hover {
+    background: rgba(45, 122, 62, 0.1);
+    border-color: #2d7a3e;
+    color: #4ade80;
+}
+
+.cal-quick-btn.green:hover {
+    background: rgba(45, 122, 62, 0.15);
+    border-color: #2d7a3e;
+    color: #4ade80;
+}
+
+.cal-arrow-sep {
+    color: #4ade80;
+    opacity: 0.8;
+}
+
+.rankings-table a, .modern-stats-table a { color: var(--color-link); }
+.rankings-table a:hover, .modern-stats-table a:hover { color: var(--color-link-hover); text-shadow: none; }
+
+.page-header {
+    padding: 0.75rem 1rem;
+    padding-left: 1.5rem;
+    padding-bottom: 1rem;
+    text-align: left;
+    border-radius: 0 0 20px 20px;
+    margin-bottom: 1rem;
+}
+.page-header h1 {
+    padding: 0;
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin-bottom: 0;
+}
+.page-header .subtitle {
+    margin: 0;
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.card-based h2 { color: #2d7a3e; }
+.card-based h3 { color: #B01C34; }
+
+.modern-filter-section-title {
+    color: #4ade80;
+}
+
+.lineup-card-player-name a {
+    color: var(--color-link);
+}
+
+.lineup-card-player-name a:hover {
+    color: var(--color-link-hover);
+}

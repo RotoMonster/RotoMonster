@@ -30,6 +30,11 @@ namespace RotoMonster.Pages
         public YahooLib YahooLib { get; }
         public FanTraxLib FanTraxLib { get; }
         public List<UserLeague> SelectedUserLeagues { get; set; }
+
+        // Hoisted from the individual pages so _Layout can render one league
+        // dropdown for the whole site. Pages still assign it exactly as before.
+        [BindProperty]
+        public int SelectedUserLeagueId { get; set; }
         public Helper SelectedHelper { get; set; } = null;
 
         public RMPageModel(
@@ -96,7 +101,25 @@ namespace RotoMonster.Pages
                 ViewData["AdminErrors"] = db.GetLogItems("Error");
             }
 
-            ViewData["SeasonState"] = db.GetDefaultSeason().State;
+            var defaultSeason = db.GetDefaultSeason();
+            ViewData["SeasonState"] = defaultSeason.State;
+
+            // Feeds the header progress bar. Season.State is already formatted
+            // text, so the percentage is derived from the real dates instead.
+            var seasonToday = DateTime.UtcNow.Date;
+            if (seasonToday < defaultSeason.StartDate.Date)
+            {
+                ViewData["SeasonDaysUntil"] = (int)(defaultSeason.StartDate.Date - seasonToday).TotalDays;
+                ViewData["SeasonPercent"] = 0d;
+            }
+            else
+            {
+                var seasonDays = (defaultSeason.EndDate.Date - defaultSeason.StartDate.Date).TotalDays;
+                var seasonElapsed = (seasonToday - defaultSeason.StartDate.Date).TotalDays;
+                ViewData["SeasonPercent"] = seasonDays > 0
+                    ? System.Math.Min(100d, seasonElapsed / seasonDays * 100d)
+                    : 100d;
+            }
         }
 
         public IRMData NewDb

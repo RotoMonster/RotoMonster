@@ -1,45 +1,47 @@
-@using RotoMonster.Core
-@using System.Linq
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="@ViewData["metadescription"]">
-    <title>@ViewData["pagetitle"]</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css?v=5" />
-    <link rel="stylesheet" href="~/css/bm.light.css" asp-append-version="true" />
-    @{
-        // Declared here rather than reusing the `sport` variable below, which is
-        // defined after </head>. Only MLB and NBA override files exist.
-        string sportCss = ViewData["sport"].ToString().ToLower();
-    }
-    @if (sportCss == "mlb" || sportCss == "nba")
-    {
-        <link rel="stylesheet" href="~/css/bm.@(sportCss).light.css" asp-append-version="true" />
-    }
-    <link rel="stylesheet" href="~/css/rm.light.css" asp-append-version="true" />
-    <link rel="icon" type="image/x-icon" href="https://rotomonster.com/@ViewData["sport"].ToString().ToLower()/favicon.ico" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Passion+One&display=swap" rel="stylesheet">
-</head>
+#!/usr/bin/env python3
+"""
+Ken's RotoMonster Menu Bar doc: organize the header like Basketball Monster.
 
-@{
-    @inject IConfiguration Configuration
-    string sport = ViewData["sport"].ToString().ToUpper();
-    string[] codes = { "NBA", "MLB", "NFL", "NHL" };
-    IconType[] icons = { IconType.Basketball, IconType.Baseball, IconType.Football, IconType.HockeyPuck };
-}
+  Row 1: the menu plus user login/logout, with the other sports' icons there
+         too, "smaller and optional for now".
+  Row 2: the Logo along with the Search and Season Progress.
 
-<body class="bg">
-    <header>
+Season Progress stays TEXT, not the library's SeasonProgress bar - Ken's own
+mockup shows "Season: 35% Complete" as text, and ViewData["SeasonState"] holds
+Season.State, not a percentage. So this patch is purely structural.
+
+WHAT MOVES
+  down to row 2 : _Logo, the player search form, the league dropdown, Season
+  stays in row 1: Tools / Settings / Helpers, mail, twitter, sport icons,
+                  the admin gear, and _LoginPartial
+
+WHY THE HEADER WRAPPED TO THREE LINES: everything was in one nav, and the
+Season text was jammed into a nav <li> with no room. Splitting the rows is what
+fixes the alignment, not a CSS tweak.
+
+OTHER CHANGES
+  - sport icons drop from Size 30 to Size 22 (Ken: "smaller")
+  - flex-sm-row-reverse is gone; row 1 now reads left-to-right with login
+    pushed right by ms-auto, matching the mockup
+  - mb-3 moves from the nav to the row 2 wrapper so page spacing is unchanged
+
+The whole <header> block is replaced by regex rather than an exact text match,
+so trailing whitespace inside it cannot break the patch.
+
+Run from the repo root:  python3 patch_menubar_tworow_v1.py
+"""
+
+import os
+import re
+import sys
+
+LAYOUT = "RotoMonster.Web/Pages/Shared/_Layout.cshtml"
+
+NEW_HEADER = '''    <header>
 
         @* ROW 1 - menu and account. *@
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
-            <div class="container-fluid px-4">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light light py-1">
+            <div class="container">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -124,7 +126,7 @@
 
                     </ul>
 
-                    <div class="ms-auto navbar-right">
+                    <div class="ms-auto d-flex align-items-center">
                         <partial name="_LoginPartial" />
                     </div>
                 </div>
@@ -133,26 +135,9 @@
 
         @* ROW 2 - identity and the controls that apply to whatever page you are on. *@
         <div class="border-bottom box-shadow mb-3 py-2">
-            <div class="container-fluid px-4 d-flex align-items-center flex-wrap gap-3">
+            <div class="container d-flex align-items-center flex-wrap gap-3">
 
-                @{
-                    // Matches Basketball Monster's brand block. .page-header is
-                    // styled by bm.light.css and takes its gradient from
-                    // --brand-primary, so it follows the sport automatically.
-                    string sportName;
-                    switch (sport)
-                    {
-                        case "MLB": sportName = "Baseball"; break;
-                        case "NBA": sportName = "Basketball"; break;
-                        case "NFL": sportName = "Football"; break;
-                        case "NHL": sportName = "Hockey"; break;
-                        default: sportName = sport; break;
-                    }
-                }
-                <a class="page-header mb-0 text-decoration-none flex-shrink-0" asp-area="" asp-page="/Index">
-                    <h1>RotoMonster</h1>
-                    <div class="subtitle">Fantasy @sportName Projections and Tools</div>
-                </a>
+                <partial name="_Logo" model='new RotoMonster.Models.Shared.LogoModel(){Sport=sport,Controller="/Index"}' />
 
                 @{
                     // RMPageModel-derived pages only. Identity pages derive
@@ -219,77 +204,67 @@
                            placeholder="Search players" autocomplete="off" />
                 </form>
 
-                @if (ViewData["SeasonPercent"] != null)
+                @if (ViewData["SeasonState"] != null)
                 {
-                    @* .season-progress is width:100%, so it needs a sized wrapper
-                       or it stretches across the whole row. *@
-                    <div class="flex-shrink-0" style="width: 210px;">
-                        @Html.Raw(new RotoMonsterUI.SeasonProgress(new RotoMonsterUI.SeasonProgressInput
-                        {
-                            SeasonPercent = (double)ViewData["SeasonPercent"],
-                            DaysUntilSeason = ViewData["SeasonDaysUntil"] as int?
-                        }).Render())
+                    <div class="ms-auto small text-muted text-nowrap">
+                        Season: @ViewData["SeasonState"]
                     </div>
                 }
 
             </div>
         </div>
 
-    </header>
+    </header>'''
 
-    <partial name="_Messages" />
 
-    @if (ViewData["Helper"] != null)
-    {
-        Helper helper = (Helper)ViewData["Helper"];
-        <div class="alert alert-info container">
-            <h3>Helper: @Html.Raw(helper.Title)</h3>
-            <div>Description: @Html.Raw(helper.Description)</div>
-            @if (helper.OnPageDetails != null && helper.OnPageDetails.Length > 0)
-            {
-                <div class="mt-1">Page Info: @Html.Raw(helper.OnPageDetails)</div>
-            }
-        </div>
-    }
+def main():
+    if not os.path.exists(LAYOUT):
+        print("Cannot find %s - run this from the repo root." % LAYOUT)
+        sys.exit(1)
 
-    <div class="ms-2">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    with open(LAYOUT, "rb") as f:
+        raw = f.read()
+    bom = raw.startswith(b"\xef\xbb\xbf")
+    if bom:
+        raw = raw[3:]
+    text = raw.decode("utf-8")
+    crlf = text.count("\r\n")
+    lf = text.count("\n") - crlf
+    ending = "\r\n" if crlf > lf else "\n"
+    text = text.replace("\r\n", "\n")
 
-    <footer>
-        @RenderSection("footer", required: false)
-        <div class="me-2 mt-2">@Html.Raw(new RotoMonsterUI.YahooAttribution().Render())</div>
-        <div class="text-muted text-end me-2 mt-2">
-            &copy; @DateTime.Today.Year RotoMonster LLC
-            @*            <small class="font-monospace">
-            @Configuration["InstanceID"].ToString()
-            </small>
-            *@
-        </div>
-    </footer>
+    if "ROW 1 - menu and account" in text:
+        print("  FAILED: already patched")
+        sys.exit(1)
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    # Sanity: the earlier patches must already be in, or this would silently
+    # drop the league dropdown that patch 1 and 2a added.
+    for needed, why in [
+        ("bm-custom-select", "patch_menubar_style_v1 (modern dropdown)"),
+        ('data-name="l"', "patch_layout_league_v1 (league dropdown)"),
+    ]:
+        if needed not in text:
+            print("  FAILED: %s not found - run %s first" % (needed, why))
+            sys.exit(1)
+    print("  ok  earlier patches present")
 
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/rotomonster-ui.js" asp-append-version="true"></script>
-    <script src="~/js/custom-dropdown-update.js" asp-append-version="true"></script>
-    <partial name="_PlayerSearchScripts" model='"navPlayerSearch"' />
+    pattern = re.compile(r"^    <header>.*?^    </header>", re.DOTALL | re.MULTILINE)
+    matches = pattern.findall(text)
+    if len(matches) != 1:
+        print("  FAILED: found %d <header> blocks, expected 1" % len(matches))
+        sys.exit(1)
+    print("  ok  located the header block (%d lines)" % matches[0].count("\n"))
 
-    @*<script>
-    (function (i, s, o, g, r, a, m) {
-    i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-    (i[r].q = i[r].q || []).push(arguments)
-    }, i[r].l = 1 * new Date(); a = s.createElement(o),
-    m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    text = pattern.sub(lambda m: NEW_HEADER, text, count=1)
 
-    ga('create', 'UA-41816439-1', 'rotomonster.com');
-    ga('send', 'pageview');
-    </script>*@
+    data = text.replace("\n", ending).encode("utf-8")
+    if bom:
+        data = b"\xef\xbb\xbf" + data
+    with open(LAYOUT, "wb") as f:
+        f.write(data)
+    print("  written (%s)" % ("CRLF" if ending == "\r\n" else "LF"))
+    print("\nDone. Razor views recompile on reload - refresh the browser.")
 
-    @RenderSection("Scripts", required: false)
-</body>
-</html>
+
+if __name__ == "__main__":
+    main()

@@ -31,9 +31,6 @@ namespace RotoMonster.Pages
         public List<UserLeague> OwnedInUserLeagues = null;
         public List<UserLeague> AvailableInUserLeagues = null;
 
-        [BindProperty]
-        public int SelectedUserLeagueId { get; set; }
-
         [BindProperty(SupportsGet = true)]
         public string SearchTerm { get; set; }
 

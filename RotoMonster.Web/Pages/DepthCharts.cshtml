@@ -11,7 +11,8 @@
         var titleRow = new RotoMonster.Models.Shared.PageTitleRowViewModel
         {
             Title = "Depth Charts",
-            UserLeagueList = (Microsoft.AspNetCore.Mvc.Rendering.SelectList)ViewBag.UserLeagueList,
+            // League dropdown now lives in _Layout for the whole site. Leaving
+            // UserLeagueList unset makes _PageTitleRow skip its own copy.
             SelectedUserLeagueId = Model.SelectedUserLeagueId
         };
     }

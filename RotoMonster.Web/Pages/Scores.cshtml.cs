@@ -19,7 +19,6 @@ namespace RotoMonster.Pages
     public class ScoresModel : RMPageModel
     {
 
-        [BindProperty] public int SelectedUserLeagueId { get; set; }
         [BindProperty] [Display(Name = "Show Top Players That Missed Games")] public bool ShowTopToo { get; set; } = true;
 
         [BindProperty] public DateTime SelectedDate { get; set; }

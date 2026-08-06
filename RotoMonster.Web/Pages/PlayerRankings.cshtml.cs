@@ -41,7 +41,6 @@ namespace RotoMonster.Pages
         public List<PlayerType> ShowPlayerTypes { get; set; }
         public List<DisplayActiveRosterSpot> DisplayActiveRosterSpots { get; set; }
 
-        [BindProperty] public int SelectedUserLeagueId { get; set; }
         [BindProperty] public int SelectedPerValueId { get; set; }
         [BindProperty] public int SelectedTeamId { get; set; }
         [BindProperty] public DateTime SelectedStartDate { get; set; }
