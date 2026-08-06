@@ -45,7 +45,7 @@ namespace RotoMonster.Pages
         {
         }
 
-        public async Task OnGetAsync(DateTime date)
+        public async Task OnGetAsync(DateTime date, [FromQuery(Name = "l")] int? leagueId)
         {
             InitGet("");
 
@@ -75,6 +75,22 @@ namespace RotoMonster.Pages
             RecentArticles = (from a in db.GetRecentArticles(1) where !a.IsAutomated select a).ToList();
 
             SelectedUserLeagues = await db.GetTrackedUserLeaguesAsync(UserId);
+
+            // The front page renders a card per league, so switching does not
+            // change what is shown here. The dropdown lives in _Layout though,
+            // so this page still has to show the CURRENT league and persist a
+            // change for the pages that do act on it.
+            UserLeague selectedUserLeague = leagueId.HasValue
+                ? await db.SelectUserLeagueAsync(UserId, await db.GetUserLeagueAsync(UserId, leagueId.Value))
+                : await db.SelectUserLeagueAsync(UserId, null);
+
+            // Only bind to a league the dropdown actually offers - GetUserLeague
+            // can return one that is not the user's.
+            if (selectedUserLeague != null && SelectedUserLeagues != null
+                && SelectedUserLeagues.Any(x => x.Id == selectedUserLeague.Id))
+            {
+                SelectedUserLeagueId = selectedUserLeague.Id;
+            }
 
             List<OwnershipPlayer> ownershipPlayers = null;
             UserLeague userLeague = null;
