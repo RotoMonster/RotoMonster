@@ -186,31 +186,94 @@ namespace RotoMonster.Data
         }
 
         /// <summary>
-        /// NOTE: this is an N+1 and a real one - it loads the league list, then
-        /// calls GetUserLeagueAsync per league, which is five more queries each.
-        /// Preserved from the sync version. Worth revisiting.
+        /// Loads every league's children in a fixed number of queries rather than
+        /// one set per league. Parent rows stay AsNoTracking to match the previous
+        /// behaviour - a tracked parent would revive the dead LastSelectedDate write
+        /// in SelectUserLeague as a side effect.
         /// </summary>
+        private async Task HydrateUserLeaguesAsync(List<UserLeague> leagues)
+        {
+            if (leagues == null || leagues.Count == 0)
+                return;
+
+            var ids = leagues.Select(l => l.Id).ToList();
+
+            var rosterSpots = (await (from ars in db.UserLeagueActiveRosterSpots
+                                          .Include(i => i.ActiveRosterSpot)
+                                              .ThenInclude(t => t.ActiveRosterSpotPositions)
+                                              .ThenInclude(t2 => t2.Position)
+                                      where ids.Contains(ars.UserLeagueId)
+                                      orderby ars.ActiveRosterSpot.DisplayOrder
+                                      select ars).ToListAsync()).ToLookup(x => x.UserLeagueId);
+
+            var categories = (await (from ulc in db.UserLeagueCategories
+                                         .Include(i => i.Category).ThenInclude(t => t.PlayerType)
+                                         .Include(i => i.Category).ThenInclude(t => t.WeightCategory)
+                                         .Include(i => i.Category).ThenInclude(t => t.CategoryPerValues)
+                                     where ids.Contains(ulc.UserLeagueId)
+                                     orderby ulc.Category.DisplayOrder
+                                     select ulc).ToListAsync()).ToLookup(x => x.UserLeagueId);
+
+            var playerTypes = (await (from pt in db.UserLeaguePlayerTypes
+                                          .Include(i => i.PlayerType).Include(i => i.CategoriesString)
+                                      where ids.Contains(pt.UserLeagueId)
+                                      orderby pt.PlayerType.DisplayOrder
+                                      select pt).ToListAsync()).ToLookup(x => x.UserLeagueId);
+
+            var teams = await (from t in db.UserLeagueTeams.AsNoTracking()
+                               where ids.Contains(t.UserLeagueId)
+                               orderby t.Title
+                               select t).ToListAsync();
+
+            var teamPlayers = (await (from p in db.UserLeagueTeamPlayers.AsNoTracking()
+                                          .Include(i => i.Player)
+                                      join team in db.UserLeagueTeams on p.UserLeagueTeamId equals team.Id
+                                      where ids.Contains(team.UserLeagueId)
+                                      select p).Include(t => t.UserLeagueTeam).ToListAsync())
+                                          .ToLookup(p => p.UserLeagueTeamId);
+
+            foreach (var t in teams)
+                t.UserLeagueTeamPlayers = teamPlayers[t.Id].ToList();
+
+            var teamsByLeague = teams.ToLookup(t => t.UserLeagueId);
+
+            foreach (var league in leagues)
+            {
+                league.UserLeagueActiveRosterSpots = rosterSpots[league.Id].ToList();
+                league.UserLeagueCategories = categories[league.Id].ToList();
+                league.UserLeaguePlayerTypes = playerTypes[league.Id].ToList();
+                league.UserLeagueTeams = teamsByLeague[league.Id].ToList();
+            }
+        }
+
         public async Task<List<UserLeague>> GetUserLeaguesAsync(string userId)
         {
             if (userId == null)
                 return new List<UserLeague>();
 
-            var leagues = await (from l in db.UserLeagues
+            var leagues = await (from l in db.UserLeagues.AsNoTracking()
                                  where l.SeasonId == GetDefaultSeason().Id && l.UserId == userId
                                  orderby l.DisplayTitle, l.Title
                                  select l).Include(a => a.FantasyProvider).ToListAsync();
 
-            var outLeagues = new List<UserLeague>();
-            foreach (var league in leagues)
-                outLeagues.Add(await GetUserLeagueAsync(league.Id));
+            await HydrateUserLeaguesAsync(leagues);
 
-            return outLeagues;
+            return leagues;
         }
 
         public async Task<List<UserLeague>> GetTrackedUserLeaguesAsync(string userId)
         {
-            var leagues = await GetUserLeaguesAsync(userId);
-            return (from ul in leagues where ul.TrackLeague select ul).ToList();
+            if (userId == null)
+                return new List<UserLeague>();
+
+            var leagues = await (from l in db.UserLeagues.AsNoTracking()
+                                 where l.SeasonId == GetDefaultSeason().Id && l.UserId == userId && l.TrackLeague
+                                 orderby l.DisplayTitle, l.Title
+                                 select l).Include(a => a.FantasyProvider).ToListAsync();
+
+            await HydrateUserLeaguesAsync(leagues);
+
+            return leagues;
         }
 
         public async Task<UserLeague> GetUserLeagueAsync(string userId, int id)
@@ -218,8 +281,13 @@ namespace RotoMonster.Data
             if (userId == null || id == 0)
                 return null;
 
-            var leagues = await GetUserLeaguesAsync(userId);
-            return (from u in leagues where u.Id == id select u).FirstOrDefault();
+            var leagues = await (from l in db.UserLeagues.AsNoTracking()
+                                 where l.SeasonId == GetDefaultSeason().Id && l.UserId == userId && l.Id == id
+                                 select l).Include(a => a.FantasyProvider).ToListAsync();
+
+            await HydrateUserLeaguesAsync(leagues);
+
+            return leagues.FirstOrDefault();
         }
 
         public async Task<UserLeague> GetDefaultUserLeagueAsync()

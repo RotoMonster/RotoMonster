@@ -1347,25 +1347,83 @@ namespace RotoMonster.Data
         }
 
 
+        private void HydrateUserLeagues(List<UserLeague> leagues)
+        {
+            if (leagues == null || leagues.Count == 0)
+                return;
+
+            var ids = leagues.Select(l => l.Id).ToList();
+
+            var rosterSpots = (from ars in db.UserLeagueActiveRosterSpots
+                                   .Include(i => i.ActiveRosterSpot).ThenInclude(t => t.ActiveRosterSpotPositions).ThenInclude(t2 => t2.Position)
+                               where ids.Contains(ars.UserLeagueId)
+                               orderby ars.ActiveRosterSpot.DisplayOrder
+                               select ars).ToList().ToLookup(x => x.UserLeagueId);
+
+            var categories = (from ulc in db.UserLeagueCategories
+                                  .Include(i => i.Category).ThenInclude(t => t.PlayerType)
+                                  .Include(i => i.Category).ThenInclude(t => t.WeightCategory)
+                                  .Include(i => i.Category).ThenInclude(t => t.CategoryPerValues)
+                              where ids.Contains(ulc.UserLeagueId)
+                              orderby ulc.Category.DisplayOrder
+                              select ulc).ToList().ToLookup(x => x.UserLeagueId);
+
+            var playerTypes = (from pt in db.UserLeaguePlayerTypes.Include(i => i.PlayerType).Include(i => i.CategoriesString)
+                               where ids.Contains(pt.UserLeagueId)
+                               orderby pt.PlayerType.DisplayOrder
+                               select pt).ToList().ToLookup(x => x.UserLeagueId);
+
+            var teams = (from t in db.UserLeagueTeams.AsNoTracking()
+                         where ids.Contains(t.UserLeagueId)
+                         orderby t.Title
+                         select t).ToList();
+
+            var teamPlayers = (from p in db.UserLeagueTeamPlayers.AsNoTracking()
+                                   .Include(i => i.Player)
+                               join team in db.UserLeagueTeams on p.UserLeagueTeamId equals team.Id
+                               where ids.Contains(team.UserLeagueId)
+                               select p).Include(t => t.UserLeagueTeam).ToList().ToLookup(p => p.UserLeagueTeamId);
+
+            foreach (var t in teams)
+                t.UserLeagueTeamPlayers = teamPlayers[t.Id].ToList();
+
+            var teamsByLeague = teams.ToLookup(t => t.UserLeagueId);
+
+            foreach (var league in leagues)
+            {
+                league.UserLeagueActiveRosterSpots = rosterSpots[league.Id].ToList();
+                league.UserLeagueCategories = categories[league.Id].ToList();
+                league.UserLeaguePlayerTypes = playerTypes[league.Id].ToList();
+                league.UserLeagueTeams = teamsByLeague[league.Id].ToList();
+            }
+        }
+
         public List<UserLeague> GetUserLeagues(string userId)
         {
             if (userId == null)
                 return new List<UserLeague>();
 
-            var leagues = (from l in db.UserLeagues where l.SeasonId == GetDefaultSeason().Id && l.UserId == userId orderby l.DisplayTitle, l.Title select l)
+            var leagues = (from l in db.UserLeagues.AsNoTracking() where l.SeasonId == GetDefaultSeason().Id && l.UserId == userId orderby l.DisplayTitle, l.Title select l)
                 .Include(a => a.FantasyProvider)
                 .ToList();
 
-            var outLeagues = new List<UserLeague>();
-            foreach (var league in leagues)
-                outLeagues.Add(GetUserLeague(league.Id));
+            HydrateUserLeagues(leagues);
 
-            return outLeagues;
+            return leagues;
         }
 
         public List<UserLeague> GetTrackedUserLeagues(string userId)
         {
-            return (from ul in GetUserLeagues(userId) where ul.TrackLeague select ul).ToList();
+            if (userId == null)
+                return new List<UserLeague>();
+
+            var leagues = (from l in db.UserLeagues.AsNoTracking() where l.SeasonId == GetDefaultSeason().Id && l.UserId == userId && l.TrackLeague orderby l.DisplayTitle, l.Title select l)
+                .Include(a => a.FantasyProvider)
+                .ToList();
+
+            HydrateUserLeagues(leagues);
+
+            return leagues;
         }
 
         public List<UserLeague> GetUserLeagues()
@@ -1546,9 +1604,13 @@ namespace RotoMonster.Data
             if (userId == null || id == 0)
                 return null;
 
-            var league = (from u in GetUserLeagues(userId) where u.Id == id select u).FirstOrDefault();
+            var leagues = (from l in db.UserLeagues.AsNoTracking() where l.SeasonId == GetDefaultSeason().Id && l.UserId == userId && l.Id == id select l)
+                .Include(a => a.FantasyProvider)
+                .ToList();
 
-            return league;
+            HydrateUserLeagues(leagues);
+
+            return leagues.FirstOrDefault();
         }
 
         public UserLeague AddUserLeague(UserLeague userLeague)
