@@ -1,5 +1,11 @@
 @using RotoMonster.Core
 @using System.Linq
+@{
+    // Page-level so both the <head> stylesheet links and the toggle in the body
+    // can see it. Read server-side so the right stylesheet is in the initial
+    // HTML - applying the theme with JS after load flashes white on every page.
+    string rmTheme = Context.Request.Cookies["monster-theme"] == "dark" ? "dark" : "light";
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,17 +16,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css?v=5" />
-    <link rel="stylesheet" href="~/css/bm.light.css" asp-append-version="true" />
     @{
         // Declared here rather than reusing the `sport` variable below, which is
         // defined after </head>. Only MLB and NBA override files exist.
         string sportCss = ViewData["sport"].ToString().ToLower();
     }
+    <link rel="stylesheet" href="~/css/bm.@(rmTheme).css" asp-append-version="true" />
     @if (sportCss == "mlb" || sportCss == "nba")
     {
-        <link rel="stylesheet" href="~/css/bm.@(sportCss).light.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/bm.@(sportCss).@(rmTheme).css" asp-append-version="true" />
     }
+    @* rm.light.css carries the sizing and layout for both themes; rm.dark.css
+       only flips the colours that were hardcoded for a light page. *@
     <link rel="stylesheet" href="~/css/rm.light.css" asp-append-version="true" />
+    @if (rmTheme == "dark")
+    {
+        <link rel="stylesheet" href="~/css/rm.dark.css" asp-append-version="true" />
+    }
     <link rel="icon" type="image/x-icon" href="https://rotomonster.com/@ViewData["sport"].ToString().ToLower()/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -107,6 +119,13 @@
                                 <a class="nav-link p-0 ms-2" title="@code" href="/@code.ToLower()"><span class="p-1 @cssCode" style="display:inline-flex;align-items:center;">@Html.Raw(new Icon(new IconInput { Type = icon, Size = 22 }).Render())</span></a>
                             </li>
                         }
+
+                        <li class="nav-item ms-2">
+                            <a class="nav-link" href="#" onclick="rmToggleTheme(); return false;"
+                               title="@(rmTheme == "dark" ? "Switch to light mode" : "Switch to dark mode")">
+                                @Html.Raw(new Icon(new IconInput { Type = rmTheme == "dark" ? IconType.Sun : IconType.Moon, Size = 18 }).Render())
+                            </a>
+                        </li>
 
                         @if (User.IsInRole("Admin"))
                         {
@@ -276,6 +295,16 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/rotomonster-ui.js" asp-append-version="true"></script>
     <script src="~/js/custom-dropdown-update.js" asp-append-version="true"></script>
+    <script>
+        // Writes the cookie the layout reads on the next request, then reloads
+        // so the server emits the other stylesheet. One year, path-wide.
+        function rmToggleTheme() {
+            var isDark = document.cookie.indexOf('monster-theme=dark') > -1;
+            document.cookie = 'monster-theme=' + (isDark ? 'light' : 'dark')
+                + ';path=/;max-age=31536000;samesite=lax';
+            location.reload();
+        }
+    </script>
     <partial name="_PlayerSearchScripts" model='"navPlayerSearch"' />
 
     @*<script>

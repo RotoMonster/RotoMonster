@@ -1,0 +1,117 @@
+/* rm.dark.css - dark-mode colour overrides for RotoMonster's own layers.
+
+   Loaded AFTER rm.light.css, which keeps every sizing and layout rule, so
+   nothing is duplicated between the two files. Only the hardcoded light
+   colours in rm.light.css and site.css are flipped here - anything already
+   using the Monster variables adapts on its own once bm.dark.css is loaded.
+
+   Add to this file only when something reads wrong in dark mode. If a rule
+   has no colour in it, it does not belong here. */
+
+/* Page background. rm.light.css sets a light grey. */
+.bg {
+    background-color: var(--color-bg-primary);
+}
+
+/* Surfaces that were hardcoded white. */
+.btn-secondary,
+.btn-light,
+.table-responsive-sm,
+.table-container,
+.ui-autocomplete {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+}
+
+.btn-secondary:hover,
+.btn-light:hover {
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+}
+
+/* The nav search box is white in both of its rm.light.css rules. */
+.navbar input#navPlayerSearch,
+.navbar input#navPlayerSearch:focus {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+}
+
+/* Dense table rows. */
+.card .table-sm td {
+    border-color: var(--color-border);
+}
+
+.card .table-sm tbody tr:hover td {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Player names were a dark navy that vanishes on a dark surface. */
+.card .display-player-name {
+    color: #7cb0ee;
+}
+
+/* The data table header was near-black to stand out from a white page.
+   On a dark page it has to be lighter than the surface, not darker. */
+.rm-data-table-head {
+    --bs-table-bg: var(--color-bg-secondary);
+    --bs-table-color: var(--color-text-primary);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+}
+
+/* ---- site.css leftovers -------------------------------------------
+   site.css loads first and predates the Monster stylesheet, so its
+   colours assume a white page. */
+
+a {
+    color: #7cb0ee;
+}
+
+.border-top {
+    border-top: 1px solid var(--color-border);
+}
+
+.border-bottom {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.pre-holder {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+}
+
+/* ---- Bootstrap's own text colour ----------------------------------
+   RotoMonster does not use Bootstrap's dark mode, so --bs-body-color is
+   still near-black. Plain text inside a card inherits it and vanishes.
+   Set at the card level - deliberately NOT on :root, because the nav
+   dropdown menus stay white and their items carry .text-dark. */
+
+.card,
+.card-body,
+.card-header {
+    color: var(--color-text-primary);
+}
+
+.text-muted {
+    color: var(--color-text-tertiary) !important;
+}
+
+/* The brand block's drop shadow is tinted with the brand colour, which
+   reads as a green halo against a dark page rather than a shadow. */
+.page-header {
+    box-shadow: none;
+}
+
+/* ---- C#-computed inline backgrounds --------------------------------
+   ColorLib emits pale pastel shades as inline styles - ownership and
+   active percentages, stat shading, game states. They are chosen for
+   black text and are the same colour in both themes, so they need dark
+   text explicitly now that cards set a light one.
+
+   Matching `background-color:#` rather than `background-color` keeps
+   this off elements that only set an inline border-color. */
+
+[style*="background-color:#"],
+[style*="background-color: #"] {
+    color: #212529;
+}
