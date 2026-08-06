@@ -105,61 +105,51 @@
     <form method="post">
         <input asp-for="DefaultSort" type="hidden" />
 
-        <div class="row p-2">
+        <div class="rm-filter-section modern-filter-row">
             @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
             {
-                <div class="col-auto p-1">
-                    <select asp-for="@Model.SelectedUserLeagueId" class="form-control" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
-                </div>
+                <select asp-for="@Model.SelectedUserLeagueId" class="form-control rm-modern-select" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
             }
-            <div class="col-auto p-1">
-                <select asp-for="@Model.SelectedFilterId" class="form-control" asp-items="ViewBag.FilterList" onchange="this.form.submit()"></select>
-            </div>
-            <div class="col-auto p-1">
-                <select asp-for="@Model.SelectedPerValueId" class="form-control" asp-items="ViewBag.PerValues" onchange="this.form.submit()"></select>
-            </div>
-
-            <div class="col-auto p-1">
-                <select asp-for="@Model.SelectedTeamId" class="form-control" asp-items="ViewBag.TeamList" onchange="this.form.submit()"></select>
-            </div>
-
-            <div class="col-auto p-1">
-                <input type="date" asp-for="@Model.SelectedStartDate" />
-                <input type="date" asp-for="@Model.SelectedEndDate" />
-                <input type="submit" name="seasonbutton" value="Season" class="btn btn-sm btn-outline-dark" />
-                <input type="submit" name="onemonthbutton" value="1 Month" class="btn btn-sm btn-outline-dark" />
-                <input type="submit" name="twoweeksbutton" value="2 Weeks" class="btn btn-sm btn-outline-dark" />
-                <input type="submit" name="oneweekbutton" value="1 Week" class="btn btn-sm btn-outline-dark" />
-                <input type="submit" name="onedaybutton" value="1 Day" class="btn btn-sm btn-outline-dark" />
-            </div>
-
+            <select asp-for="@Model.SelectedFilterId" class="form-control rm-modern-select" asp-items="ViewBag.FilterList" onchange="this.form.submit()"></select>
+            <select asp-for="@Model.SelectedPerValueId" class="form-control rm-modern-select" asp-items="ViewBag.PerValues" onchange="this.form.submit()"></select>
+            <select asp-for="@Model.SelectedTeamId" class="form-control rm-modern-select" asp-items="ViewBag.TeamList" onchange="this.form.submit()"></select>
         </div>
 
-        <div class="row ms-0 container p-0">
+        <div class="rm-filter-section modern-filter-row">
+            <input type="date" asp-for="@Model.SelectedStartDate" class="form-control rm-date-input" />
+            <input type="date" asp-for="@Model.SelectedEndDate" class="form-control rm-date-input" />
+            <input type="submit" name="seasonbutton" value="Season" class="btn btn-sm btn-outline-dark" />
+            <input type="submit" name="onemonthbutton" value="1 Month" class="btn btn-sm btn-outline-dark" />
+            <input type="submit" name="twoweeksbutton" value="2 Weeks" class="btn btn-sm btn-outline-dark" />
+            <input type="submit" name="oneweekbutton" value="1 Week" class="btn btn-sm btn-outline-dark" />
+            <input type="submit" name="onedaybutton" value="1 Day" class="btn btn-sm btn-outline-dark" />
+        </div>
+
+        <div class="rm-filter-section modern-filter-row rm-pos-filter">
             @foreach (var playerType in Model.ShowPlayerTypes)
             {
-                <div class="col-auto m-1 border border-secondary p-1 ps-3">
-                    <div class="ms-2 p-1 form-check">
-                        @foreach (var ars in Model.DisplayActiveRosterSpots)
+                <div class="rm-pos-group">
+                    @foreach (var ars in Model.DisplayActiveRosterSpots)
+                    {
+                        if (ars.PlayerType.Id == playerType.Id)
                         {
-                            if (ars.PlayerType.Id == playerType.Id)
-                            {
-                                <label class="form-check-label me-4 text-nowrap ms-2">
-                                    <input class="form-check-input" asp-for="SelectedDisplayActiveRosterSpotId" value="@ars.Id" type="radio" onchange="this.form.submit()" />
+                            <label class="rm-pos-badge text-nowrap">
+                                <input asp-for="SelectedDisplayActiveRosterSpotId" value="@ars.Id" type="radio" onchange="this.form.submit()" />
+                                <span class="rm-pos-badge-label">
                                     @foreach (var p in ars.Positions)
                                     {
                                         <partial name="_ColoredPosition" model="@p" />
                                     }
-                                </label>
-                            }
+                                </span>
+                            </label>
                         }
-                    </div>
+                    }
                 </div>
             }
         </div>
 
-        <div class="p-2">
-            <span class="ms-2">
+        <div class="rm-filter-section modern-filter-row">
+            <span>
                 <label class="form-check-label">
                     <input asp-for="ColorStats" onchange="this.form.submit()">
                     @Html.DisplayNameFor(model => model.ColorStats)
@@ -199,12 +189,12 @@
                     <input type="submit" name="analysis2weeks" value="Two Weeks" class="btn btn-sm btn-primary" />
                 </div>
                 <div class="col-auto ms-2">
-                    <select asp-for="@Model.SelectedProjectionSourceId" class="form-control" asp-items="ViewBag.ProjectionSourceList"></select>
+                    <select asp-for="@Model.SelectedProjectionSourceId" class="form-control rm-modern-select" asp-items="ViewBag.ProjectionSourceList"></select>
                 </div>
             </div>
         }
 
-        <div class="p-2">
+        <div class="rm-filter-section modern-filter-row">
             <button class="btn btn-primary">Refresh</button>
             @if (isUser)
             {
@@ -244,7 +234,7 @@
                 @if (ViewBag.DraftTeamList != null)
                 {
                     <div class="col-auto ps-3">
-                        <select asp-for="@Model.SelectedDraftTeamId" class="form-control" asp-items="ViewBag.DraftTeamList"></select>
+                        <select asp-for="@Model.SelectedDraftTeamId" class="form-control rm-modern-select" asp-items="ViewBag.DraftTeamList"></select>
                     </div>
                 }
                 @if (Model.UpcomingDraftText.Length > 0)

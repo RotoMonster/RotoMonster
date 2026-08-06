@@ -250,3 +250,102 @@ select {
     max-width: 100%;
     flex-shrink: 1;
 }
+
+/* Wrapper added by modern-select.js. .bm-custom-select is width:100% with a
+   200px minimum, which is too wide for a row of four filters - size these to
+   their content instead. Lives here rather than in rm.dark.css because this
+   file loads in both themes. */
+.rm-modern-select-wrap {
+    width: auto;
+    min-width: 150px;
+}
+
+/* ---- PlayerRankings filter area -------------------------------------
+   The controls above the table were five unrelated wrappers with their own
+   ad-hoc margins. These give every group the same gap and a divider, so the
+   area reads as one panel. .modern-filter-row comes from bm.light.css. */
+
+.rm-filter-section {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.rm-filter-section:last-of-type {
+    border-bottom: none;
+}
+
+/* Native date inputs sat unstyled next to the buttons. */
+.rm-date-input {
+    width: auto;
+    min-width: 9rem;
+}
+
+/* ---- Position filter badges -----------------------------------------
+   Kept as RADIOS - single select, unchanged behaviour. This is the badge
+   look from the library's position filter, not the component itself.
+
+   _ColoredPosition is shared and emits `<span style="color:#xxx">`, so it
+   is left alone: currentColor picks each position's own colour up for the
+   border and the selected tint, with no per-position CSS. */
+
+.rm-pos-filter {
+    gap: 1.25rem;
+}
+
+.rm-pos-filter .rm-pos-group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.rm-pos-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    margin: 0;
+}
+
+.rm-pos-badge input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.rm-pos-badge-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.7rem;
+    /* Neutral, not currentColor: a spot can hold several positions in
+       different colours, and borrowing one of them reads as arbitrary. */
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.3;
+    background-color: transparent;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.rm-pos-badge:hover .rm-pos-badge-label {
+    border-color: var(--brand-primary);
+}
+
+.rm-pos-badge input[type="radio"]:checked + .rm-pos-badge-label {
+    border-color: var(--brand-primary);
+    box-shadow: inset 0 0 0 1px var(--brand-primary);
+    background-color: rgba(var(--brand-primary-rgb), 0.12);
+}
+
+.rm-pos-badge input[type="radio"]:focus-visible + .rm-pos-badge-label {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 2px;
+}
+
+/* inline-block so the flex gap applies between them - as plain inline
+   they ran together with no separation. */
+.rm-pos-badge-label span {
+    display: inline-block;
+}
