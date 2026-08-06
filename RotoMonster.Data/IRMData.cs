@@ -13,6 +13,7 @@ namespace RotoMonster.Data
     {
         int ClearCache();
         int RemoveCacheItem(string cacheId);
+        int RemoveCacheItems(string cacheId);
 
         IEnumerable<Player> GetPlayerByName(string name);
         List<string> AutoCompletePlayerSearch(string term);

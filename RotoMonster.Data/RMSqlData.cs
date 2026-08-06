@@ -15,6 +15,7 @@ using System;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace RotoMonster.Data
         private ValuePlayerLib valuePlayerLib = new ValuePlayerLib();
         private readonly ColorLib colorLib = new ColorLib();
 
-        //private readonly Dictionary<string, bool> cacheKeys = new Dictionary<string, bool>();
+        private static readonly ConcurrentDictionary<string, byte> cacheKeys = new ConcurrentDictionary<string, byte>();
         private static CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
 
@@ -57,8 +58,14 @@ namespace RotoMonster.Data
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(30));
                 cacheEntryOptions.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
+                cacheEntryOptions.RegisterPostEvictionCallback((evictedKey, evictedValue, reason, state) =>
+                {
+                    byte ignored;
+                    cacheKeys.TryRemove(evictedKey.ToString(), out ignored);
+                });
 
                 memoryCache.Set(cacheId, cacheItem, cacheEntryOptions);
+                cacheKeys[cacheId] = 0;
             }
 
             return cacheItem;
@@ -66,21 +73,40 @@ namespace RotoMonster.Data
 
         public int RemoveCacheItem(string cacheId)
         {
-            int removes = 0;
-            var field = typeof(MemoryCache).GetProperty("EntriesCollection", BindingFlags.NonPublic | BindingFlags.Instance);
-            var collection = field.GetValue(memoryCache) as ICollection;
-            var items = new List<string>();
-            if (collection != null)
-                foreach (var item in collection)
+            if (memoryCache == null || string.IsNullOrEmpty(cacheId))
+                return 0;
+
+            if (!cacheKeys.ContainsKey(cacheId))
+                return 0;
+
+            memoryCache.Remove(cacheId);
+
+            byte ignored;
+            cacheKeys.TryRemove(cacheId, out ignored);
+
+            return 1;
+        }
+
+        public int RemoveCacheItems(string cacheId)
+        {
+            if (memoryCache == null || string.IsNullOrEmpty(cacheId))
+                return 0;
+
+            int removed = 0;
+
+            foreach (var key in cacheKeys.Keys)
+            {
+                if (key.StartsWith(cacheId, StringComparison.Ordinal))
                 {
-                    memoryCache.Remove(item.ToString());
+                    memoryCache.Remove(key);
 
-                    var methodInfo = item.GetType().GetProperty("Key");
-                    var val = methodInfo.GetValue(item);
-                    items.Add(val.ToString());
+                    byte ignored;
+                    cacheKeys.TryRemove(key, out ignored);
+                    removed++;
                 }
+            }
 
-            return removes;
+            return removed;
         }
 
         public object GetCacheItem(string cacheId)
