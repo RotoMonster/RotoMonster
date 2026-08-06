@@ -18,7 +18,7 @@
             Edit
         </a>
         <a class="btn btn-danger" data-bm-confirm="Delete this player?" asp-page="./Delete" asp-route-playerId="@Model.Id">
-            Delete
+            @Html.Raw(new Icon(new IconInput { Type = IconType.Trash, Size = 16 }).Render())<span class="ms-1">Delete</span>
         </a>
     </div>
 </div>
