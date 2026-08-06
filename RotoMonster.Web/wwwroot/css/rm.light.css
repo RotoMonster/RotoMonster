@@ -266,8 +266,23 @@ select {
    area reads as one panel. .modern-filter-row comes from bm.light.css. */
 
 .rm-filter-section {
-    padding: 0.5rem 0.75rem;
+    padding: 0.6rem 0;
     border-bottom: 1px solid var(--color-border);
+}
+
+/* Section labels, rendered from the data-title attribute rather than a real
+   element - the sections are flex rows, so flex-basis 100% turns ::before into
+   a full-width first line. Avoids nesting every row one level deeper. */
+.rm-filter-section[data-title]::before {
+    content: attr(data-title);
+    flex-basis: 100%;
+    width: 100%;
+    margin-bottom: 0.1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--color-text-secondary);
 }
 
 .rm-filter-section:last-of-type {
@@ -348,4 +363,33 @@ select {
    they ran together with no separation. */
 .rm-pos-badge-label span {
     display: inline-block;
+}
+
+/* The page name in header row 2. Deliberately NOT .page-header - that is the
+   brand panel (gradient + tagline) and belongs to the site name on the front
+   page, not to "Depth Charts". */
+.rm-page-heading {
+    margin: 0;
+    font-size: 2.6rem;
+    font-weight: 700;
+    /* Large bold type reads loose at default tracking. */
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--color-text-primary);
+}
+
+/* Narrow screens: keep it from pushing the controls onto their own line. */
+@media (max-width: 991px) {
+    .rm-page-heading {
+        font-size: 1.6rem;
+    }
+}
+
+/* Header row 2. A solid band rather than a bordered strip - the background is
+   what separates it from the page, so there is no rule under the nav. In dark
+   mode this sits flush against the navbar gradient and reads as one header. */
+.rm-page-bar {
+    background: var(--color-bg-secondary);
+    padding: 0.85rem 0;
+    margin-bottom: 1rem;
 }

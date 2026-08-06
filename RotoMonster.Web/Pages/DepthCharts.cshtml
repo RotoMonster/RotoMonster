@@ -7,18 +7,10 @@
 
 <div class="container">
 
-    @{
-        var titleRow = new RotoMonster.Models.Shared.PageTitleRowViewModel
-        {
-            Title = "Depth Charts",
-            // League dropdown now lives in _Layout for the whole site. Leaving
-            // UserLeagueList unset makes _PageTitleRow skip its own copy.
-            SelectedUserLeagueId = Model.SelectedUserLeagueId
-        };
-    }
-
+    @* _PageTitleRow removed: its title moved to the header block, its league
+       dropdown moved to _Layout and its search is off, so it rendered as an
+       empty styled band. *@
     <form method="post" asp-page-handler="Refresh">
-        <partial name="_PageTitleRow" model="titleRow" />
 
 
         <div class="row m-1 mb-1">

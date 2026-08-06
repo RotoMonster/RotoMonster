@@ -7,8 +7,6 @@
 }
 
 <div class="ms-1 container">
-    <h1>Rankings</h1>
-
     <div>
         <a href="#ShowSettings" data-bs-toggle="collapse">Show Settings</a>
         @if (Model.UserLeagueTeamAnalyses != null)
@@ -105,7 +103,9 @@
     <form method="post">
         <input asp-for="DefaultSort" type="hidden" />
 
-        <div class="rm-filter-section modern-filter-row">
+        <div class="modern-filter-container">
+
+        <div class="rm-filter-section modern-filter-row" data-title="Value settings">
             @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
             {
                 <select asp-for="@Model.SelectedUserLeagueId" class="form-control rm-modern-select" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
@@ -115,7 +115,7 @@
             <select asp-for="@Model.SelectedTeamId" class="form-control rm-modern-select" asp-items="ViewBag.TeamList" onchange="this.form.submit()"></select>
         </div>
 
-        <div class="rm-filter-section modern-filter-row">
+        <div class="rm-filter-section modern-filter-row" data-title="Date range">
             <input type="date" asp-for="@Model.SelectedStartDate" class="form-control rm-date-input" />
             <input type="date" asp-for="@Model.SelectedEndDate" class="form-control rm-date-input" />
             <input type="submit" name="seasonbutton" value="Season" class="btn btn-sm btn-outline-dark" />
@@ -125,7 +125,7 @@
             <input type="submit" name="onedaybutton" value="1 Day" class="btn btn-sm btn-outline-dark" />
         </div>
 
-        <div class="rm-filter-section modern-filter-row rm-pos-filter">
+        <div class="rm-filter-section modern-filter-row rm-pos-filter" data-title="Positions">
             @foreach (var playerType in Model.ShowPlayerTypes)
             {
                 <div class="rm-pos-group">
@@ -148,7 +148,7 @@
             }
         </div>
 
-        <div class="rm-filter-section modern-filter-row">
+        <div class="rm-filter-section modern-filter-row" data-title="Display">
             <span>
                 <label class="form-check-label">
                     <input asp-for="ColorStats" onchange="this.form.submit()">
@@ -180,7 +180,7 @@
 
         @if (Model.PlayerTableModel.ShowAnalysisDates)
         {
-            <div id="AnalysisDates" class="row p-2 ms-1">
+            <div id="AnalysisDates" class="rm-filter-section modern-filter-row" data-title="Projections">
                 <div class="col-">
                     <input type="date" asp-for="@Model.AnalysisStartDate" />
                     <input type="date" asp-for="@Model.AnalysisEndDate" />
@@ -210,6 +210,8 @@
             <span class="ms-2">
                 <a asp-page="./DisplaySettings">display options</a>
             </span>
+        </div>
+
         </div>
 
         @if (Model.ButtonMessage.Length > 0)

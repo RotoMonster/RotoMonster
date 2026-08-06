@@ -94,6 +94,10 @@ namespace RotoMonster.Pages
             if (pageTitle.Length > 0)
             {
                 ViewData["pagetitle"] = pageTitle + " - RotoMonster" + db.Sport.Title;
+
+                // The bare name, for the header block. "pagetitle" above is the
+                // browser tab text and is too long to use as a heading.
+                ViewData["PageHeading"] = pageTitle;
             }
 
             if (User.IsInRole("Admin"))

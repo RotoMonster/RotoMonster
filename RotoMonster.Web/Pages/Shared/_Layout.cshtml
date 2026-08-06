@@ -52,6 +52,7 @@
         @* ROW 1 - menu and account. *@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
             <div class="container-fluid px-4">
+                <partial name="_Logo" model='new RotoMonster.Models.Shared.LogoModel(){Sport=sport,Controller="/Index"}' />
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -151,7 +152,7 @@
         </nav>
 
         @* ROW 2 - identity and the controls that apply to whatever page you are on. *@
-        <div class="border-bottom box-shadow mb-3 py-2">
+        <div class="rm-page-bar">
             <div class="container-fluid px-4 d-flex align-items-center flex-wrap gap-3">
 
                 @{
@@ -168,10 +169,25 @@
                         default: sportName = sport; break;
                     }
                 }
-                <a class="page-header mb-0 text-decoration-none flex-shrink-0" asp-area="" asp-page="/Index">
-                    <h1>RotoMonster</h1>
-                    <div class="subtitle">Fantasy @sportName Projections and Tools</div>
-                </a>
+                @{
+                    // InitGet stashes the bare page name. The front page passes
+                    // nothing, which is what distinguishes home from the rest.
+                    var pageHeading = ViewData["PageHeading"] as string;
+                }
+                @if (string.IsNullOrEmpty(pageHeading))
+                {
+                    @* Home only. .page-header is the BRAND panel - a gradient in
+                       the sport colour with the tagline - so it suits the site
+                       name and not a page name. *@
+                    <div class="page-header mb-0 flex-shrink-0">
+                        <h1>RotoMonster</h1>
+                        <div class="subtitle">Fantasy @sportName Projections and Tools</div>
+                    </div>
+                }
+                else
+                {
+                    <h1 class="rm-page-heading flex-shrink-0">@pageHeading</h1>
+                }
 
                 @{
                     // RMPageModel-derived pages only. Identity pages derive
