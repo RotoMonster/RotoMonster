@@ -113,5 +113,71 @@ a {
 
 [style*="background-color:#"],
 [style*="background-color: #"] {
-    color: #212529;
+    /* !important because Bootstrap's `.table > :not(caption) > * > *` is
+       more specific than a bare attribute selector, so without it the
+       stat cells take the table's light colour on a pale background. */
+    color: #212529 !important;
+}
+
+/* ---- Outline buttons ----------------------------------------------
+   PlayerRankings uses `btn btn-sm btn-outline-dark` for its date-range
+   and view buttons - near-black text on a near-black border, which is
+   correct on a white page and invisible here. */
+
+.btn-outline-dark {
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+}
+
+.btn-outline-dark:hover,
+.btn-outline-dark:focus,
+.btn-outline-dark:active {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--brand-primary);
+    color: var(--color-text-primary);
+}
+
+/* Disabled ones should read as unavailable, not as missing. */
+.btn-outline-dark:disabled,
+.btn-outline-dark.disabled {
+    color: var(--color-text-tertiary);
+    border-color: var(--color-border);
+    opacity: 0.65;
+}
+
+/* ---- Data tables ---------------------------------------------------
+   RMCss.DataTable is table + table-sm + table-hover + table-bordered, so
+   Bootstrap's table variables drive the borders and the row states. They
+   all default to light values.
+
+   Row states are painted as `box-shadow: inset 0 0 0 9999px`, which
+   COVERS a cell's own background rather than tinting it - so a hovered
+   row would go flat and lose the ColorLib stat shading. Keeping these
+   translucent lets the shading show through. */
+
+.table {
+    --bs-table-color: var(--color-text-primary);
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--color-border);
+
+    --bs-table-striped-color: var(--color-text-primary);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+
+    --bs-table-hover-color: var(--color-text-primary);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.07);
+
+    --bs-table-active-color: var(--color-text-primary);
+    --bs-table-active-bg: rgba(255, 255, 255, 0.10);
+
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+}
+
+/* td-small / trdivider set their own greys for a light page. */
+.trdivider td {
+    border-bottom-color: var(--color-border);
+}
+
+td.tdleft {
+    border-left-color: var(--color-border);
 }
