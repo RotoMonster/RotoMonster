@@ -891,3 +891,51 @@ select.rm-modern-select-wide {
 .rm-scores-table td.tdc {
     color: var(--color-text-secondary);
 }
+
+/* rm-data-table-modern */
+table.table {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+}
+
+table.table > :not(caption) > * > * {
+    border-color: var(--color-border-light);
+    padding: 0.3rem 0.4rem;
+    vertical-align: middle;
+}
+
+.rm-data-table-head th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 0.45rem 0.4rem;
+}
+
+.rm-data-table-head th .btn {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: baseline;
+}
+
+table.table > tbody > tr > td {
+    transition: none;
+}
+
+table.table > tbody > tr:hover > td {
+    background-image: linear-gradient(rgba(128, 128, 128, 0.10), rgba(128, 128, 128, 0.10));
+}
+
+table.table a {
+    text-decoration: none;
+}
+
+table.table a:hover {
+    text-decoration: underline;
+}
