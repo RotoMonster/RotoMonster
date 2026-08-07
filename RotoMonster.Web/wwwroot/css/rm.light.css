@@ -939,3 +939,78 @@ table.table a {
 table.table a:hover {
     text-decoration: underline;
 }
+
+/* rm-league-grid */
+.rm-league-grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.rm-league-grid > .card {
+    margin-bottom: 0 !important;
+    flex: 0 1 auto;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.rm-league-grid > .card > .card-header {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* rm-front */
+.rm-front .card {
+    border: 1px solid var(--color-border) !important;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+}
+
+.rm-front .card-header {
+    background: var(--color-bg-primary);
+    border-bottom: 1px solid var(--color-border-light);
+    padding: 0.7rem 0.9rem;
+}
+
+.rm-front .card-header h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.rm-front .card-header h5 {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.rm-front .card-header a {
+    text-decoration: none;
+}
+
+.rm-front .card-header a:hover {
+    text-decoration: underline;
+}
+
+.rm-front .card-body {
+    padding: 0.8rem 0.9rem;
+}
+
+.rm-front .card table.table {
+    margin-bottom: 0;
+}
+
+.rm-front .card table.table > :not(caption) > * > * {
+    border-left: none;
+    border-right: none;
+    border-color: var(--color-border-light);
+}
+
+.rm-front .card table.table > tbody > tr:last-child > * {
+    border-bottom: none;
+}
+
+.rm-front .btn {
+    border-radius: 8px;
+}
