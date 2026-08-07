@@ -295,7 +295,7 @@
         </div>
     }
 
-    <div class="ms-2">
+    <div class="ms-2 @(ViewData["identity"] != null ? "rm-identity" : "")">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
