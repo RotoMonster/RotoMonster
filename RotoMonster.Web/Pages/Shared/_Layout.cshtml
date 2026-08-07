@@ -29,9 +29,17 @@
     @* rm.light.css carries the sizing and layout for both themes; rm.dark.css
        only flips the colours that were hardcoded for a light page. *@
     <link rel="stylesheet" href="~/css/rm.light.css" asp-append-version="true" />
+    @if (sportCss == "mlb")
+    {
+        <link rel="stylesheet" href="~/css/rm.@(sportCss).light.css" asp-append-version="true" />
+    }
     @if (rmTheme == "dark")
     {
         <link rel="stylesheet" href="~/css/rm.dark.css" asp-append-version="true" />
+        @if (sportCss == "mlb")
+        {
+            <link rel="stylesheet" href="~/css/rm.@(sportCss).dark.css" asp-append-version="true" />
+        }
     }
     <link rel="icon" type="image/x-icon" href="https://rotomonster.com/@ViewData["sport"].ToString().ToLower()/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com">

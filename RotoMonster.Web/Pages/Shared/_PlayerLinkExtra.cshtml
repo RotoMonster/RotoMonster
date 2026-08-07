@@ -13,7 +13,7 @@
             .Select(p => new RotoMonsterUI.DisplayPosition
             {
                 Abbreviation = p.Abbreviation,
-                Color = "#" + p.ColorCode
+                Color = "var(--pos-" + p.Abbreviation.Trim().ToLower() + ")"
             }).ToList()
     };
 }

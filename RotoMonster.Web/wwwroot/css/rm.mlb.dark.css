@@ -1,0 +1,20 @@
+/* rm-position-colors */
+:root {
+    --pos-1b: #4ec94e;
+    --pos-2b: #5c5cff;
+    --pos-3b: #ff6600;
+    --pos-c: #0099ff;
+    --pos-cf: #cc66ff;
+    --pos-cl: #ff4db8;
+    --pos-dh: #94a3b8;
+    --pos-lf: #cc66ff;
+    --pos-of: #cc66ff;
+    --pos-p: #e0913f;
+    --pos-ph: #e0913f;
+    --pos-pp: #e0913f;
+    --pos-pr: #e0913f;
+    --pos-rf: #cc66ff;
+    --pos-rp: #ff4db8;
+    --pos-sp: #e0913f;
+    --pos-ss: #ff5c5c;
+}

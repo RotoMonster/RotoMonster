@@ -81,9 +81,7 @@
         {
             <form method="post">
                 <div class="mt-2 mb-1 p-2 row">
-                    <div class="col-auto p-1">
-                        <select asp-for="@Model.SelectedUserLeagueId" class="form-control" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
-                    </div>
+                    <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
                     <div class="col-auto p-1">
                         <button class="btn btn-sm btn-primary ms-1" name="refresh">Refresh</button>
                     </div>

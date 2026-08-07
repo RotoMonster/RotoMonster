@@ -7,16 +7,16 @@
             var playerPositionPercent = (from pp in Model.PlayerPositionPercents where pp.DisplayPercent > 0 && pp.Position.Id == position.Id select pp).FirstOrDefault();
             if (playerPositionPercent != null)
             {
-                <div style="border-color:#@position.ColorCode;">
-                    <span class="m-0 p-0" style="color:#@position.ColorCode;">@playerPositionPercent.DisplayPercent</span>
+                <div class="pos-border-@(position.Abbreviation.Trim().ToLower())">
+                    <span class="m-0 p-0 pos-@(position.Abbreviation.Trim().ToLower())">@playerPositionPercent.DisplayPercent</span>
                 </div>
             }
             else
             {
-                <div style="border-color:#@position.ColorCode;">&#160;</div>
+                <div class="pos-border-@(position.Abbreviation.Trim().ToLower())">&#160;</div>
             }
             @*
-                <div style="border-color:#@position.ColorCode;">
+                <div class="pos-border-@(position.Abbreviation.Trim().ToLower())">
                 @{
                 bool match = false;
                 foreach (var playerPositionPercent in Model.PlayerPositionPercents)

@@ -30,8 +30,8 @@
             var playerPositionPercentOver = (from pp in Model.PlayerPositionPercentOvers where pp.NormalPlayerPositionPercent.DisplayPercent > 0 && pp.Position.Id == position.Id select pp).FirstOrDefault();
             if (playerPositionPercentOver != null)
             {
-                <div style="border-color:#@position.ColorCode;background-color:#@playerPositionPercentOver.PercentColorCode;">
-                    <span class="m-0 p-0" style="color:#@position.ColorCode;">@playerPositionPercentOver.NormalPlayerPositionPercent.DisplayPercent</span>
+                <div class="pos-border-@(position.Abbreviation.Trim().ToLower())" style="background-color:#@playerPositionPercentOver.PercentColorCode;">
+                    <span class="m-0 p-0 pos-@(position.Abbreviation.Trim().ToLower())">@playerPositionPercentOver.NormalPlayerPositionPercent.DisplayPercent</span>
                 </div>
             }
         }

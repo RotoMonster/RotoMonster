@@ -106,10 +106,7 @@
         <div class="modern-filter-container">
 
         <div class="rm-filter-section modern-filter-row" data-title="Value settings">
-            @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
-            {
-                <select asp-for="@Model.SelectedUserLeagueId" class="form-control rm-modern-select rm-modern-select-wide" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
-            }
+            <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
             <select asp-for="@Model.SelectedFilterId" class="form-control rm-modern-select rm-modern-select-wide" asp-items="ViewBag.FilterList" onchange="this.form.submit()"></select>
             <select asp-for="@Model.SelectedPerValueId" class="form-control rm-modern-select" asp-items="ViewBag.PerValues" onchange="this.form.submit()"></select>
             <select asp-for="@Model.SelectedTeamId" class="form-control rm-modern-select" asp-items="ViewBag.TeamList" onchange="this.form.submit()"></select>

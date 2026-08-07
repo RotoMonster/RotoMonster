@@ -483,3 +483,57 @@ select.rm-modern-select-wide {
     border-color: var(--color-border);
     opacity: 0.65;
 }
+
+/* rm-position-colors */
+
+.pos-1b { color: var(--pos-1b); }
+.pos-2b { color: var(--pos-2b); }
+.pos-3b { color: var(--pos-3b); }
+.pos-c { color: var(--pos-c); }
+.pos-cf { color: var(--pos-cf); }
+.pos-cl { color: var(--pos-cl); }
+.pos-dh { color: var(--pos-dh); }
+.pos-lf { color: var(--pos-lf); }
+.pos-of { color: var(--pos-of); }
+.pos-p { color: var(--pos-p); }
+.pos-ph { color: var(--pos-ph); }
+.pos-pp { color: var(--pos-pp); }
+.pos-pr { color: var(--pos-pr); }
+.pos-rf { color: var(--pos-rf); }
+.pos-rp { color: var(--pos-rp); }
+.pos-sp { color: var(--pos-sp); }
+.pos-ss { color: var(--pos-ss); }
+
+.pos-border-1b { border-color: var(--pos-1b); }
+.pos-border-2b { border-color: var(--pos-2b); }
+.pos-border-3b { border-color: var(--pos-3b); }
+.pos-border-c { border-color: var(--pos-c); }
+.pos-border-cf { border-color: var(--pos-cf); }
+.pos-border-cl { border-color: var(--pos-cl); }
+.pos-border-dh { border-color: var(--pos-dh); }
+.pos-border-lf { border-color: var(--pos-lf); }
+.pos-border-of { border-color: var(--pos-of); }
+.pos-border-p { border-color: var(--pos-p); }
+.pos-border-ph { border-color: var(--pos-ph); }
+.pos-border-pp { border-color: var(--pos-pp); }
+.pos-border-pr { border-color: var(--pos-pr); }
+.pos-border-rf { border-color: var(--pos-rf); }
+.pos-border-rp { border-color: var(--pos-rp); }
+.pos-border-sp { border-color: var(--pos-sp); }
+.pos-border-ss { border-color: var(--pos-ss); }
+
+/* rm-position-colors-nba */
+.pos-g { color: var(--pos-g); }
+.pos-f { color: var(--pos-f); }
+.pos-pg { color: var(--pos-pg); }
+.pos-sg { color: var(--pos-sg); }
+.pos-sf { color: var(--pos-sf); }
+.pos-pf { color: var(--pos-pf); }
+
+.pos-border-g { border-color: var(--pos-g); }
+.pos-border-f { border-color: var(--pos-f); }
+.pos-border-pg { border-color: var(--pos-pg); }
+.pos-border-sg { border-color: var(--pos-sg); }
+.pos-border-sf { border-color: var(--pos-sf); }
+.pos-border-pf { border-color: var(--pos-pf); }
+

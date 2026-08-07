@@ -24,14 +24,7 @@
             </label>
         </span>
 
-        @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
-        {
-            <div class="row m-1 mb-1">
-                <div class="col-auto p-1">
-                    <select asp-for="@Model.SelectedUserLeagueId" class="form-control" asp-items="ViewBag.UserLeagueList" onchange="this.form.submit()"></select>
-                </div>
-            </div>
-        }
+        <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
 
         <div class="row m-1 mb-3 ms-0">
             <div class="col-auto p-1 pt-2">
