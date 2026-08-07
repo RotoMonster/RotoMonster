@@ -260,6 +260,16 @@ select {
     min-width: 150px;
 }
 
+select.rm-modern-select {
+    width: auto;
+    min-width: 150px;
+}
+
+.rm-modern-select-wrap.rm-modern-select-wide,
+select.rm-modern-select-wide {
+    min-width: 240px;
+}
+
 /* ---- PlayerRankings filter area -------------------------------------
    The controls above the table were five unrelated wrappers with their own
    ad-hoc margins. These give every group the same gap and a divider, so the

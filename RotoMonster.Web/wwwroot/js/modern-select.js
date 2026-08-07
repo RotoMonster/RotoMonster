@@ -23,6 +23,9 @@
 
         var wrap = document.createElement('div');
         wrap.className = 'bm-custom-select rm-modern-select-wrap';
+        if (select.classList.contains('rm-modern-select-wide')) {
+            wrap.classList.add('rm-modern-select-wide');
+        }
         if (select.name) wrap.setAttribute('data-name', select.name);
 
         var trigger = document.createElement('div');
