@@ -156,8 +156,8 @@ namespace RotoMonster.Pages
                         var depthPlayers = db.GetDepthPlayers(playerType, await db.GetUserLeagueCategoryCodeAsync(userLeague, playerType), DateTime.UtcNow, false);
                         var playerTableModel = new PlayerTableModel();
                         playerTableModel.DisplayPerValue = db.GetTotalPerValue(playerType.Id);
-                        playerTableModel.ShowTrending = true;
-                        playerTableModel.ShowRank = false;
+                        playerTableModel.ShowTrending = false;
+                        playerTableModel.ShowRank = true;
                         playerTableModel.SelectedUserLeague = userLeague;
                         playerTableModel.ScoringSystem = userLeague.ScoringSystem;
                         playerTableModel.UserId = UserId;
@@ -167,22 +167,24 @@ namespace RotoMonster.Pages
                         playerTableModel.DisplayPerValue = db.GetTotalPerValue(playerType.Id);
                         playerTableModel.UserDisplayCategories = await db.GetUserDisplayCategoriesAsync(UserId, userLeague, playerType);
                         playerTableModel.GamesCategoryId = db.GetGamesCategory(playerType.Id).Id;
-                        playerTableModel.BeforeCategories = db.GetBeforeDisplayCategories(playerType);
-                        playerTableModel.AfterCategories = db.GetAfterDisplayCategories(playerType);
+                        playerTableModel.BeforeCategories = new List<DisplayCategory>();
+                        playerTableModel.AfterCategories = new List<DisplayCategory>();
                         playerTableModel.DisplayPlayers = new List<DisplayPlayer>();
                         playerTableModel.ValuePerValues.Add(db.GetPerGamePerValue(playerType.Id));
-                        playerTableModel.ColorStats = true;
+                        playerTableModel.ColorStats = false;
                         playerTableModel.ShowMonsterBot = false;
                         playerTableModel.ShowPositions = false;
                         playerTableModel.ShowInjuries = false;
                         playerTableModel.ShowCurrentGame = false;
                         playerTableModel.ShowPositionalValue = false;
-                        playerTableModel.ShowCategoryValues = true;
+                        playerTableModel.ShowCategoryValues = false;
                         playerTableModel.ShowGames = false;
                         playerTableModel.ShowTeam = false;
+                        playerTableModel.ShowOwnership = false;
+                        playerTableModel.ShowDepth = false;
 
                         boxScoreModel.TeamPlayerTableModels[team][playerType] = playerTableModel;
-                        playerTableModel.MonsterBarGame = monsterBars[playerType.Id];
+                        playerTableModel.MonsterBarGame = null;
                         var ownershipPlayers = ownershipPlayerLists[playerType.Id];
                         foreach (var boxScorePlayer in boxScoreModel.BoxScorePlayers)
                         {

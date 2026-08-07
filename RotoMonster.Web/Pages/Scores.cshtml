@@ -4,93 +4,106 @@
     RotoMonster.Core.Libs.FileLib fileLib = new Core.Libs.FileLib();
 }
 
-<div class="container">
+<div class="container-fluid px-4">
 
     <form method="post">
 
-        <h2>
-            Box Scores for
-            @Model.SelectedDate.DayOfWeek.ToString()
-            <partial name="_SmallDate" model="Model.SelectedDate" />
-            <small class="ms-1">
-                (@Model.ScheduleGames.Count)
-            </small>
-        </h2>
-
-        <span class="ms-2">
-            <label class="form-check-label">
-                <input asp-for="ShowTopToo">
-                @Html.DisplayNameFor(model => model.ShowTopToo)
-            </label>
-        </span>
-
         <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
 
-        <div class="row m-1 mb-3 ms-0">
-            <div class="col-auto p-1 pt-2">
-                <input type="submit" name="backbutton" value="Back" class="btn btn-sm btn-primary" />
-                <input type="submit" name="nextbutton" value="Next" class="btn btn-sm btn-primary" />
-            </div>
-            <div class="col-auto p-1 pt-2">
-                <input type="date" asp-for="@Model.SelectedDate" onchange="this.form.submit()" />
-            </div>
-            <div class="col-auto p-1 pt-2">
-                <button class="btn btn-success">Refresh</button>
-            </div>
-        </div>
+        <div class="rm-scores-layout">
 
-        <div class="container ms-2 p-0">
+            <div class="rm-scores-side">
 
-            <div class="row">
-                <div class="col-auto border border-primary p-2 m-0 mb-3">
+                <div class="rm-scores-panel">
+                    <div class="rm-scores-date">
+                        @Model.SelectedDate.DayOfWeek.ToString()
+                        <partial name="_SmallDate" model="Model.SelectedDate" />
+                        <span class="rm-scores-count">(@Model.ScheduleGames.Count)</span>
+                    </div>
+
+                    <div class="rm-scores-controls">
+                        <input type="submit" name="backbutton" value="Back" class="btn btn-sm btn-primary" />
+                        <input type="submit" name="nextbutton" value="Next" class="btn btn-sm btn-primary" />
+                        <input type="date" asp-for="@Model.SelectedDate" class="form-control form-control-sm rm-scores-datebox" onchange="this.form.submit()" />
+                        <button class="btn btn-sm btn-success">Refresh</button>
+                    </div>
+
+                    <label class="form-check-label rm-scores-toggle">
+                        <input asp-for="ShowTopToo">
+                        @Html.DisplayNameFor(model => model.ShowTopToo)
+                    </label>
+                </div>
+
+                <div class="rm-scores-panel rm-scores-games">
                     @foreach (var game in Model.ScheduleGames)
                     {
-                        <div class="clearfix small mb-1">
+                        <div class="rm-scores-game clearfix small">
                             <partial name="_TeamGame" model="new RotoMonster.Models.Shared.TeamGameModel() {Sport=Model.Sport,Game=game,Team=game.AwayTeam}" />
                             @if (game.PercentComplete > 0)
                             {
-                                <input type="submit" name="viewgame" asp-route-newgameid="@game.Id" value="view" class="linkbutton" />
+                                <input type="submit" name="viewgame" asp-route-newgameid="@game.Id" value="box score" class="linkbutton rm-scores-view" />
                             }
                         </div>
                     }
                 </div>
+
             </div>
 
-            @if (Model.BoxScoreModel != null && Model.BoxScoreModel.Game != null)
-            {
-                <input type="hidden" id="gameid" name="prevgameid" value="@Model.BoxScoreModel.Game.Id" />
+            <div class="rm-scores-main">
 
-                <div class="mt-3">
+                @if (Model.BoxScoreModel != null && Model.BoxScoreModel.Game != null)
+                {
+                    <input type="hidden" id="gameid" name="prevgameid" value="@Model.BoxScoreModel.Game.Id" />
+
+                    <div class="rm-scores-header">
+                        <span class="rm-scores-state">
+                            @(Model.BoxScoreModel.Game.IsFinished ? "Final" : Model.BoxScoreModel.Game.HasStarted ? "Live" : "Upcoming")
+                        </span>
+                        @foreach (var t in Model.BoxScoreModel.Game.GetTeams())
+                        {
+                            <span class="rm-scores-pill" style="@Model.BoxScoreModel.Game.GetTeamStyle(t)">
+                                <span class="rm-scores-pill-code">@t.Code</span>
+                                <span class="rm-scores-pill-score">@Model.BoxScoreModel.Game.GetTeamScore(t)</span>
+                            </span>
+                        }
+                    </div>
+
                     @foreach (var team in Model.BoxScoreModel.Game.GetTeams())
                     {
-                        <h3 class="teamscore mb-2" style="@Model.BoxScoreModel.Game.GetTeamStyle(team)">
-                            @team.Code
-                            <span class="ms-2 small">
-                                @Model.BoxScoreModel.Game.GetTeamScore(team)
-                            </span>
-                        </h3>
+                        <div class="rm-scores-team">
+                            <div class="rm-scores-team-head">
+                                <span class="rm-scores-team-code" style="@Model.BoxScoreModel.Game.GetTeamStyle(team)">@team.Code</span>
+                                <span class="rm-scores-team-score">@Model.BoxScoreModel.Game.GetTeamScore(team)</span>
+                            </div>
 
-                        @foreach (var playerType in Model.BoxScoreModel.PlayerTypes)
-                        {
-                            var playerTableModel = Model.BoxScoreModel.TeamPlayerTableModels[team][playerType];
-                            if (playerTableModel.DisplayPlayers.Count > 0)
+                            @foreach (var playerType in Model.BoxScoreModel.PlayerTypes)
                             {
-                                <div>
-                                    <partial name="_PlayerTable" model="playerTableModel" />
-                                </div>
+                                var playerTableModel = Model.BoxScoreModel.TeamPlayerTableModels[team][playerType];
+                                if (playerTableModel.DisplayPlayers.Count > 0)
+                                {
+                                    <div class="rm-scores-table">
+                                        <partial name="_PlayerTable" model="playerTableModel" />
+                                    </div>
+                                }
                             }
+                        </div>
+                    }
+
+                    if (Model.BoxScoreModel.Articles != null && Model.BoxScoreModel.Articles.Count > 0)
+                    {
+                        foreach (var article in Model.BoxScoreModel.Articles)
+                        {
+                            <partial name="_Article" model="article" />
                         }
                     }
-                </div>
-
-                if (Model.BoxScoreModel.Articles != null && Model.BoxScoreModel.Articles.Count > 0)
-                {
-                    foreach (var article in Model.BoxScoreModel.Articles)
-                    {
-                        <partial name="_Article" model="article" />
-                    }
                 }
-            }
+                else
+                {
+                    <div class="rm-scores-empty">Pick a game to see its box score.</div>
+                }
+
+            </div>
+
         </div>
 
         <input type="hidden" id="prevdate" name="prevdate" value="@Model.SelectedDate.ToShortDateString()" />

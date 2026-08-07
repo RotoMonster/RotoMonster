@@ -92,20 +92,20 @@
         }
 
         <div class="progress pbar-holder @holderCss" style="@style">
-            <div aria-valuenow="@pct" class="progress-bar wlink @css" role="progressbar" style="width: @pct%" aria-valuemin="0" s aria-valuemax="100">
-                @if (pct > 0)
-                {
+            @if (pct > 0)
+            {
+                <div aria-valuenow="@pct" class="progress-bar wlink @css" role="progressbar" style="width: @pct%" aria-valuemin="0" aria-valuemax="100">
                     <a class="ms-1 me-1" asp-page="/Scores" asp-route-g="@Model.Game.Id">
                         @gameState
                     </a>
-                }
-                else
-                {
-                    <span class="ms-1 me-1">
-                        @gameState
-                    </span>
-                }
-            </div>
+                </div>
+            }
+            else
+            {
+                <span class="ms-1 me-1 pbar-pregame">
+                    @gameState
+                </span>
+            }
         </div>
     }
 }

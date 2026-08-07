@@ -38,6 +38,7 @@ namespace RotoMonster.Models.Shared
         public bool ShowDepth { get; set; } = true;
         public bool ShowInjuries { get; set; } = true;
         public bool ShowTrending { get; set; } = true;
+        public bool ShowOwnership { get; set; } = true;
         public bool ShowPositionalValue { get; set; } = true;
         public bool ShowCurrentGame { get; set; } = true;
         public bool ShowGames { get; set; } = true;

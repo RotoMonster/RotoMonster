@@ -98,7 +98,7 @@
                     <th class="tdc">Position %</th>
                 }
 
-                @if (!Model.IsPlayerHistory)
+                @if (!Model.IsPlayerHistory && Model.ShowOwnership)
                 {
                     <th class="text-nowrap">
                         @{ var tipId5 = Context.NextTooltipId(); }
@@ -560,7 +560,7 @@
                     </td>
                 }
 
-                @if (!Model.IsPlayerHistory)
+                @if (!Model.IsPlayerHistory && Model.ShowOwnership)
                 {
                     if (dp.OwnershipPlayer != null)
                     {
