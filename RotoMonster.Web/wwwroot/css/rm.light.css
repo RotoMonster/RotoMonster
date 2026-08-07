@@ -1492,3 +1492,16 @@ table.table > :not(caption) > * > * {
     max-height: 520px;
     overflow-y: auto;
 }
+
+/* rm-table-head-brand */
+.rm-data-table-head th {
+    --bs-table-bg: var(--brand-primary);
+    --bs-table-color: #ffffff;
+    background-color: var(--brand-primary);
+    color: #ffffff;
+}
+
+.rm-data-table-head th .btn,
+.rm-data-table-head th a {
+    color: #ffffff !important;
+}
