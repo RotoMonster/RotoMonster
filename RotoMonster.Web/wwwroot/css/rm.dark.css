@@ -231,3 +231,14 @@ td.tdleft {
     --pos-rp: #ff4db8;   /* was #e6008a */
     --pos-cl: #ff4db8;   /* was #e6008a */
 }
+
+/* rm-depth-tone-dark */
+.rm-depth-card .display-player-name,
+.rm-depth-card .card .display-player-name,
+.rm-depth-card .display-player-name:hover {
+    color: var(--brand-accent) !important;
+}
+
+.injury-badge {
+    color: #ffffff !important;
+}
