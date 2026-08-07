@@ -1157,18 +1157,338 @@ table.table > :not(caption) > * > * {
 }
 
 .rm-depth-card .rm-data-table-head th {
-    border-bottom-color: rgba(128, 128, 128, 0.22) !important;
+    border-bottom-color: rgba(128, 128, 128, 0.12) !important;
 }
 
 .rm-depth-card .card-header {
-    border-bottom-color: rgba(128, 128, 128, 0.18);
+    border-bottom-color: rgba(128, 128, 128, 0.10);
 }
 
 .rm-depth-card .display-player-name,
 .rm-depth-card .display-player-name:hover {
-    color: var(--brand-accent);
+    color: var(--brand-primary);
 }
 
 .injury-badge {
     color: #ffffff !important;
+}
+
+/* rm-players */
+.rm-players > .container {
+    margin-left: 0 !important;
+}
+
+.rm-players .card {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+}
+
+.rm-players .card-header {
+    background: var(--color-bg-primary);
+    border-bottom: 1px solid var(--color-border-light);
+    padding: 0.9rem 1.1rem;
+}
+
+.rm-players .card-header h1,
+.rm-players .card-header h2,
+.rm-players .card-header h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.2rem;
+}
+
+.rm-players .card-body {
+    padding: 0.9rem 1.1rem;
+}
+
+.rm-players table.table > :not(caption) > * > * {
+    border-left: none;
+    border-right: none;
+    border-color: var(--color-border-light);
+    padding: 0.4rem 0.55rem;
+}
+
+.rm-players table.table > tbody > tr:last-child > * {
+    border-bottom: none;
+}
+
+.rm-players table.table > tbody > tr:nth-child(even) > td {
+    background-image: linear-gradient(rgba(128, 128, 128, 0.03), rgba(128, 128, 128, 0.03));
+}
+
+.rm-players table.table > tbody > tr:hover > td {
+    background-image: linear-gradient(rgba(128, 128, 128, 0.08), rgba(128, 128, 128, 0.08));
+}
+
+.rm-players .rm-data-table-head th {
+    position: static;
+}
+
+/* rm-players-fit */
+.rm-players table.table {
+    width: auto;
+    max-width: 100%;
+}
+
+.rm-players .card {
+    width: fit-content;
+    max-width: 100%;
+    min-width: 420px;
+    margin-bottom: 1.25rem;
+}
+
+.rm-players .card-header {
+    padding: 0.85rem 1.25rem;
+}
+
+.rm-players .card-body {
+    padding: 0.85rem 1.25rem;
+}
+
+.rm-players .rm-history-wrap,
+.rm-players .rm-gamelog-wrap {
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+}
+
+.rm-players .btn {
+    border-radius: 8px;
+}
+
+.rm-players form {
+    margin-bottom: 1rem;
+}
+
+/* rm-player-header */
+.rm-players > .container[style*="max-width"] {
+    display: none;
+}
+
+.rm-players .card-header h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.rm-players .card-header h1 span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+.rm-players .card-header h4 {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+    margin-left: 0 !important;
+    margin-top: 0.4rem !important;
+    margin-bottom: 0 !important;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rm-players .card-header h4 > span {
+    padding: 0 !important;
+}
+
+.rm-players .card-header h4 span[style] {
+    padding: 2px 8px !important;
+    border-radius: 5px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.rm-players .card-header h4 small {
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.rm-players .card-header .border {
+    border: none !important;
+    border-radius: 6px;
+    padding: 3px 9px !important;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.rm-players .card-header .border small {
+    font-size: 0.68rem;
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+.rm-players .card-header > div.mt-0 {
+    margin-top: 0.7rem !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+/* rm-players-grid */
+.rm-players {
+    display: grid;
+    grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+    column-gap: 1.75rem;
+    align-items: start;
+}
+
+.rm-players > form[method="get"] {
+    display: none;
+}
+
+.rm-players > div:has(> .card) {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.rm-players > form[method="post"] {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.rm-players > .container.ms-0 {
+    grid-column: 1;
+    grid-row: 3;
+    margin-left: 0 !important;
+    padding-left: 0;
+    padding-right: 0;
+    max-width: none;
+}
+
+.rm-players > .mt-3 {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    margin-top: 0 !important;
+    overflow-x: auto;
+}
+
+.rm-players .card {
+    width: 100%;
+    min-width: 0;
+}
+
+.rm-players > form[method="post"] .row {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+@media (max-width: 1100px) {
+    .rm-players {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .rm-players > div:has(> .card),
+    .rm-players > form[method="post"],
+    .rm-players > .container.ms-0,
+    .rm-players > .mt-3 {
+        grid-column: 1;
+        grid-row: auto;
+    }
+}
+
+/* rm-players-grid2 */
+.rm-players > .container.ms-0 {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin-top: 1.5rem;
+}
+
+.rm-players > .mt-3 {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+}
+
+.rm-players > .container.ms-0 table.table {
+    width: 100%;
+}
+
+.rm-players > .mt-3 table.table {
+    width: 100%;
+}
+
+@media (max-width: 1100px) {
+    .rm-players > .container.ms-0 {
+        grid-column: 1;
+        grid-row: auto;
+    }
+}
+
+/* rm-players-hero */
+.rm-players {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.rm-players > div:has(> .card) {
+    grid-column: 1 / -1;
+    grid-row: 1;
+}
+
+.rm-players > form[method="post"] {
+    grid-column: 1 / -1;
+    grid-row: 2;
+}
+
+.rm-players > .mt-3 {
+    grid-column: 1 / -1;
+    grid-row: 3;
+}
+
+.rm-players > .container.ms-0 {
+    grid-column: 1 / -1;
+    grid-row: 4;
+}
+
+.rm-players .card-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
+    padding: 1.4rem 1.6rem;
+}
+
+.rm-players .card-header h1 {
+    flex-basis: 100%;
+    font-size: 2.3rem;
+    margin-bottom: 0.15rem !important;
+}
+
+.rm-players .card-header h1 span {
+    font-size: 1.1rem;
+}
+
+.rm-players .card-header h4 {
+    margin: 0 !important;
+    font-size: 0.95rem;
+}
+
+.rm-players .card-header h4 span[style],
+.rm-players .card-header h4 small {
+    font-size: 0.8rem;
+}
+
+.rm-players .card-header > div.mt-0 {
+    margin-top: 0 !important;
+    margin-left: auto;
+}
+
+.rm-players .card-header .border {
+    font-size: 0.9rem;
+    padding: 5px 12px !important;
+}
+
+.rm-players > .container.ms-0 {
+    max-height: 520px;
+    overflow-y: auto;
 }
