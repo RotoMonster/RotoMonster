@@ -1848,3 +1848,26 @@ table.table > :not(caption) > * > * {
     order: 2;
     margin-right: 0.5rem;
 }
+
+/* rm-default */
+.rm-display .rm-default > label::after {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--brand-primary);
+    margin-left: 6px;
+    vertical-align: 2px;
+}
+
+.rm-display .rm-default > label {
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+/* rm-page-guide-placement */
+.bm-page-guide-trigger {
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}

@@ -11,6 +11,7 @@
         <div class="rm-display-bar">
             <input type="search" id="rmDisplayFilter" class="form-control" placeholder="Find a column..." autocomplete="off" />
             <span class="rm-display-count" id="rmDisplayCount"></span>
+            <button type="button" class="rm-display-link" id="rmDisplayDefaults">Use defaults</button>
             <button type="button" class="rm-display-link" id="rmDisplayAll">Select all</button>
             <button type="button" class="rm-display-link" id="rmDisplayNone">Clear all</button>
         </div>
@@ -23,7 +24,7 @@
                 <h4>Stat Columns</h4>
                 @for (var i = 0; i < Model.DisplayCategorySelects.Count(); i++)
                 {
-                    <div class="ms-2">
+                    <div class="ms-2 @(Model.DisplayCategorySelects[i].Category.IsDefaultDisplayCategory ? "rm-default" : "")">
                         <input type="checkbox" asp-for="@Model.DisplayCategorySelects[i].Selected" />
                         <label asp-for="@Model.DisplayCategorySelects[i].Selected">@Model.DisplayCategorySelects[i].Name</label>
                         <input type="hidden" asp-for="@Model.DisplayCategorySelects[i].Id" />
@@ -82,6 +83,19 @@
             if (box) box.checked = state;
         });
         updateCount();
+    }
+
+    var statCol = root.querySelector(".row > .col-auto");
+    var defBtn = document.getElementById("rmDisplayDefaults");
+    if (defBtn) {
+        defBtn.addEventListener("click", function () {
+            rows.forEach(function (row) {
+                if (!statCol || !statCol.contains(row)) return;
+                var box = row.querySelector('input[type="checkbox"]');
+                if (box) box.checked = row.classList.contains("rm-default");
+            });
+            updateCount();
+        });
     }
 
     document.getElementById("rmDisplayAll").addEventListener("click", function () { setAll(true); });

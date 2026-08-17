@@ -7,6 +7,24 @@
 
 <div class="container-fluid px-4">
 
+@Html.Raw(new PageGuide("depth-guide")
+    .WithTitle("Depth Charts")
+    .WithPurpose("Depth charts show how each team lines up by position, so you can see who is ahead of who and spot players in line for more playing time.")
+    .AddSection("Reading a card", "<p>Each card is one team. Rows are ordered by position and then by depth, so the player listed first at a position is the starter and the ones below are the backups.</p><p>The number beside the position is that player's depth, and the percentage is how widely they are rostered across leagues.</p>")
+    .AddSection("Why depth matters", "<p>A backup with a low ownership percent sitting behind an injured starter is the classic pickup. The depth chart is where you see that before it shows up in the rankings.</p><p>Players marked injured stay listed at their position so you can see who is likely to fill in for them.</p>")
+    .AddSection("The monster bar", "<p>The bar on each row summarises how the player has performed over several windows at once, so you can see recent form and season-long production side by side without opening the rankings.</p><p>Use the checkboxes above to show the per game bar, the total bar, or both.</p>")
+    .AddSection("Filtering", "<p>The team dropdown narrows to a single team. <strong>Hide 0% Players</strong> removes players nobody rosters, which cuts the cards down to the names actually worth watching.</p>")
+    .WithTourId("depth-tour")
+    .Render())
+
+@Html.Raw(new Tour("depth-tour")
+    .WithManualTrigger()
+    .AddStep("SelectedTeamId", "Pick a single team here, or leave it on All to see every team's chart at once.", TooltipPosition.Bottom)
+    .AddStep("HideZeroPlayers", "Hide 0% Players drops everyone nobody rosters, so you are left with the players actually worth tracking.", TooltipPosition.Bottom)
+    .AddStep("ShowGameMonsterBar", "This toggles the per game monster bar on each row, which shows recent form at a glance.", TooltipPosition.Bottom)
+    .AddStep("rm-tour-depth-refresh", "Refresh pulls the latest depth and ownership data.", TooltipPosition.Bottom)
+    .Render())
+
     @* _PageTitleRow removed: its title moved to the header block, its league
        dropdown moved to _Layout and its search is off, so it rendered as an
        empty styled band. *@
@@ -18,7 +36,7 @@
                 <select asp-for="@Model.SelectedTeamId" class="form-control" asp-items="ViewBag.TeamList" onchange="this.form.submit()"></select>
             </div>
             <div class="col-auto p-1">
-                <button class="btn btn-primary" asp-page-handler="Refresh">Refresh</button>
+                <button id="rm-tour-depth-refresh" class="btn btn-primary" asp-page-handler="Refresh">Refresh</button>
             </div>
         </div>
 

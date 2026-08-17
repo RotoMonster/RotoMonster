@@ -8,7 +8,25 @@
 
 <div class="ms-1 container">
     <div>
-        <a class="rm-toggle-link" href="#ShowSettings" data-bs-toggle="collapse">Show Settings</a>
+        @Html.Raw(new PageGuide("rankings-guide")
+    .WithTitle("Player Rankings")
+    .WithPurpose("This page ranks every player by how much value they have produced, so you can compare your roster against what is available and decide who to start, add or drop.")
+    .AddSection("Total value vs per game value", "<p>The table sorts by <strong>TotalV</strong> by default, which is the value a player has produced across the whole date range. Click <strong>GameV</strong> to sort by value per game instead.</p><p>Total value rewards players who have stayed healthy and played often. Per game value shows who is most productive when they do play, which is the better view when you are deciding between two players for a single day.</p>")
+    .AddSection("Narrowing the list", "<p>Use <strong>Value Settings</strong> at the top to switch between all players, only your team, or free agents. The <strong>Positions</strong> row filters to a single position.</p><p>The <strong>Date Range</strong> buttons change the window the values are calculated over. A short window shows who is hot right now, a full season shows who has been reliable.</p>")
+    .AddSection("Ownership columns", "<p><strong>Own%</strong> is the percent of leagues where a player is rostered, and <strong>Act%</strong> is the percent where they are actively started.</p><p>A player with high ownership but low active percent is being held rather than used, which can be a signal they are droppable in your league too.</p>")
+    .AddSection("Changing which columns show", "<p>The <strong>display options</strong> link below the buttons opens Display Settings, where you can pick exactly which stat and value columns appear in this table.</p>")
+    .WithTourId("rankings-tour")
+    .Render())
+
+@Html.Raw(new Tour("rankings-tour")
+    .WithManualTrigger()
+    .AddStep("rm-tour-settings", "Start here. Show Settings opens the controls that decide what the rankings are based on, including the date range and which positions to include.", TooltipPosition.Bottom)
+    .AddStep("rm-tour-myteam", "My Team narrows the list to only the players on your roster.", TooltipPosition.Top)
+    .AddStep("rm-tour-freeagents", "Find Free Agents switches to your players plus everyone available in your league, sorted by advanced ownership percent, so the best pickups rise to the top.", TooltipPosition.Top)
+    .AddStep("rm-tour-display", "Display options lets you choose exactly which stat and value columns show in the table.", TooltipPosition.Top)
+    .Render())
+
+        <a id="rm-tour-settings" class="rm-toggle-link" href="#ShowSettings" data-bs-toggle="collapse">Show Settings</a>
         @if (Model.UserLeagueTeamAnalyses != null)
         {
             <a class="ms-3 rm-toggle-link" href="#ShowAnalysis" data-bs-toggle="collapse">Show Team Ownership Analysis</a>
@@ -195,8 +213,8 @@
             <button class="btn btn-primary">Refresh</button>
             @if (isUser)
             {
-                <input type="submit" name="myteambutton" value="My Team" class="btn btn-sm btn-outline-dark" />
-                <input type="submit" name="freeagentsbutton" value="Find Free Agents" class="btn btn-sm btn-outline-dark" />
+                <input id="rm-tour-myteam" type="submit" name="myteambutton" value="My Team" class="btn btn-sm btn-outline-dark" />
+                <input id="rm-tour-freeagents" type="submit" name="freeagentsbutton" value="Find Free Agents" class="btn btn-sm btn-outline-dark" />
                 <input type="submit" name="waiversbutton" value="Waiver Trends" class="btn btn-sm btn-outline-dark" />
                 <input type="submit" name="livebutton" value="Live Results" class="btn btn-sm btn-outline-dark" />
                 <button type="submit" name="rostersbutton" value="Refresh Rosters" class="btn btn-sm btn-outline-dark">@Html.Raw(new Icon(new IconInput { Type = IconType.RefreshRosters, Size = 16 }).Render())<span class="ms-1">Refresh Rosters</span></button>
@@ -205,7 +223,7 @@
             }
 
             <span class="ms-2">
-                <a asp-page="./DisplaySettings">display options</a>
+                <a id="rm-tour-display" asp-page="./DisplaySettings">display options</a>
             </span>
         </div>
 
