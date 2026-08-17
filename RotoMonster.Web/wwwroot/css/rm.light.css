@@ -251,6 +251,18 @@ select {
     flex-shrink: 1;
 }
 
+/* The header row is .rm-page-bar, not .navbar, so these cannot be scoped
+   under .navbar the way the rule above is. */
+.rm-page-bar input#navPlayerSearch {
+    width: 320px;
+    max-width: 100%;
+    flex-shrink: 0;
+}
+
+.rm-page-bar .bm-custom-select {
+    min-width: 300px;
+}
+
 /* Wrapper added by modern-select.js. .bm-custom-select is width:100% with a
    200px minimum, which is too wide for a row of four filters - size these to
    their content instead. Lives here rather than in rm.dark.css because this
