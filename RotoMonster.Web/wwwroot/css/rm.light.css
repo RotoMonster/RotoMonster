@@ -1997,13 +1997,14 @@ td.pct-badge-cell {
     height: 1px;
 }
 
+
 .pct-badge {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     min-height: 26px;
-    margin: 0 0 2px;
+    margin: 0;
     padding: 0 8px;
     border-radius: 6px;
     font-size: 13px;
@@ -2036,7 +2037,7 @@ td.value-badge-cell {
     justify-content: center;
     width: 100%;
     min-height: 26px;
-    margin: 0 0 2px;
+    margin: 0;
     padding: 0 8px;
     border-radius: 6px;
     font-size: 13px;
