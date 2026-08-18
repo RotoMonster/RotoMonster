@@ -1886,19 +1886,19 @@ table.table > :not(caption) > * > * {
 
 /* rm-own-badge */
 .own-badge {
-    --own-badge-starting-bg: #3aa14e;
-    --own-badge-bench-bg: #3aa14e;
-    --own-badge-ir-bg: #3aa14e;
-    --own-badge-other-starting-bg: #6b7f92;
-    --own-badge-other-bench-bg: #6b7f92;
-    --own-badge-other-ir-bg: #6b7f92;
+    --own-badge-starting-bg: #00e64d;
+    --own-badge-bench-bg: #00e64d;
+    --own-badge-ir-bg: #00e64d;
+    --own-badge-other-starting-bg: #c5cdd3;
+    --own-badge-other-bench-bg: #c5cdd3;
+    --own-badge-other-ir-bg: #c5cdd3;
     --own-badge-waiver-bg: #6b7f92;
-    --own-badge-starting-fg: #96f2d7;
-    --own-badge-bench-fg: #c3d0dd;
-    --own-badge-ir-fg: #ffa8a8;
-    --own-badge-other-starting-fg: #8ce9c8;
-    --own-badge-other-bench-fg: #dbe4ec;
-    --own-badge-other-ir-fg: #ff9d9d;
+    --own-badge-starting-fg: #ffffff;
+    --own-badge-bench-fg: #ffffff;
+    --own-badge-ir-fg: #ffffff;
+    --own-badge-other-starting-fg: #ffffff;
+    --own-badge-other-bench-fg: #ffffff;
+    --own-badge-other-ir-fg: #ffffff;
     --own-badge-waiver-fg: #dbe4ec;
     display: inline-flex;
     align-items: center;
