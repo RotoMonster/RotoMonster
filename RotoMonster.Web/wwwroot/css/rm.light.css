@@ -1883,3 +1883,84 @@ table.table > :not(caption) > * > * {
     margin-right: 0.5rem;
     vertical-align: middle;
 }
+
+/* rm-own-badge */
+.own-badge {
+    --own-badge-starting-bg: #3aa14e;
+    --own-badge-bench-bg: #3aa14e;
+    --own-badge-ir-bg: #3aa14e;
+    --own-badge-other-starting-bg: #cc9900;
+    --own-badge-other-bench-bg: #cc9900;
+    --own-badge-other-ir-bg: #cc9900;
+    --own-badge-waiver-bg: #cc9900;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 30px;
+    height: 22px;
+    border-radius: 5px;
+    color: #fff;
+    vertical-align: middle;
+}
+
+.own-badge-icon {
+    width: 14px;
+    height: 14px;
+    display: block;
+}
+
+.own-badge-icon--ir {
+    width: 19px;
+    height: 11px;
+}
+
+.own-badge-text {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+}
+
+.own-badge--starting {
+    background-color: var(--own-badge-starting-bg);
+}
+
+.own-badge--bench {
+    background-color: var(--own-badge-bench-bg);
+}
+
+.own-badge--ir {
+    background-color: var(--own-badge-ir-bg);
+}
+
+.own-badge--other-starting {
+    background-color: var(--own-badge-other-starting-bg);
+}
+
+.own-badge--other-bench {
+    background-color: var(--own-badge-other-bench-bg);
+}
+
+.own-badge--other-ir {
+    background-color: var(--own-badge-other-ir-bg);
+}
+
+.own-badge--waiver {
+    background-color: var(--own-badge-waiver-bg);
+}
+
+.own-last-marker {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 2px;
+    vertical-align: middle;
+}
+
+td.own-cell {
+    padding: 2px 4px !important;
+}
+
+td.own-cell > .bm-tooltip-wrap:first-child {
+    display: block;
+}

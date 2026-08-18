@@ -203,22 +203,110 @@ namespace RotoMonster.Core.Libs
 
         public string GetDisplayPlayerOwnCss(DisplayPlayer displayPlayer)
         {
-            if (displayPlayer.UserLeagueTeam == null)
-                return "";
+            return "own-cell";
+        }
 
-            string ownCss = "";
+        public OwnBadgeState GetOwnBadgeState(DisplayPlayer displayPlayer)
+        {
+            if (displayPlayer.UserLeagueTeam == null)
+                return displayPlayer.IsWaiver ? OwnBadgeState.Waiver : OwnBadgeState.None;
 
             if (displayPlayer.IsMyPlayer)
             {
-                if (displayPlayer.IsActive)
-                    ownCss = "own-my";
-                else
-                    ownCss = "own-my-i";
-            }
-            else
-                ownCss = "own";
+                if (displayPlayer.IsIR)
+                    return OwnBadgeState.IR;
 
-            return ownCss;
+                if (displayPlayer.IsActive)
+                    return OwnBadgeState.Starting;
+
+                return OwnBadgeState.Bench;
+            }
+
+            if (displayPlayer.IsIR)
+                return OwnBadgeState.OtherIR;
+
+            if (displayPlayer.IsActive)
+                return OwnBadgeState.OtherStarting;
+
+            return OwnBadgeState.OtherBench;
+        }
+
+        public bool IsOwnBadgeStarting(OwnBadgeState state)
+        {
+            return state == OwnBadgeState.Starting || state == OwnBadgeState.OtherStarting;
+        }
+
+        public bool IsOwnBadgeBench(OwnBadgeState state)
+        {
+            return state == OwnBadgeState.Bench || state == OwnBadgeState.OtherBench;
+        }
+
+        public bool IsOwnBadgeIR(OwnBadgeState state)
+        {
+            return state == OwnBadgeState.IR || state == OwnBadgeState.OtherIR;
+        }
+
+        public string GetOwnBadgeCss(OwnBadgeState state)
+        {
+            switch (state)
+            {
+                case OwnBadgeState.Starting:
+                    return "own-badge own-badge--starting";
+                case OwnBadgeState.Bench:
+                    return "own-badge own-badge--bench";
+                case OwnBadgeState.IR:
+                    return "own-badge own-badge--ir";
+                case OwnBadgeState.OtherStarting:
+                    return "own-badge own-badge--other-starting";
+                case OwnBadgeState.OtherBench:
+                    return "own-badge own-badge--other-bench";
+                case OwnBadgeState.OtherIR:
+                    return "own-badge own-badge--other-ir";
+                case OwnBadgeState.Waiver:
+                    return "own-badge own-badge--waiver";
+                default:
+                    return "";
+            }
+        }
+
+        public string GetOwnBadgeTitle(DisplayPlayer displayPlayer, OwnBadgeState state)
+        {
+            string title = GetOwnBadgeTitle(state);
+
+            if (state != OwnBadgeState.OtherStarting
+                && state != OwnBadgeState.OtherBench
+                && state != OwnBadgeState.OtherIR)
+                return title;
+
+            if (displayPlayer.UserLeagueTeam == null)
+                return title;
+
+            string teamTitle = displayPlayer.UserLeagueTeam.Title;
+
+            if (string.IsNullOrWhiteSpace(teamTitle))
+                return title;
+
+            return title + " - " + teamTitle.Trim();
+        }
+
+        public string GetOwnBadgeTitle(OwnBadgeState state)
+        {
+            switch (state)
+            {
+                case OwnBadgeState.Starting:
+                case OwnBadgeState.OtherStarting:
+                    return "Active";
+                case OwnBadgeState.Bench:
+                case OwnBadgeState.OtherBench:
+                    return "Bench";
+                case OwnBadgeState.IR:
+                case OwnBadgeState.OtherIR:
+                    return "Injured Reserve";
+                case OwnBadgeState.Waiver:
+                    return "On Waiver Wire";
+                default:
+                    return "";
+            }
         }
 
         public string GetPointsColor(double points, Sport sport)
