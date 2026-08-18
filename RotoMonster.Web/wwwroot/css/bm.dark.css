@@ -5115,11 +5115,11 @@ a.modern-filter-btn:hover {
 
 .range-badge--monster .monster-bar-cell--top {
     color: #2563eb;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .range-badge--monster .monster-bar-cell--ownable {
-    color: #7c3aed;
+    color: #b35900;
     font-weight: 600;
 }
 
