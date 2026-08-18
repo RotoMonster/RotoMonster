@@ -1964,3 +1964,36 @@ td.own-cell {
 td.own-cell > .bm-tooltip-wrap:first-child {
     display: block;
 }
+
+/* rm-monster-bar-weights */
+.range-badge--monster .monster-bar-measure {
+    font-weight: 400;
+}
+
+.range-badge--monster .monster-bar-cell--ownable {
+    font-weight: 500;
+}
+
+.range-badge--monster .monster-bar-cell--dim {
+    font-weight: 500;
+}
+
+/* rm-pct-badge-cell */
+td.pct-badge-cell {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: center;
+}
+
+.pct-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1c1f1d;
+}
