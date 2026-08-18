@@ -1918,8 +1918,8 @@ table.table > :not(caption) > * > * {
 }
 
 .own-badge-icon--ir {
-    width: 24px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
 }
 
 .own-badge-text {
