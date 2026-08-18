@@ -242,3 +242,22 @@ td.tdleft {
 .injury-badge {
     color: #ffffff !important;
 }
+
+/* Own badges. The light-mode greens and gold sit too bright against the dark
+   page, and white icons glare - deepen the fills and tint the icons instead. */
+.own-badge {
+    --own-badge-starting-bg: #63e6be;
+    --own-badge-bench-bg: #63e6be;
+    --own-badge-ir-bg: #63e6be;
+    --own-badge-other-starting-bg: #5b7183;
+    --own-badge-other-bench-bg: #5b7183;
+    --own-badge-other-ir-bg: #5b7183;
+    --own-badge-waiver-bg: #5b7183;
+    --own-badge-starting-fg: #0b4a3a;
+    --own-badge-bench-fg: #37474f;
+    --own-badge-ir-fg: #b02525;
+    --own-badge-other-starting-fg: #8ce9c8;
+    --own-badge-other-bench-fg: #dbe4ec;
+    --own-badge-other-ir-fg: #ff9d9d;
+    --own-badge-waiver-fg: #c3ced9;
+}

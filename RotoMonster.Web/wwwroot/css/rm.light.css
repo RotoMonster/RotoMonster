@@ -1889,30 +1889,37 @@ table.table > :not(caption) > * > * {
     --own-badge-starting-bg: #3aa14e;
     --own-badge-bench-bg: #3aa14e;
     --own-badge-ir-bg: #3aa14e;
-    --own-badge-other-starting-bg: #cc9900;
-    --own-badge-other-bench-bg: #cc9900;
-    --own-badge-other-ir-bg: #cc9900;
-    --own-badge-waiver-bg: #cc9900;
+    --own-badge-other-starting-bg: #6b7f92;
+    --own-badge-other-bench-bg: #6b7f92;
+    --own-badge-other-ir-bg: #6b7f92;
+    --own-badge-waiver-bg: #6b7f92;
+    --own-badge-starting-fg: #96f2d7;
+    --own-badge-bench-fg: #c3d0dd;
+    --own-badge-ir-fg: #ffa8a8;
+    --own-badge-other-starting-fg: #8ce9c8;
+    --own-badge-other-bench-fg: #dbe4ec;
+    --own-badge-other-ir-fg: #ff9d9d;
+    --own-badge-waiver-fg: #dbe4ec;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-width: 30px;
-    height: 22px;
+    min-width: 34px;
+    height: 24px;
     border-radius: 5px;
     color: #fff;
     vertical-align: middle;
 }
 
 .own-badge-icon {
-    width: 14px;
-    height: 14px;
+    width: 17px;
+    height: 17px;
     display: block;
 }
 
 .own-badge-icon--ir {
-    width: 19px;
-    height: 11px;
+    width: 24px;
+    height: 14px;
 }
 
 .own-badge-text {
@@ -1924,26 +1931,32 @@ table.table > :not(caption) > * > * {
 
 .own-badge--starting {
     background-color: var(--own-badge-starting-bg);
+    color: var(--own-badge-starting-fg);
 }
 
 .own-badge--bench {
     background-color: var(--own-badge-bench-bg);
+    color: var(--own-badge-bench-fg);
 }
 
 .own-badge--ir {
     background-color: var(--own-badge-ir-bg);
+    color: var(--own-badge-ir-fg);
 }
 
 .own-badge--other-starting {
     background-color: var(--own-badge-other-starting-bg);
+    color: var(--own-badge-other-starting-fg);
 }
 
 .own-badge--other-bench {
     background-color: var(--own-badge-other-bench-bg);
+    color: var(--own-badge-other-bench-fg);
 }
 
 .own-badge--other-ir {
     background-color: var(--own-badge-other-ir-bg);
+    color: var(--own-badge-other-ir-fg);
 }
 
 .own-badge--waiver {
@@ -1996,4 +2009,10 @@ td.pct-badge-cell {
     font-size: 14px;
     font-weight: 600;
     color: #1c1f1d;
+}
+
+/* rm-rankings-player-name */
+.rm-rankings .display-player-name {
+    font-size: 0.85rem;
+    font-weight: 500;
 }
