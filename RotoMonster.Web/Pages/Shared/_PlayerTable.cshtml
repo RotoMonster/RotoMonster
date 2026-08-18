@@ -651,7 +651,7 @@
                     var dvp = (from vp in dp.DisplayValuePlayers where vp.PerValue.Id == pv.Id select vp).FirstOrDefault();
                     if (dvp != null && dvp.ValuePlayer != null)
                     {
-                        <td class="tdr" style="background-color:#@dvp.ValuePlayer.LeagueValueColor;">@String.Format("{0:#####0.00}", dvp.ValuePlayer.LeagueValue)</td>
+                        <td class="tdr value-badge-cell"><span class="value-badge" style="background-color:#@dvp.ValuePlayer.LeagueValueColor;">@String.Format("{0:#####0.00}", dvp.ValuePlayer.LeagueValue)</span></td>
                     }
                     else
                     {

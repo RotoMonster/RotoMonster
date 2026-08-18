@@ -1886,9 +1886,9 @@ table.table > :not(caption) > * > * {
 
 /* rm-own-badge */
 .own-badge {
-    --own-badge-starting-bg: #00e64d;
-    --own-badge-bench-bg: #00e64d;
-    --own-badge-ir-bg: #00e64d;
+    --own-badge-starting-bg: #00b33c;
+    --own-badge-bench-bg: #00b33c;
+    --own-badge-ir-bg: #00b33c;
     --own-badge-other-starting-bg: #c5cdd3;
     --own-badge-other-bench-bg: #c5cdd3;
     --own-badge-other-ir-bg: #c5cdd3;
@@ -1993,24 +1993,24 @@ td.own-cell > .bm-tooltip-wrap:first-child {
 
 /* rm-pct-badge-cell */
 td.pct-badge-cell {
-    padding-top: 0;
-    padding-bottom: 0;
-    padding-left: 2px;
-    padding-right: 2px;
-    text-align: center;
+    padding: 0 !important;
+    height: 1px;
 }
 
 .pct-badge {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 48px;
-    height: 24px;
-    padding: 0 10px;
-    border-radius: 5px;
+    width: 100%;
+    height: 100%;
+    min-height: 22px;
+    margin: 2px 0;
+    padding: 0 8px;
+    border-radius: 6px;
     font-size: 13px;
     font-weight: 600;
     color: #1c1f1d;
+    box-sizing: border-box;
 }
 
 /* rm-rankings-compact-rows */
@@ -2023,4 +2023,26 @@ td.pct-badge-cell {
 .rm-rankings .display-player-name {
     font-size: 0.85rem;
     font-weight: 500;
+}
+
+/* rm-value-badge */
+td.value-badge-cell {
+    padding: 0 !important;
+    height: 1px;
+}
+
+.value-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 22px;
+    margin: 2px 0;
+    padding: 0 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1c1f1d;
+    box-sizing: border-box;
 }
