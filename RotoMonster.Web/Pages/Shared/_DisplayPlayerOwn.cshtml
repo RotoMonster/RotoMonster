@@ -30,17 +30,25 @@
             {
                 <span class="own-badge-text">WW</span>
             }
+            @if (Model.IsMyLastPlayer)
+            {
+                var lastTipId = "bm-tip-ownlast-" + ownKey;
+                <span class="bm-tooltip-wrap">
+                    <span class="own-last-marker bm-tooltip-trigger bm-tooltip-trigger--hover"
+                          data-bm-tooltip="@lastTipId">@Html.Raw(new Icon(new IconInput { Type = IconType.ArrowDown, Size = 14 }).Render())</span>
+                    <div class="bm-tooltip-content" id="@lastTipId" role="tooltip">Your last owned player</div>
+                </span>
+            }
         </span>
         <div class="bm-tooltip-content" id="@tipId" role="tooltip">@colorLib.GetOwnBadgeTitle(Model, ownState)</div>
     </span>
 }
-
-@if (Model.IsMyLastPlayer)
+else if (Model.IsMyLastPlayer)
 {
-    var lastTipId = "bm-tip-ownlast-" + ownKey;
+    var lastTipIdAlone = "bm-tip-ownlast-" + ownKey;
     <span class="bm-tooltip-wrap">
         <span class="own-last-marker bm-tooltip-trigger bm-tooltip-trigger--hover"
-              data-bm-tooltip="@lastTipId">@Html.Raw(new Icon(new IconInput { Type = IconType.ArrowDown, Size = 14 }).Render())</span>
-        <div class="bm-tooltip-content" id="@lastTipId" role="tooltip">Your last owned player</div>
+              data-bm-tooltip="@lastTipIdAlone">@Html.Raw(new Icon(new IconInput { Type = IconType.ArrowDown, Size = 14 }).Render())</span>
+        <div class="bm-tooltip-content" id="@lastTipIdAlone" role="tooltip">Your last owned player</div>
     </span>
 }

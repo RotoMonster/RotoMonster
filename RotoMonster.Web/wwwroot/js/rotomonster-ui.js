@@ -60,7 +60,16 @@
         activeArrow = arrow;
     }
 
+    // Tooltips are click-only. The bm-tooltip-trigger--hover class is left in
+    // the markup but no longer does anything - it's the one place to switch
+    // hover back on if that's ever wanted.
     document.addEventListener('click', function (e) {
+        // A click inside the open tooltip is not a click elsewhere. The
+        // tooltip lives on document.body and has no data-bm-tooltip of its
+        // own, so without this anything interactive inside it would close
+        // the tooltip the moment it was used.
+        if (activeTooltip && activeTooltip.contains(e.target)) return;
+
         var trigger = e.target.closest('[data-bm-tooltip]');
 
         if (!trigger) {
@@ -79,22 +88,6 @@
 
         showTooltip(trigger);
         e.stopPropagation();
-    });
-
-    // Hover-triggered tooltips (icon-only buttons) - opt-in via the
-    // bm-tooltip-trigger--hover class. Click still works too as a touch
-    // fallback, since hover doesn't exist on touch devices.
-    document.addEventListener('mouseover', function (e) {
-        var trigger = e.target.closest('.bm-tooltip-trigger--hover');
-        if (!trigger) return;
-        showTooltip(trigger);
-    });
-
-    document.addEventListener('mouseout', function (e) {
-        var trigger = e.target.closest('.bm-tooltip-trigger--hover');
-        if (!trigger) return;
-        if (trigger.contains(e.relatedTarget)) return;
-        closeTooltip();
     });
 })();
 
