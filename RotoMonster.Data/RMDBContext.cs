@@ -83,10 +83,27 @@ namespace RotoMonster.Data
         public DbSet<UserOptionType> UserOptionTypes { get; set; }
         public DbSet<UserOption> UserOptions { get; set; }
         public DbSet<Helper> Helpers { get; set; }
+        public DbSet<Tutorial> Tutorials { get; set; }
+        public DbSet<TutorialSection> TutorialSections { get; set; }
+        public DbSet<TutorialStep> TutorialSteps { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Sport>().HasNoKey();
+
+            modelBuilder.Entity<Tutorial>().HasIndex(t => t.TutorialKey).IsUnique();
+
+            modelBuilder.Entity<Tutorial>()
+                .HasMany(t => t.TutorialSections)
+                .WithOne(s => s.Tutorial)
+                .HasForeignKey(s => s.TutorialId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Tutorial>()
+                .HasMany(t => t.TutorialSteps)
+                .WithOne(s => s.Tutorial)
+                .HasForeignKey(s => s.TutorialId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<SeasonTeam>().HasKey(s => new { s.SeasonId, s.TeamId });
             modelBuilder.Entity<SeasonTeam>().ToTable("SeasonTeams");
