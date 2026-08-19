@@ -27,7 +27,7 @@
                 @if (Model.DisplayPlayer != null && Model.DisplayPlayer.OpposingTeamValuePlayer != null)
                     oppStyle = "background-color:#" + Model.DisplayPlayer.OpposingTeamValuePlayer.LeagueValueColor;
             }
-            <span style="@oppStyle;">
+            <span class="@(string.IsNullOrEmpty(oppStyle) ? "" : "rm-opp-badge")" style="@oppStyle;">
                 @Model.Game.GetOpponentText(Model.Team)
             </span>
             @if (Model.Game.OpponentProjectedPoints(Model.Sport, Model.Team) > 0)

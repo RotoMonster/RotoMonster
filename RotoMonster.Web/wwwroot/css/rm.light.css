@@ -1991,14 +1991,19 @@ td.own-cell > .bm-tooltip-wrap:first-child {
     font-weight: 500;
 }
 
-/* rm-pct-badge-cell */
-td.pct-badge-cell {
+/* rm-badge */
+/* One shared fill badge. .rm-badge is canonical; .pct-badge and .value-badge
+   are kept as aliases so existing markup is unaffected. */
+td.rm-badge-cell,
+td.pct-badge-cell,
+td.value-badge-cell {
     padding: 0 !important;
     height: 1px;
 }
 
-
-.pct-badge {
+.rm-badge,
+.pct-badge,
+.value-badge {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2011,6 +2016,15 @@ td.pct-badge-cell {
     font-weight: 600;
     color: #1c1f1d;
     box-sizing: border-box;
+}
+
+/* Inline variant - sits inside a cell alongside other content rather than
+   filling it. Used for the opposing team badge in the schedule grid. */
+.rm-badge--inline {
+    display: inline-flex;
+    width: auto;
+    min-height: 0;
+    padding: 1px 5px;
 }
 
 /* rm-rankings-compact-rows */
@@ -2025,23 +2039,24 @@ td.pct-badge-cell {
     font-weight: 500;
 }
 
-/* rm-value-badge */
-td.value-badge-cell {
-    padding: 0 !important;
-    height: 1px;
+/* rm-mbar-head */
+/* Stack the GAME / TOTAL label above its badge instead of beside it.
+   .range-badge is inline-flex, so a block wrapper on the label is what
+   pushes the badge onto the next line. */
+.rm-mbar-head > .bm-tooltip-wrap {
+    display: block;
+    text-align: center;
+    line-height: 1.1;
 }
 
-.value-badge {
-    display: flex;
+/* rm-opp-badge */
+/* Opposing team as a badge in the schedule grid. Deliberately inherits
+   colour and font-size - the cell also holds starter icons, so only the
+   shape is changed here. */
+.rm-opp-badge {
     align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 26px;
-    margin: 0;
-    padding: 0 8px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #1c1f1d;
-    box-sizing: border-box;
+    padding: 1px 5px;
+    border-radius: 5px;
+    font-weight: 500;
+    white-space: nowrap;
 }
