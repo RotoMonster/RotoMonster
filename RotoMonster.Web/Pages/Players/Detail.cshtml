@@ -64,17 +64,17 @@
             @if (Model.OwnershipPlayer != null)
             {
                 <div class="mt-0">
-                    <span class="me-2 border ps-1 pe-1" style="background-color:#@colorLib.OwnershipGetPercentColor(Model.OwnershipPlayer.OwnershipPercent)">
+                    <span class="me-2 rm-badge rm-badge--inline" style="background-color:#@colorLib.OwnershipGetPercentColor(Model.OwnershipPlayer.OwnershipPercent)">
                         <partial name="_PlayerOwnershipChange" model="new RotoMonster.Models.Shared.PlayerOwnershipChangeModel(Model.OwnershipPlayer.OwnershipPercent,Model.OwnershipPlayer.PercentOwnershipChange)" />
                         <small>% Own</small>
                     </span>
-                    <span class="border ps-1 pe-1" style="background-color:#@colorLib.ActiveGetPercentColor(Model.OwnershipPlayer.ActivePercent)">
+                    <span class="rm-badge rm-badge--inline" style="background-color:#@colorLib.ActiveGetPercentColor(Model.OwnershipPlayer.ActivePercent)">
                         <partial name="_PlayerOwnershipChange" model="new RotoMonster.Models.Shared.PlayerOwnershipChangeModel(Model.OwnershipPlayer.ActivePercent,Model.OwnershipPlayer.PercentActiveChange)" />
                         <small>% Active</small>
                     </span>
                     @if (Model.OwnershipPlayer.IRPercent > 0)
                     {
-                        <span class="border ps-1 pe-1 ms-2">
+                        <span class="rm-badge rm-badge--inline rm-badge--outline ms-2">
                             <partial name="_PlayerOwnershipChange" model="new RotoMonster.Models.Shared.PlayerOwnershipChangeModel(Model.OwnershipPlayer.IRPercent,Model.OwnershipPlayer.PercentActiveChange)" />
                             <small>% IR</small>
                         </span>

@@ -144,7 +144,7 @@
 
                                     @if (dp.OwnershipPlayer != null)
                                     {
-                                        <td class="tdr text-nowrap ps-1 pe-1" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
+                                        <td class="tdr text-nowrap rm-badge-cell"><span class="rm-badge" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
                                             @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)
                                             @if (dp.OwnershipPlayer.PercentOwnershipChange != 0)
                                             {
@@ -152,7 +152,7 @@
                                                     <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentOwnershipChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentOwnershipChange)
                                                 </small>
                                             }
-                                        </td>
+                                        </span></td>
                                     }
                                     else
                                     {

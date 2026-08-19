@@ -2060,3 +2060,13 @@ td.value-badge-cell {
     font-weight: 500;
     white-space: nowrap;
 }
+
+/* rm-badge-outline */
+/* For a badge with no background of its own - IR% has no colour, so it
+   keeps the pill shape but stays transparent and inherits its text colour
+   rather than taking the dark fill colour meant for coloured badges. */
+.rm-badge--outline {
+    background-color: transparent;
+    color: inherit;
+    border: 1px solid var(--color-border);
+}

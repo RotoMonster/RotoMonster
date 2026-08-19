@@ -90,19 +90,19 @@
                                         @num
                                     </td>
 
-                                    <td class="text-nowrap" style="background-color:#@colorLib.OwnershipGetPercentColor(userLeagueTeamAnalysis.AverageOwnershipPercent)">
+                                    <td class="text-nowrap rm-badge-cell"><span class="rm-badge" style="background-color:#@colorLib.OwnershipGetPercentColor(userLeagueTeamAnalysis.AverageOwnershipPercent)">
                                         @String.Format(" {0:##0.0}%", userLeagueTeamAnalysis.AverageOwnershipPercent)
-                                    </td>
+                                    </span></td>
 
                                     @foreach (var ptAnalysis in userLeagueTeamAnalysis.UserLeagueTeamAnalysisPlayerTypes)
                                     {
-                                        <td class="text-nowrap" style="background-color:#@colorLib.OwnershipGetPercentColor(ptAnalysis.AverageOwnershipPercent)">
+                                        <td class="text-nowrap rm-badge-cell"><span class="rm-badge" style="background-color:#@colorLib.OwnershipGetPercentColor(ptAnalysis.AverageOwnershipPercent)">
                                             @if (ptAnalysis.PlayerCount > 0)
                                             {
                                                 @String.Format("{0:##0.0}%", ptAnalysis.AverageOwnershipPercent)
                                             }
                                             <span class="float-end me-1">@ptAnalysis.PlayerCount</span>
-                                        </td>
+                                        </span></td>
                                     }
 
                                     <td>
