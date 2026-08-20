@@ -1,4 +1,4 @@
-/* rm.light.css - RotoMonster-only overrides.
+﻿/* rm.light.css - RotoMonster-only overrides.
    Loaded AFTER bm.light.css. Nothing shared belongs in here: bm.light.css
    is a verbatim copy of the RotoMonsterUI stylesheet and gets refreshed by
    overwriting it, so any edit made there is lost on the next refresh. */
@@ -2016,6 +2016,28 @@ td.value-badge-cell {
     font-weight: 600;
     color: #1c1f1d;
     box-sizing: border-box;
+}
+
+/* Change value pinned inside the badge. Absolute rather than a flex row so
+   the percent stays centered whatever the change is - a -100 and a +5 leave
+   it in the same place. */
+.rm-badge,
+.pct-badge,
+.value-badge {
+    position: relative;
+}
+
+.rm-badge-change {
+    position: absolute;
+    left: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0 3px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
 }
 
 /* Inline variant - sits inside a cell alongside other content rather than
