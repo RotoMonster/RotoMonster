@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -181,7 +181,8 @@ namespace RotoMonster.Pages
 
         public UserLeague RefreshRosters(UserLeague userLeague)
         {
-            return null;
+            if (userLeague == null)
+                return null;
 
             if (userLeague.ProviderLeagueId == null || userLeague.ProviderLeagueId.Length == 0)
                 return userLeague;

@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using RotoMonster.Core;
 using RotoMonster.Core.Libs;
 using RotoMonster.Data;
+using RotoMonsterExternalAPIs.Client.Models;
+using RotoMonsterExternalAPIs.Client.Services.Yahoo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +17,7 @@ using System.Xml;
 
 namespace RotoMonster.Data
 {
-    public class RMSharedSqlData : IRMSharedData
+    public class RMSharedSqlData : IRMSharedData, IYahooTokenStore
     {
         private readonly RMSharedDbContext db;
         private readonly IConfiguration config;
@@ -167,45 +169,41 @@ namespace RotoMonster.Data
             UserAuth userAuth,
             string url)
         {
-            string xml = "";
+            var client = new YahooApiClient(
+                new YahooOAuth(config["YahooClientId"], config["YahooClientSecret"]),
+                this);
 
-            var yahooRequest = new YahooRequest();
-            yahooRequest.UserId = userAuth.UserId;
-            yahooRequest.Url = url;
-            yahooRequest.DateAdded = DateTime.UtcNow;
-            db.YahooRequests.Add(yahooRequest);
-            db.SaveChanges();
+            var result = client.GetAsync(userAuth.UserId, url).GetAwaiter().GetResult();
 
-            var now = DateTime.UtcNow;
-            while (DateTime.UtcNow < now.AddSeconds(20))
+            // Returning "" on failure to match what the old version did - every
+            // caller checks the length rather than expecting an exception.
+            return result.Success ? result.Content : "";
+        }
+
+        // ---- IYahooTokenStore ----
+        // Tokens live on UserAuth. There is no expiry column, so it is derived
+        // from LastUsed the same way MustRefreshYahoo already does, which keeps
+        // this from needing a migration.
+
+        Task<YahooTokens> IYahooTokenStore.LoadAsync(string userKey)
+        {
+            var auth = GetUserAuth(userKey);
+
+            if (auth == null || string.IsNullOrEmpty(auth.YahooRefreshToken))
+                return Task.FromResult<YahooTokens>(null);
+
+            return Task.FromResult(new YahooTokens
             {
-                Task.Delay(500).GetAwaiter().GetResult();
-                var testRequest = (from yr in db.YahooRequests.AsNoTracking() where yr.Id == yahooRequest.Id select yr).FirstOrDefault();
-                if (testRequest.DateProcessed != null)
-                {
-                    try
-                    {
-                        if (testRequest.WasSuccessful)
-                        {
-                            xml = testRequest.Results;
-                        }
-                        else if (testRequest.ErrorMessage.Length > 0)
-                        {
-                        }
-                    }
-                    catch
-                    {
+                AccessToken = auth.YahooAccessToken,
+                RefreshToken = auth.YahooRefreshToken,
+                ExpiresAtUtc = auth.LastUsed.AddMinutes(55)
+            });
+        }
 
-                    }
-
-                    var deleteRequest = (from yr in db.YahooRequests where yr.Id == yahooRequest.Id select yr).FirstOrDefault();
-                    db.Remove(deleteRequest);
-                    db.SaveChanges();
-                    break;
-                }
-            }
-
-            return xml;
+        Task IYahooTokenStore.SaveAsync(string userKey, YahooTokens tokens)
+        {
+            AddYahooUserAuth(userKey, tokens.AccessToken, tokens.RefreshToken);
+            return Task.CompletedTask;
         }
 
         public string GetLeaguesXml(UserAuth userAuth, string yahooSeasonId)

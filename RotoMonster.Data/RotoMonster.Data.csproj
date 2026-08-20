@@ -19,6 +19,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\RotoMonster.Core\RotoMonster.Core.csproj" />
+		<ProjectReference Include="..\..\RotoMonsterExternalAPIs\RotoMonsterExternalAPIs.Client.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
