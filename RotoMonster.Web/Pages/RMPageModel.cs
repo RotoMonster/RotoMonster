@@ -144,7 +144,7 @@ namespace RotoMonster.Pages
                 var builderS = new DbContextOptionsBuilder<RMSharedDbContext>();
                 builderS.UseSqlServer(config.GetConnectionString("RotoMonsterSharedDb"));
                 var db2 = new RMSharedDbContext(builderS.Options);
-                return new RMSharedSqlData(db2, null, null);
+                return new RMSharedSqlData(db2, config, null);
             }
         }
 
