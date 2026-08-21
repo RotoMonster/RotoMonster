@@ -294,6 +294,124 @@ namespace RotoMonster.Data
             return Finish(result);
         }
 
+        // -------------------------------------------------------------------
+        // Roster refresh
+        // -------------------------------------------------------------------
+
+        /// <summary>
+        /// Refreshes rosters for every tracked league with this provider.
+        ///
+        /// The old path refreshed one league per call, so twenty leagues meant
+        /// twenty round trips to Yahoo. This asks for all of them at once.
+        /// </summary>
+        public async Task<RosterRefreshResult> RefreshRostersAsync(string userId, string providerName)
+        {
+            var result = new RosterRefreshResult { ProviderName = providerName };
+
+            var provider = GetProvider(providerName);
+            var fantasyProvider = _db.GetFantasyProvider(providerName);
+
+            if (provider == null || fantasyProvider == null)
+            {
+                result.ErrorMessage = providerName + " is not set up yet.";
+                return result;
+            }
+
+            var tracked = await _db.GetTrackedUserLeaguesAsync(userId).ConfigureAwait(false);
+
+            var leagues = tracked
+                .Where(l => l.FantasyProviderId == fantasyProvider.Id
+                            && !string.IsNullOrEmpty(l.ProviderLeagueId))
+                .ToList();
+
+            if (leagues.Count == 0)
+            {
+                result.Success = true;
+                return result;
+            }
+
+            var data = await provider.GetLeagueDataAsync(
+                userId,
+                SeasonKeyFor(providerName),
+                leagues.Select(l => l.ProviderLeagueId).ToList(),
+                ProviderLeagueDataParts.Rosters).ConfigureAwait(false);
+
+            result.RequestCount = data.RequestCount;
+
+            if (!data.Success)
+            {
+                result.ErrorMessage = data.ErrorMessage;
+                result.NeedsReauthorization = data.NeedsReauthorization;
+                return result;
+            }
+
+            var mapper = new ProviderImportMapper(
+                fantasyProvider,
+                _db.GetDefaultSeason(),
+                _db.GetCategories(),
+                _db.GetActiveRosterSpots(),
+                _db.GetFantasyProviderPlayers(fantasyProvider));
+
+            var byProviderId = new Dictionary<string, UserLeague>(StringComparer.OrdinalIgnoreCase);
+            foreach (var league in leagues)
+            {
+                if (!byProviderId.ContainsKey(league.ProviderLeagueId))
+                    byProviderId[league.ProviderLeagueId] = league;
+            }
+
+            foreach (var leagueData in data.Leagues)
+            {
+                UserLeague league;
+                if (!byProviderId.TryGetValue(leagueData.LeagueId ?? "", out league)) continue;
+
+                var entry = new RefreshedLeague
+                {
+                    LeagueId = leagueData.LeagueId,
+                    Title = league.DisplayTitle ?? league.Title
+                };
+
+                if (leagueData.HasError)
+                {
+                    entry.Message = leagueData.ErrorMessage;
+                    result.Leagues.Add(entry);
+                    continue;
+                }
+
+                try
+                {
+                    var mapping = mapper.MapRosters(leagueData);
+
+                    // No teams back is treated as a failure, not an empty
+                    // roster. Writing it through would wipe the league.
+                    if (!mapping.Success)
+                    {
+                        entry.Message = "No teams came back, so this league was left alone.";
+                        result.Leagues.Add(entry);
+                        continue;
+                    }
+
+                    _db.UpdateUserLeagueTeams(
+                        league.Id,
+                        mapping.Teams,
+                        mapping.MissingPlayers,
+                        _db.GetUserLeagueWaiverPlayers(league));
+
+                    entry.Refreshed = true;
+                    entry.MissingPlayerCount = mapping.MissingPlayers.Count;
+                }
+                catch (Exception ex)
+                {
+                    // One league failing should not stop the others.
+                    entry.Message = ex.Message;
+                }
+
+                result.Leagues.Add(entry);
+            }
+
+            result.Success = true;
+            return result;
+        }
+
         private static LeagueImportResult Finish(LeagueImportResult result)
         {
             result.Success = true;
@@ -347,6 +465,47 @@ namespace RotoMonster.Data
         {
             return (providerName ?? "").Replace("!", "").Trim().ToLowerInvariant();
         }
+    }
+
+    public class RosterRefreshResult
+    {
+        public bool Success { get; set; }
+
+        public string ProviderName { get; set; }
+
+        public string ErrorMessage { get; set; }
+
+        public bool NeedsReauthorization { get; set; }
+
+        /// <summary>
+        /// What the batching bought. One or two rather than one per league.
+        /// </summary>
+        public int RequestCount { get; set; }
+
+        public List<RefreshedLeague> Leagues { get; set; } = new List<RefreshedLeague>();
+
+        public int RefreshedCount
+        {
+            get { return Leagues.Count(l => l.Refreshed); }
+        }
+
+        public int FailedCount
+        {
+            get { return Leagues.Count(l => !l.Refreshed); }
+        }
+    }
+
+    public class RefreshedLeague
+    {
+        public string LeagueId { get; set; }
+
+        public string Title { get; set; }
+
+        public bool Refreshed { get; set; }
+
+        public string Message { get; set; }
+
+        public int MissingPlayerCount { get; set; }
     }
 
     public class LeagueListResult

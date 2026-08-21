@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RotoMonster.Core;
+using RotoMonster.Core.Libs;
 using RotoMonsterExternalAPIs.Client.Models.Providers;
 
 namespace RotoMonster.Data
@@ -158,7 +159,7 @@ namespace RotoMonster.Data
                 // so importing them would invent categories nobody plays.
                 if (category.IsDisplayOnly) continue;
 
-                var match = FindCategory(category.Code);
+                var match = FindCategory(category);
                 if (match == null)
                 {
                     var name = string.IsNullOrEmpty(category.Name) ? category.Code : category.Name;
@@ -178,6 +179,60 @@ namespace RotoMonster.Data
         // -------------------------------------------------------------------
         // Teams and rosters
         // -------------------------------------------------------------------
+
+        /// <summary>
+        /// Maps just the teams and rosters, for refreshing a league that is
+        /// already imported. Nothing else about the league is touched, so a
+        /// refresh cannot quietly change its settings.
+        /// </summary>
+        public ProviderRosterMapping MapRosters(ProviderLeagueData data)
+        {
+            var mapping = new ProviderRosterMapping { LeagueId = data.LeagueId };
+
+            if (data.Teams == null || data.Teams.Count == 0)
+            {
+                mapping.Warnings.Add("No teams were returned for this league.");
+                return mapping;
+            }
+
+            foreach (var providerTeam in data.Teams)
+            {
+                var team = new UserLeagueTeam
+                {
+                    ProviderId = providerTeam.TeamId,
+                    Title = providerTeam.Title,
+                    DraftOrder = providerTeam.DraftOrder,
+                    UserLeagueTeamPlayers = new List<UserLeagueTeamPlayer>()
+                };
+
+                if (providerTeam.IsMyTeam)
+                    mapping.MyProviderTeamId = providerTeam.TeamId;
+
+                foreach (var providerPlayer in providerTeam.Players)
+                {
+                    var playerId = FindPlayerId(providerPlayer.PlayerId);
+                    if (playerId == 0)
+                    {
+                        mapping.MissingPlayers.Add(new UserLeagueMissingPlayer
+                        {
+                            ProviderId = providerPlayer.PlayerId + "," + providerPlayer.Name
+                        });
+                        continue;
+                    }
+
+                    team.UserLeagueTeamPlayers.Add(new UserLeagueTeamPlayer
+                    {
+                        PlayerId = playerId,
+                        IsActive = providerPlayer.IsActive,
+                        IsIR = providerPlayer.IsIR
+                    });
+                }
+
+                mapping.Teams.Add(team);
+            }
+
+            return mapping;
+        }
 
         private void MapTeams(UserLeague league, List<ProviderTeam> teams, ProviderImportMapping mapping)
         {
@@ -282,21 +337,31 @@ namespace RotoMonster.Data
         /// Each provider has its own column on Category and ActiveRosterSpot,
         /// so which one to read depends on who we are importing from.
         /// </summary>
-        private Category FindCategory(string code)
+        private Category FindCategory(ProviderCategory category)
         {
+            var code = category.Code;
             if (string.IsNullOrEmpty(code)) return null;
 
             switch (ProviderKey())
             {
                 case "yahoo":
                     return _categories.FirstOrDefault(c => c.YahooId == code);
+
                 case "espn":
                     return _categories.FirstOrDefault(c => c.ESPNId == code);
+
+                case "fantrax":
+                    // Fantrax scopes its ids by group, so the same id can mean
+                    // different things depending on which group it came from.
+                    // Matching on the id alone can land on the wrong category,
+                    // which is why this goes through CategoryLib rather than a
+                    // straight comparison.
+                    var matches = new CategoryLib()
+                        .GetFanTraxCategories(_categories, category.GroupCode, code);
+                    return matches.FirstOrDefault();
+
                 default:
-                    // Fantrax has no id column on Category, so fall back to the
-                    // abbreviation, which is how its codes read anyway.
-                    return _categories.FirstOrDefault(c =>
-                        string.Equals(c.Abbreviation, code, StringComparison.OrdinalIgnoreCase));
+                    return null;
             }
         }
 
@@ -343,6 +408,35 @@ namespace RotoMonster.Data
         {
             var name = _provider.Name ?? "";
             return name.Replace("!", "").Trim().ToLowerInvariant();
+        }
+    }
+
+    /// <summary>
+    /// Teams and rosters for a league that already exists, from a refresh.
+    /// </summary>
+    public class ProviderRosterMapping
+    {
+        public string LeagueId { get; set; }
+
+        public List<UserLeagueTeam> Teams { get; set; } = new List<UserLeagueTeam>();
+
+        public List<UserLeagueMissingPlayer> MissingPlayers { get; set; } = new List<UserLeagueMissingPlayer>();
+
+        /// <summary>
+        /// Empty when the provider did not say which team is the user's, in
+        /// which case the caller should keep whatever it already had.
+        /// </summary>
+        public string MyProviderTeamId { get; set; }
+
+        public List<string> Warnings { get; set; } = new List<string>();
+
+        /// <summary>
+        /// A provider returning no teams is treated as a failure rather than
+        /// an empty roster, so a bad response cannot wipe a league's teams.
+        /// </summary>
+        public bool Success
+        {
+            get { return Teams.Count > 0; }
         }
     }
 

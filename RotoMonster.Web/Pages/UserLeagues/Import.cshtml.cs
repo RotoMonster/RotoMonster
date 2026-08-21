@@ -31,7 +31,7 @@ namespace RotoMonster.Pages.UserLeagues
         [BindProperty]
         public string ESPNPassword { get; set; }
         [BindProperty]
-        public string FanTraxEmail { get; set; }
+        public string FanTraxSecretId { get; set; }
         [BindProperty]
         public string FanTraxLeagueId { get; set; }
 
@@ -251,24 +251,6 @@ namespace RotoMonster.Pages.UserLeagues
             return Page();
         }
 
-        public async Task<IActionResult> OnGetUpdateRostersAsync(int id, string tab)
-        {
-            var userLeague = await db.GetUserLeagueAsync(UserId, id);
-
-            if (userLeague == null)
-            {
-                AddErrorMessage("That league could not be found.");
-            }
-            else
-            {
-                // Inherited from RMPageModel, same call the front page uses.
-                RefreshRosters(userLeague);
-                AddMessage("Refreshed rosters for " + userLeague.DisplayTitle + ".");
-            }
-
-            return RedirectToPage("./Import", new { tab });
-        }
-
         public async Task<IActionResult> OnPostToggleTrackAsync(int userLeagueId, string provider)
         {
             var leagues = await db.GetUserLeaguesAsync(UserId);
@@ -363,19 +345,29 @@ namespace RotoMonster.Pages.UserLeagues
 
         public IActionResult OnPostFanTrax()
         {
-            if (!string.IsNullOrEmpty(FanTraxEmail))
+            if (!string.IsNullOrEmpty(FanTraxSecretId))
             {
-                var email = FanTraxEmail.Trim();
+                var secretId = FanTraxSecretId.Trim();
                 var lib = new FanTraxLib(config, logger);
-                if (lib.IsEmailValid(email))
+
+                // Despite the name, this does not check email format. It calls
+                // Fantrax with the value and checks that leagues come back, so
+                // it works unchanged for a Secret ID.
+                if (lib.IsEmailValid(secretId))
                 {
-                    sharedDb.AddFanTraxUserAuth(userManager.GetUserId(User), email);
-                    AddMessage("You have successfully authorized with FanTrax.");
+                    // Still stored on UserAuth.FanTraxEmail. Renaming that
+                    // column needs a migration and touches shared data, so it
+                    // is left for its own change.
+                    sharedDb.AddFanTraxUserAuth(userManager.GetUserId(User), secretId);
+                    AddMessage("Connected to FanTrax.");
                     return RedirectToPage("./Import", new { tab = FanTraxProvider });
                 }
+
+                AddErrorMessage("FanTrax did not recognise that Secret ID.");
+                return RedirectToPage("./Import", new { tab = FanTraxProvider });
             }
 
-            AddErrorMessage("An error occurred authorizing FanTrax.");
+            AddErrorMessage("Enter your FanTrax Secret ID.");
             return RedirectToPage("./Import", new { tab = FanTraxProvider });
         }
 

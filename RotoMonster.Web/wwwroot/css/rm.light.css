@@ -2472,3 +2472,21 @@ td.value-badge-cell {
 .rm-import-name a:hover {
     text-decoration: underline;
 }
+
+/* rm-import-action-narrower */
+/* Three actions instead of four now that Rosters is gone. */
+.rm-import-action {
+    width: 11rem;
+}
+
+/* rm-import-action-narrower */
+/* Three actions instead of four now that Rosters is gone. */
+.rm-import-action {
+    width: 11rem;
+}
+
+/* rm-import-action-narrower */
+/* Three actions instead of four now that Rosters is gone. */
+.rm-import-action {
+    width: 11rem;
+}

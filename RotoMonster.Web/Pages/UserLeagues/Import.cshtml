@@ -204,9 +204,6 @@
                                                         asp-route-provider="@tab.ProviderName">
                                                     @(league.TrackLeague ? "Untrack" : "Track")
                                                 </button>
-                                                <a class="rm-import-linkbtn" asp-page-handler="UpdateRosters"
-                                                   asp-route-id="@league.UserLeagueId"
-                                                   asp-route-tab="@tab.ProviderName">Rosters</a>
                                                 <a class="rm-import-linkbtn" asp-page="./Edit"
                                                    asp-route-id="@league.UserLeagueId">Edit</a>
                                                 <button type="submit" class="rm-import-linkbtn rm-import-linkbtn--danger"

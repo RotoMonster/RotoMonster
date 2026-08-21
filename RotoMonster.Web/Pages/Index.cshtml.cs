@@ -388,10 +388,44 @@ namespace RotoMonster.Pages
 
         public async Task<IActionResult> OnGetUpdateAllRostersAsync()
         {
+            // Yahoo takes every league key in one request, so all of them come
+            // back together rather than one round trip each.
+            var yahooProvider = db.GetFantasyProvider("Yahoo!");
+            var handledByProvider = new HashSet<int>();
+
+            if (yahooProvider != null)
+            {
+                var importService = new RotoMonster.Data.LeagueImportService(db, sharedDb, config);
+                var refreshed = await importService.RefreshRostersAsync(UserId, "Yahoo!");
+
+                if (!refreshed.Success && !string.IsNullOrEmpty(refreshed.ErrorMessage))
+                {
+                    AddErrorMessage(refreshed.ErrorMessage);
+                }
+                else
+                {
+                    if (refreshed.RefreshedCount > 0)
+                    {
+                        AddMessage("Refreshed rosters for " + refreshed.RefreshedCount
+                                   + (refreshed.RefreshedCount == 1 ? " league." : " leagues."));
+                    }
+
+                    foreach (var failed in refreshed.Leagues.Where(l => !l.Refreshed))
+                        AddErrorMessage(failed.Title + ": " + failed.Message);
+                }
+
+                handledByProvider.Add(yahooProvider.Id);
+            }
+
+            // Everything else still goes one at a time, since those providers
+            // have no implementation behind the layer yet.
             foreach (var ul in SelectedUserLeagues)
             {
                 if (!ul.TrackLeague)
                     continue;
+                if (handledByProvider.Contains(ul.FantasyProviderId))
+                    continue;
+
                 UserLeague userLeague = await db.GetUserLeagueAsync(UserId, ul.Id);
                 RefreshRosters(userLeague);
             }
