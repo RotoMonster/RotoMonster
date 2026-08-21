@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +19,10 @@ namespace RotoMonster.Pages.UserLeagues
     [Authorize]
     public class ImportModel : RMPageModel
     {
+        public const string YahooProvider = "Yahoo!";
+        public const string ESPNProvider = "ESPN";
+        public const string FanTraxProvider = "FanTrax";
+
         [BindProperty]
         public string YahooCode { get; set; }
         [BindProperty]
@@ -35,19 +39,39 @@ namespace RotoMonster.Pages.UserLeagues
         [BindProperty]
         public string ESPNS2 { get; set; }
 
+        /// <summary>
+        /// Which leagues the user ticked. Bound from the checkboxes, so a
+        /// single import and a twenty league import are the same post.
+        /// </summary>
+        [BindProperty]
+        public List<string> SelectedLeagueIds { get; set; } = new List<string>();
+
         public UserAuth UserAuth { get; set; }
         public Sport Sport { get; set; }
+
         public bool IsYahooConnected { get; set; }
         public string YahooUrl { get; set; }
         public bool IsESPNConnected { get; set; }
         public bool IsFanTraxConnected { get; set; }
-        public UserLeagueTableModel YahooUserLeagueTableModel { get; set; }
-        public UserLeagueTableModel ESPNUserLeagueTableModel { get; set; }
-        public UserLeagueTableModel FanTraxUserLeagueTableModel { get; set; }
 
-        private YahooLib yahoo = null;
-        private FanTraxLib fanTrax = null;
-        private ESPNLib espn = null;
+        /// <summary>
+        /// Which tab is showing. Kept in the query string so a postback can
+        /// come back to the same one.
+        /// </summary>
+        public string ActiveTab { get; set; } = YahooProvider;
+
+        public List<ImportTab> Tabs { get; set; } = new List<ImportTab>();
+
+        /// <summary>
+        /// Filled after an import so the page can report what happened per
+        /// league rather than a single success or failure.
+        /// </summary>
+        public LeagueImportResult ImportResult { get; set; }
+
+        private readonly YahooLib yahoo;
+        private readonly FanTraxLib fanTrax;
+        private readonly ESPNLib espn;
+        private readonly LeagueImportService importService;
 
         public ImportModel(IRMData db, IRMSharedData sharedDb, IConfiguration config, UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor, ILogger<PageModel> logger)
             : base(config, db, sharedDb, userManager, contextAccessor, logger)
@@ -55,6 +79,8 @@ namespace RotoMonster.Pages.UserLeagues
             yahoo = new YahooLib(config, config["YahooClientId"], config["YahooClientSecret"], db.GetDefaultSeason().YahooId, logger);
             fanTrax = new FanTraxLib(config, logger);
             espn = new ESPNLib(config, logger);
+
+            importService = new LeagueImportService(db, sharedDb, config);
 
             UserAuth = sharedDb.GetUserAuth(UserId);
             Sport = db.Sport;
@@ -66,266 +92,369 @@ namespace RotoMonster.Pages.UserLeagues
             IsFanTraxConnected = fanTrax.IsConnected(UserAuth);
         }
 
-        public void OnGet()
+        // -------------------------------------------------------------------
+        // Page load
+        // -------------------------------------------------------------------
+
+        public async Task OnGetAsync(string tab = null)
         {
+            await BuildTabsAsync(tab);
         }
 
-        public IActionResult OnPostYahooDisconnect()
+        /// <summary>
+        /// Builds every tab, fetching leagues only for the providers that are
+        /// connected. That is one call per connected provider, which is what
+        /// lets the counts show without the user clicking into each one.
+        /// </summary>
+        private async Task BuildTabsAsync(string requestedTab)
         {
-            sharedDb.ClearYahooAuth(userManager.GetUserId(User));
+            Tabs.Clear();
 
-            return RedirectToPage("./Import");
+            Tabs.Add(await BuildTabAsync(YahooProvider, IsYahooConnected, true));
+
+            if (Sport.IsNBA || Sport.IsMLB || Sport.IsNFL)
+                Tabs.Add(await BuildTabAsync(ESPNProvider, IsESPNConnected, false));
+
+            Tabs.Add(await BuildTabAsync(FanTraxProvider, IsFanTraxConnected, false));
+
+            // Fall back to the first tab rather than showing nothing when the
+            // requested one does not exist.
+            var match = Tabs.FirstOrDefault(t =>
+                string.Equals(t.ProviderName, requestedTab, StringComparison.OrdinalIgnoreCase));
+
+            ActiveTab = match != null
+                ? match.ProviderName
+                : (Tabs.FirstOrDefault(t => t.IsConnected) ?? Tabs.First()).ProviderName;
         }
+
+        private async Task<ImportTab> BuildTabAsync(string providerName, bool isConnected, bool useBulkImport)
+        {
+            var tab = new ImportTab
+            {
+                ProviderName = providerName,
+                IsConnected = isConnected,
+                SupportsBulkImport = useBulkImport
+            };
+
+            if (!isConnected)
+                return tab;
+
+            if (useBulkImport)
+            {
+                var result = await importService.ListAsync(UserId, providerName);
+
+                tab.Leagues = result.Leagues;
+                tab.ErrorMessage = result.ErrorMessage;
+                tab.NeedsReauthorization = result.NeedsReauthorization;
+            }
+            else
+            {
+                // ESPN and FanTrax have no provider implementation yet, so they
+                // keep listing through their existing libs. Same table either
+                // way, only the import action differs.
+                tab.LegacyTable = BuildLegacyTable(providerName);
+            }
+
+            return tab;
+        }
+
+        private UserLeagueTableModel BuildLegacyTable(string providerName)
+        {
+            try
+            {
+                if (providerName == ESPNProvider)
+                {
+                    return new UserLeagueTableModel
+                    {
+                        ProviderUserLeagues = espn.GetLeagues(UserAuth.ESPNswid, db.Sport),
+                        CurrentUserLeagues = SelectedUserLeagues,
+                        FantasyProvider = db.GetFantasyProvider("espn"),
+                        ShowMyTeam = false
+                    };
+                }
+
+                if (providerName == FanTraxProvider)
+                {
+                    var json = fanTrax.GetLeaguesJson(UserAuth.FanTraxEmail);
+                    return new UserLeagueTableModel
+                    {
+                        ProviderUserLeagues = fanTrax.GetLeagues(json, db.Sport.Title),
+                        CurrentUserLeagues = SelectedUserLeagues,
+                        FantasyProvider = db.GetFantasyProvider("fantrax"),
+                        ShowMyTeam = true
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                // A provider being down should not take the whole page with it,
+                // since the other tabs are still usable.
+                AddErrorMessage("Could not read your " + providerName + " leagues [" + ex.Message + "]");
+            }
+
+            return null;
+        }
+
+        // -------------------------------------------------------------------
+        // Bulk import
+        // -------------------------------------------------------------------
+
+        public async Task<IActionResult> OnPostImportSelectedAsync(string provider)
+        {
+            if (SelectedLeagueIds == null || SelectedLeagueIds.Count == 0)
+            {
+                AddErrorMessage("Pick at least one league to import.");
+                await BuildTabsAsync(provider);
+                return Page();
+            }
+
+            ImportResult = await importService.ImportAsync(UserId, provider, SelectedLeagueIds);
+
+            if (!ImportResult.Success)
+            {
+                AddErrorMessage(ImportResult.ErrorMessage);
+            }
+            else
+            {
+                if (ImportResult.ImportedCount > 0)
+                {
+                    AddMessage("Imported " + ImportResult.ImportedCount
+                               + (ImportResult.ImportedCount == 1 ? " league." : " leagues."));
+                }
+
+                if (ImportResult.FailedCount > 0)
+                    AddErrorMessage(ImportResult.FailedCount + " could not be imported. See below.");
+            }
+
+            // Rebuilt rather than redirected, so the per league results stay on
+            // screen instead of being lost to a fresh GET.
+            await BuildTabsAsync(provider);
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostRemoveLeagueAsync(int userLeagueId, string provider)
+        {
+            if (userLeagueId > 0)
+            {
+                var leagues = await db.GetUserLeaguesAsync(UserId);
+                var owned = leagues.FirstOrDefault(l => l.Id == userLeagueId);
+
+                // Checked against the signed in user's own leagues, so an id
+                // from somewhere else cannot delete someone else's league.
+                if (owned == null)
+                {
+                    AddErrorMessage("That league could not be found.");
+                }
+                else
+                {
+                    await db.DeleteUserLeagueAsync(userLeagueId);
+                    await db.CommitAsync();
+                    AddMessage("Removed " + owned.Title + ".");
+                }
+            }
+
+            return RedirectToPage("./Import", new { tab = provider });
+        }
+
+        // -------------------------------------------------------------------
+        // Connecting
+        // -------------------------------------------------------------------
 
         public IActionResult OnPostYahoo()
         {
-            if (YahooCode != null && YahooCode.Length > 0)
+            if (!string.IsNullOrEmpty(YahooCode))
             {
                 string outAccessToken = "";
                 string outRefreshToken = "";
                 if (yahoo.GetAccessToken(YahooCode, ref outAccessToken, ref outRefreshToken))
                 {
-                    var newAuth = sharedDb.AddYahooUserAuth(userManager.GetUserId(User), outAccessToken, outRefreshToken);
+                    sharedDb.AddYahooUserAuth(userManager.GetUserId(User), outAccessToken, outRefreshToken);
                     AddMessage("You have successfully authorized with Yahoo!");
-                    return RedirectToPage("./Import");
+                    return RedirectToPage("./Import", new { tab = YahooProvider });
                 }
             }
 
             AddErrorMessage("An error occurred authorizing Yahoo!");
-            return RedirectToPage("./Import");
+            return RedirectToPage("./Import", new { tab = YahooProvider });
         }
 
-        public async Task<IActionResult> OnPostCustomLeagueAsync()
+        public IActionResult OnPostYahooDisconnect()
         {
-            //var providerPlayers = db.GetFantasyProviderPlayers(db.GetFantasyProvider("yahoo"));
-            //if (UserAuth.MustRefreshYahoo)
-            //{
-            //    string outAccessToken = "";
-            //    string outRefreshToken = "";
-            //    if (yahoo.RefreshAccessToken(UserAuth.YahooRefreshToken, ref outAccessToken, ref outRefreshToken))
-            //    {
-            //        UserAuth = sharedDb.AddYahooUserAuth(UserAuth.UserId, outAccessToken, outRefreshToken);
-            //    }
-            //}
-            //league = sharedDb.ImportUserLeague(UserAuth, db.GetDefaultSeason(), id, db.GetActiveRosterSpots(), db.GetCategories(), logger);
-            //try
-            //{
-            //    var missingPlayers = new List<UserLeagueMissingPlayer>();
-            //    league.UserLeagueTeams = sharedDb.GetUserLeagueTeams(UserAuth, db.GetDefaultSeason().YahooId, league, providerPlayers, missingPlayers, logger);
-            //}
-            //catch
-            //{
-            //}
-
-            var newUserLeague = await db.GetNewCustomUserLeagueAsync();
-            newUserLeague.UserId = UserId;
-            if (newUserLeague != null)
-                await db.AddUserLeagueAsync(newUserLeague);
-            //Draft draft = sharedDb.ImportDraft(UserAuth, league, providerPlayers, db.GetDefaultSeason().YahooId, logger);
-            //db.AddDraft(draft);
-            //AddMessage("You have imported the Yahoo! league " + league.Title);
-
-            return RedirectToPage("./Index");
-        }
-
-        public IActionResult OnGetYahooList()
-        {
-            if (IsYahooConnected)
-            {
-                try
-                {
-                    if (UserAuth.MustRefreshYahoo)
-                    {
-                        string outAccessToken = "";
-                        string outRefreshToken = "";
-                        if (yahoo.RefreshAccessToken(UserAuth.YahooRefreshToken, ref outAccessToken, ref outRefreshToken))
-                        {
-                            sharedDb.AddYahooUserAuth(UserAuth.UserId, outAccessToken, outRefreshToken);
-                        }
-                    }
-                    YahooUserLeagueTableModel = new UserLeagueTableModel();
-                    string xml = sharedDb.GetLeaguesXml(UserAuth, db.GetDefaultSeason().YahooId);
-                    YahooUserLeagueTableModel.ProviderUserLeagues = sharedDb.GetLeagues(xml);
-                    YahooUserLeagueTableModel.CurrentUserLeagues = SelectedUserLeagues;
-                    YahooUserLeagueTableModel.FantasyProvider = db.GetFantasyProvider("yahoo");
-                    YahooUserLeagueTableModel.ShowMyTeam = false;
-                }
-                catch (Exception ex)
-                {
-                    AddErrorMessage("An error occurred reading your Yahoo! leagues [" + ex.Message + "]");
-                }
-            }
-
-            return Page();
-        }
-
-        public IActionResult OnGetESPNList()
-        {
-            if (IsESPNConnected)
-            {
-                try
-                {
-                    ESPNUserLeagueTableModel = new UserLeagueTableModel();
-                    ESPNUserLeagueTableModel.ProviderUserLeagues = espn.GetLeagues(UserAuth.ESPNswid, db.Sport);
-                    ESPNUserLeagueTableModel.CurrentUserLeagues = SelectedUserLeagues;
-                    ESPNUserLeagueTableModel.FantasyProvider = db.GetFantasyProvider("espn");
-                    ESPNUserLeagueTableModel.ShowMyTeam = false;
-                }
-                catch (Exception ex)
-                {
-                    AddErrorMessage("An error occurred reading your ESPN leagues [" + ex.Message + "]");
-                }
-            }
-
-            return Page();
+            sharedDb.ClearYahooAuth(userManager.GetUserId(User));
+            return RedirectToPage("./Import", new { tab = YahooProvider });
         }
 
         public IActionResult OnPostESPN()
         {
-            if (ESPNSWID != null && ESPNS2 != null && ESPNSWID.Length > 0)
+            if (!string.IsNullOrEmpty(ESPNSWID) && ESPNS2 != null)
             {
-                var newAuth = sharedDb.AddESPNUserAuth(userManager.GetUserId(User), ESPNSWID.Trim(), ESPNS2.Trim());
-
+                sharedDb.AddESPNUserAuth(userManager.GetUserId(User), ESPNSWID.Trim(), ESPNS2.Trim());
                 AddMessage("You have successfully authorized with ESPN.");
-                return RedirectToPage("./Import");
+                return RedirectToPage("./Import", new { tab = ESPNProvider });
             }
 
-            //if (ESPNSWID != null && ESPNS2 != null && ESPNSWID.Length > 0)
-            //{
-            //    ESPNLib espn = new ESPNLib();
-            //    string swid = "";
-            //    string s2 = "";
-            //    if (espn.LoginESPN(ESPNSWID, ESPNSWID, ref swid, ref s2))
-            //    {
-            //        var newAuth = sharedDb.AddESPNUserAuth(userManager.GetUserId(User), swid, s2);
-
-            //        AddMessage("You have successfully authorized with ESPN.");
-            //        return RedirectToPage("./Import");
-            //    }
-            //}
-
             AddErrorMessage("An error occurred authorizing ESPN.");
-            return RedirectToPage("./Import");
+            return RedirectToPage("./Import", new { tab = ESPNProvider });
         }
 
         public IActionResult OnPostESPNDisconnect()
         {
             sharedDb.ClearESPNAuth(userManager.GetUserId(User));
-            return RedirectToPage("./Import");
+            return RedirectToPage("./Import", new { tab = ESPNProvider });
         }
 
         public IActionResult OnPostFanTrax()
         {
-            if (FanTraxEmail != null && FanTraxEmail.Length > 0)
+            if (!string.IsNullOrEmpty(FanTraxEmail))
             {
-                string email = FanTraxEmail.Trim();
-                FanTraxLib lib = new FanTraxLib(config, logger);
+                var email = FanTraxEmail.Trim();
+                var lib = new FanTraxLib(config, logger);
                 if (lib.IsEmailValid(email))
                 {
-                    sharedDb.AddFanTraxUserAuth(userManager.GetUserId(User), FanTraxEmail.Trim());
+                    sharedDb.AddFanTraxUserAuth(userManager.GetUserId(User), email);
                     AddMessage("You have successfully authorized with FanTrax.");
-                    return RedirectToPage("./Import");
+                    return RedirectToPage("./Import", new { tab = FanTraxProvider });
                 }
             }
 
             AddErrorMessage("An error occurred authorizing FanTrax.");
-            return RedirectToPage("./Import");
+            return RedirectToPage("./Import", new { tab = FanTraxProvider });
         }
 
         public IActionResult OnPostFanTraxDisconnect()
         {
             sharedDb.ClearFanTraxAuth(userManager.GetUserId(User));
-            return Page();
+            return RedirectToPage("./Import", new { tab = FanTraxProvider });
         }
 
-        public IActionResult OnGetFanTraxList()
-        {
-            if (IsFanTraxConnected)
-            {
-                FanTraxUserLeagueTableModel = new UserLeagueTableModel();
-                string json = fanTrax.GetLeaguesJson(UserAuth.FanTraxEmail);
-                FanTraxUserLeagueTableModel.ProviderUserLeagues = fanTrax.GetLeagues(json, db.Sport.Title);
-                FanTraxUserLeagueTableModel.CurrentUserLeagues = SelectedUserLeagues;
-                FanTraxUserLeagueTableModel.FantasyProvider = db.GetFantasyProvider("fantrax");
-                FanTraxUserLeagueTableModel.ShowMyTeam = true;
-            }
-
-            return Page();
-        }
+        // -------------------------------------------------------------------
+        // Legacy single import, still used by ESPN and FanTrax
+        // -------------------------------------------------------------------
 
         public async Task<IActionResult> OnPostImportFanTraxAsync()
         {
-            return await OnGetImportLeagueAsync(FanTraxLeagueId, "FanTrax");
+            return await OnGetImportLeagueAsync(FanTraxLeagueId, FanTraxProvider);
         }
 
         public async Task<IActionResult> OnGetImportLeagueAsync(string id, string provider)
         {
             UserLeague league = null;
 
-            if (provider == "Yahoo!")
+            if (provider == YahooProvider)
             {
-                var providerPlayers = db.GetFantasyProviderPlayers(db.GetFantasyProvider("yahoo"));
-                if (UserAuth.MustRefreshYahoo)
-                {
-                    string outAccessToken = "";
-                    string outRefreshToken = "";
-                    if (yahoo.RefreshAccessToken(UserAuth.YahooRefreshToken, ref outAccessToken, ref outRefreshToken))
-                    {
-                        UserAuth = sharedDb.AddYahooUserAuth(UserAuth.UserId, outAccessToken, outRefreshToken);
-                    }
-                }
-                league = sharedDb.ImportUserLeague(UserAuth, db.GetDefaultSeason(), id, db.GetActiveRosterSpots(), db.GetCategories(), logger);
-                try
-                {
-                    var missingPlayers = new List<UserLeagueMissingPlayer>();
-                    league.UserLeagueTeams = sharedDb.GetUserLeagueTeams(UserAuth, db.GetDefaultSeason().YahooId, league, providerPlayers, missingPlayers, logger);
-                }
-                catch
-                {
-                }
-                await db.AddUserLeagueAsync(league);
-                Draft draft = sharedDb.ImportDraft(UserAuth, league, providerPlayers, db.GetDefaultSeason().YahooId, logger);
-                await db.AddDraftAsync(draft);
-                AddMessage("You have imported the Yahoo! league " + league.Title);
+                // Yahoo goes through the import service now, which handles one
+                // league and twenty the same way.
+                var result = await importService.ImportAsync(UserId, YahooProvider, new List<string> { id });
+
+                if (result.ImportedCount > 0)
+                    AddMessage("Imported the Yahoo! league.");
+                else
+                    AddErrorMessage(result.ErrorMessage ?? "That league could not be imported.");
+
+                return RedirectToPage("./Import", new { tab = YahooProvider });
             }
 
-            else if (provider == "FanTrax")
+            if (provider == FanTraxProvider)
             {
                 var providerPlayers = db.GetFantasyProviderPlayers(db.GetFantasyProvider("fantrax"));
                 league = fanTrax.ImportUserLeague(UserAuth, db.GetDefaultSeason(), id, "", db.GetActiveRosterSpots(), db.GetCategories());
                 var missingPlayers = new List<UserLeagueMissingPlayer>();
                 league.UserLeagueTeams = fanTrax.GetUserLeagueTeams(UserAuth, db.Sport.Title, league, providerPlayers, missingPlayers);
-                if (UserAuth.FanTraxEmail.Length>0)
+
+                if (UserAuth.FanTraxEmail.Length > 0)
                 {
                     var allLeaguesJson = fanTrax.GetLeaguesJson(UserAuth.FanTraxEmail);
                     var allLeagues = fanTrax.GetLeagues(allLeaguesJson, db.Sport.Title);
-                    var matchLeague = (from l in allLeagues where l.ProviderLeagueId==league.ProviderLeagueId select l).FirstOrDefault();
-                    if (matchLeague!=null)
-                        league.MyProviderTeamId=matchLeague.MyProviderTeamId;
+                    var matchLeague = allLeagues.FirstOrDefault(l => l.ProviderLeagueId == league.ProviderLeagueId);
+                    if (matchLeague != null)
+                        league.MyProviderTeamId = matchLeague.MyProviderTeamId;
                 }
-                if (league.MyProviderTeamId.Length==0 && league.UserLeagueTeams.Count > 0)
+
+                if (league.MyProviderTeamId.Length == 0 && league.UserLeagueTeams.Count > 0)
                     league.MyProviderTeamId = league.UserLeagueTeams.First().ProviderId;
 
                 await db.AddUserLeagueAsync(league);
-                Draft draft = fanTrax.ImportDraft(UserAuth, league, providerPlayers);
+                var draft = fanTrax.ImportDraft(UserAuth, league, providerPlayers);
                 await db.AddDraftAsync(draft);
                 AddMessage("You have imported the FanTrax league " + league.Title + ". Make sure to edit the league to set your team.");
             }
-
-            else if (provider == "ESPN")
+            else if (provider == ESPNProvider)
             {
                 var providerPlayers = db.GetFantasyProviderPlayers(db.GetFantasyProvider("espn"));
                 league = espn.ImportUserLeague(db.Sport, UserAuth, db.GetDefaultSeason(), id, db.GetActiveRosterSpots(), db.GetCategories());
                 var missingPlayers = new List<UserLeagueMissingPlayer>();
                 league.UserLeagueTeams = espn.GetUserLeagueTeams(UserAuth, db.Sport, db.GetDefaultSeason(), league, providerPlayers, db.GetPlayers(), missingPlayers);
                 await db.AddUserLeagueAsync(league);
-                // Draft draft = fanTrax.ImportDraft(UserAuth, league, providerPlayers);
-                // db.AddDraft(draft);
                 AddMessage("You have imported the ESPN league " + league.Title);
             }
 
-            return RedirectToPage("./Index", provider.Replace("!", "") + "List");
+            return RedirectToPage("./Import", new { tab = provider });
         }
 
+        // -------------------------------------------------------------------
+        // Custom league
+        // -------------------------------------------------------------------
+
+        public async Task<IActionResult> OnPostCustomLeagueAsync()
+        {
+            var newUserLeague = await db.GetNewCustomUserLeagueAsync();
+            if (newUserLeague != null)
+            {
+                newUserLeague.UserId = UserId;
+                await db.AddUserLeagueAsync(newUserLeague);
+            }
+
+            return RedirectToPage("./Index");
+        }
+    }
+
+    /// <summary>
+    /// One provider's tab. Holds either the new listing or the legacy table,
+    /// never both, depending on whether that provider has been moved over to
+    /// the provider layer yet.
+    /// </summary>
+    public class ImportTab
+    {
+        public string ProviderName { get; set; }
+
+        public bool IsConnected { get; set; }
+
+        /// <summary>
+        /// True once the provider has an IFantasyProvider implementation, which
+        /// is what enables checkboxes and one button for the lot.
+        /// </summary>
+        public bool SupportsBulkImport { get; set; }
+
+        public List<ListedLeague> Leagues { get; set; } = new List<ListedLeague>();
+
+        public UserLeagueTableModel LegacyTable { get; set; }
+
+        public string ErrorMessage { get; set; }
+
+        public bool NeedsReauthorization { get; set; }
+
+        public int TotalCount
+        {
+            get
+            {
+                if (SupportsBulkImport) return Leagues.Count;
+                return LegacyTable == null || LegacyTable.ProviderUserLeagues == null
+                    ? 0
+                    : LegacyTable.ProviderUserLeagues.Count;
+            }
+        }
+
+        public int ImportedCount
+        {
+            get { return SupportsBulkImport ? Leagues.Count(l => l.IsImported) : 0; }
+        }
+
+        /// <summary>
+        /// Anchor-safe id for the tab button and panel.
+        /// </summary>
+        public string Slug
+        {
+            get { return (ProviderName ?? "").Replace("!", "").Replace(" ", "").ToLowerInvariant(); }
+        }
     }
 }

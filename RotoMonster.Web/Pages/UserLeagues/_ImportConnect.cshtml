@@ -1,0 +1,67 @@
+@model string
+
+@*
+    The connect panel for one provider. Split out of Import.cshtml because the
+    three are genuinely different - Yahoo hands back a code, ESPN needs two
+    cookie values, FanTrax needs a Secret ID - and inlining all three made the
+    page hard to follow.
+*@
+
+<div class="rm-import-connect-title">@Model is not connected</div>
+
+@if (Model == RotoMonster.Pages.UserLeagues.ImportModel.YahooProvider)
+{
+    <form method="post">
+        <div class="rm-import-connect-row">
+            <a class="modern-filter-btn modern-filter-btn-secondary"
+               href="@((ViewData["YahooUrl"] ?? "").ToString())" target="_blank">Get your code</a>
+            <input name="YahooCode" placeholder="Paste your Yahoo! code" class="rm-import-input" />
+            <button class="modern-filter-btn modern-filter-btn-primary" asp-page-handler="Yahoo">Connect</button>
+        </div>
+    </form>
+    <div class="rm-import-help">
+        Yahoo will show you a code after you allow access. Paste it above.
+    </div>
+}
+else if (Model == RotoMonster.Pages.UserLeagues.ImportModel.ESPNProvider)
+{
+    <form method="post">
+        <div class="rm-import-connect-row">
+            <input name="ESPNSWID" placeholder="SWID" class="rm-import-input" />
+            <input name="ESPNS2" placeholder="espn_s2" class="rm-import-input" />
+            <button class="modern-filter-btn modern-filter-btn-primary" asp-page-handler="ESPN">Connect</button>
+        </div>
+    </form>
+
+    <div class="rm-import-help">
+        <h6>Chrome, Edge and Brave</h6>
+        <ol>
+            <li>Make sure you are logged in to ESPN.</li>
+            <li>Open the menu from the three dots, then Settings.</li>
+            <li>Search settings for "Cookies", then open Cookies and other site data.</li>
+            <li>Click See all cookies and site data, then search for ESPN.</li>
+            <li>Copy the SWID and espn_s2 values into the boxes above.</li>
+        </ol>
+        <h6>Firefox</h6>
+        <ol>
+            <li>Make sure you are logged in to ESPN.</li>
+            <li>Press F12, then open the Storage tab.</li>
+            <li>Under Cookies, select https://www.espn.com.</li>
+            <li>Copy the SWID and espn_s2 values into the boxes above.</li>
+        </ol>
+    </div>
+}
+else
+{
+    <form method="post">
+        <div class="rm-import-connect-row">
+            <a class="modern-filter-btn modern-filter-btn-secondary"
+               href="https://www.fantrax.com/newui/userProfile.go" target="_blank">Open your profile</a>
+            <input name="FanTraxEmail" placeholder="Paste your Secret ID" class="rm-import-input" />
+            <button class="modern-filter-btn modern-filter-btn-primary" asp-page-handler="FanTrax">Connect</button>
+        </div>
+    </form>
+    <div class="rm-import-help">
+        Your Secret ID is on your FanTrax profile page, under your username.
+    </div>
+}

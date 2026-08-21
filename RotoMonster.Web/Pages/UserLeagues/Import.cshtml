@@ -1,167 +1,308 @@
-﻿@page
+@page
 @model RotoMonster.Pages.UserLeagues.ImportModel
 @{
     ViewData["Title"] = "Import";
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
+@*
+    Tabs per provider, each showing how many leagues are available and how many
+    are already imported, so nothing has to be clicked to see where things
+    stand.
+
+    Yahoo lists through the provider layer and imports in bulk. ESPN and
+    FanTrax have no provider implementation yet, so they keep their existing
+    per league Import link inside the same tab.
+*@
+
 <h1>Add Leagues</h1>
 
-<div class="card">
-    <div class="card-body">
-        @if (Model.IsYahooConnected)
-        {
-            <h5 class="card-title text-success fw-bold">Yahoo! Connected</h5>
-
-            <form method="post">
-                <a class="btn btn-primary" asp-page-handler="YahooList">List Your Leagues</a>
-                <button type="submit" class="btn btn-link" asp-page-handler="YahooDisconnect">Disconnect Yahoo!</button>
-            </form>
-
-            if (Model.YahooUserLeagueTableModel != null)
+<div class="rm-import-tabs">
+    @foreach (var tab in Model.Tabs)
+    {
+        var isActive = tab.ProviderName == Model.ActiveTab;
+        <a class="rm-import-tab @(isActive ? "rm-import-tab--active" : "")"
+           asp-page="./Import" asp-route-tab="@tab.ProviderName">
+            <span class="rm-import-tab-name">@tab.ProviderName</span>
+            @if (!tab.IsConnected)
             {
-                <partial name="_UserLeagueTable" model="Model.YahooUserLeagueTableModel" />
+                <span class="rm-import-tab-count rm-import-tab-count--off">Not connected</span>
             }
+            else if (tab.SupportsBulkImport)
+            {
+                <span class="rm-import-tab-count">@tab.ImportedCount of @tab.TotalCount imported</span>
+            }
+            else
+            {
+                <span class="rm-import-tab-count">@tab.TotalCount @(tab.TotalCount == 1 ? "league" : "leagues")</span>
+            }
+        </a>
+    }
+</div>
+
+@foreach (var tab in Model.Tabs.Where(t => t.ProviderName == Model.ActiveTab))
+{
+    <div class="rm-import-panel">
+
+        @if (!tab.IsConnected)
+        {
+            @* The Yahoo panel needs the authorization url, and a partial taking
+               just the provider name cannot reach the page model. *@
+            ViewData["YahooUrl"] = Model.YahooUrl;
+            <partial name="_ImportConnect" model="tab.ProviderName" />
         }
         else
         {
-            <h5 class="card-title text-danger fw-bold">Yahoo! Not Connected</h5>
-            <div class="row ms-4 mt-2">
+            <div class="rm-import-connection">
+                <span class="rm-import-connection-status">
+                    <span class="rm-import-dot"></span>@tab.ProviderName connected
+                </span>
                 <form method="post">
-                    <div class="col-auto p-2">
-                        <a href="@Model.YahooUrl" target="_blank">Get Yahoo! Authorization Code</a>
-                    </div>
-                    <div class="col-auto p-2">
-                        <input asp-for="YahooCode" placeholder="Enter Yahoo! Code" class="form-control" />
-                    </div>
-                    <div class="col-auto p-2">
-                        <button class="btn btn-sm btn-secondary" asp-page-handler="Yahoo">Submit</button>
-                    </div>
+                    <button type="submit" class="rm-import-linkbtn"
+                            asp-page-handler="@(tab.Slug == "espn" ? "ESPNDisconnect" : tab.Slug == "fantrax" ? "FanTraxDisconnect" : "YahooDisconnect")">
+                        Disconnect
+                    </button>
                 </form>
             </div>
-        }
-    </div>
-</div>
 
-@if (Model.Sport.IsNBA || Model.Sport.IsMLB || Model.Sport.IsNFL)
-{
-    <div class="card mt-3">
-        <div class="card-body">
-            @if (Model.IsESPNConnected)
+            @if (!string.IsNullOrEmpty(tab.ErrorMessage))
             {
-                <h5 class="card-title text-success fw-bold">ESPN Connected</h5>
-                <form method="post">
-                    <a class="btn btn-primary" asp-page-handler="ESPNList">List Your Leagues</a>
-                    <button type="submit" class="btn btn-link" asp-page-handler="ESPNDisconnect">Disconnect ESPN</button>
-                </form>
+                <div class="rm-import-error">
+                    @tab.ErrorMessage
+                    @if (tab.NeedsReauthorization)
+                    {
+                        <div>You will need to connect @tab.ProviderName again.</div>
+                    }
+                </div>
+            }
 
-                @if (Model.ESPNUserLeagueTableModel != null)
+            @if (tab.SupportsBulkImport)
+            {
+                @if (tab.Leagues.Count == 0 && string.IsNullOrEmpty(tab.ErrorMessage))
                 {
-                    <partial name="_UserLeagueTable" model="Model.ESPNUserLeagueTableModel" />
+                    <p class="rm-import-empty">No @tab.ProviderName leagues found for this season.</p>
+                }
+                else if (tab.Leagues.Count > 0)
+                {
+                    var selectable = tab.Leagues.Count(l => !l.IsImported);
+
+                    <form method="post">
+                        <input type="hidden" name="provider" value="@tab.ProviderName" />
+
+                        @if (selectable > 0)
+                        {
+                            <p class="rm-import-lead">
+                                Tick the leagues you want, then choose <b>Import selected</b>.
+                                You can import them all at once.
+                            </p>
+                        }
+                        else
+                        {
+                            <p class="rm-import-lead">
+                                All of your @tab.ProviderName leagues are imported.
+                            </p>
+                        }
+
+                        <table class="rm-import-table">
+                            <thead>
+                                <tr>
+                                    <th class="rm-import-check"></th>
+                                    <th>League</th>
+                                    <th>Your team</th>
+                                    <th class="rm-import-status">Status</th>
+                                    <th class="rm-import-action"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var league in tab.Leagues)
+                                {
+                                    <tr class="@(league.IsImported ? "rm-import-row--done" : "rm-import-row--pick")">
+                                        <td class="rm-import-check">
+                                            @if (!league.IsImported)
+                                            {
+                                                <label class="bm-checkbox">
+                                                    <input type="checkbox" name="SelectedLeagueIds"
+                                                           value="@league.LeagueId"
+                                                           aria-label="Import @league.Title" />
+                                                </label>
+                                            }
+                                        </td>
+                                        <td class="rm-import-name">@league.Title</td>
+                                        <td class="rm-import-team">
+                                            @if (string.IsNullOrEmpty(league.MyTeamTitle))
+                                            {
+                                                <span class="rm-import-muted">&mdash;</span>
+                                            }
+                                            else
+                                            {
+                                                @league.MyTeamTitle
+                                            }
+                                        </td>
+                                        <td class="rm-import-status">
+                                            @if (league.IsImported)
+                                            {
+                                                <span class="rm-import-pill rm-import-pill--done">Imported</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="rm-import-pill">Available</span>
+                                            }
+                                        </td>
+                                        <td class="rm-import-action">
+                                            @if (league.IsImported)
+                                            {
+                                                <button type="submit" class="rm-import-linkbtn rm-import-linkbtn--danger"
+                                                        asp-page-handler="RemoveLeague"
+                                                        asp-route-userLeagueId="@league.UserLeagueId"
+                                                        asp-route-provider="@tab.ProviderName">
+                                                    Remove
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        @if (selectable > 0)
+                        {
+                            <div class="rm-import-actions">
+                                <button type="submit" class="modern-filter-btn modern-filter-btn-primary"
+                                        asp-page-handler="ImportSelected"
+                                        asp-route-provider="@tab.ProviderName">
+                                    Import selected
+                                </button>
+                                <button type="button" class="rm-import-linkbtn rm-import-selectall">
+                                    Select all
+                                </button>
+                                <span class="rm-import-hint">
+                                    @selectable @(selectable == 1 ? "league" : "leagues") available to import
+                                </span>
+                            </div>
+                        }
+                    </form>
                 }
             }
             else
             {
-                <h5 class="card-title text-danger fw-bold">ESPN Not Connected</h5>
-                <div class="row ms-4 mt-2">
-                    <form method="post">
-                        <div class="row ms-4 mt-2">
-                            <div class="col-auto p-2">
-                                <input asp-for="ESPNSWID" placeholder="ESPN SWID" class="form-control" />
-                            </div>
-                            <div class="col-auto p-2">
-                                <input asp-for="ESPNS2" placeholder="ESPN S2" class="form-control" />
-                            </div>
-                            <div class="col-auto p-2">
-                                <button class="btn btn-sm btn-secondary" asp-page-handler="ESPN">Submit</button>
-                            </div>
+                @if (tab.LegacyTable != null)
+                {
+                    <partial name="_UserLeagueTable" model="tab.LegacyTable" />
+                }
+
+                @if (tab.ProviderName == RotoMonster.Pages.UserLeagues.ImportModel.FanTraxProvider)
+                {
+                    <form method="post" class="rm-import-manual">
+                        <h6>Import using a FanTrax league ID</h6>
+                        <p>
+                            Your league ID is in the URL of any league page. In
+                            https://www.fantrax.com/fantasy/league/<b>t0xqjo74kpm0ki7k</b>/home
+                            the ID is <b>t0xqjo74kpm0ki7k</b>.
+                        </p>
+                        <div class="rm-import-manual-row">
+                            <input asp-for="FanTraxLeagueId" placeholder="FanTrax League ID" class="rm-import-input" />
+                            <button class="modern-filter-btn modern-filter-btn-secondary" asp-page-handler="ImportFanTrax">Import</button>
                         </div>
                     </form>
-                </div>
-
-                <h3>How to find the SWID and S2 values</h3>
-                <h5>Chrome (Edge and Brave similar):</h5>
-                <ul>
-                    <li>Make sure you're logged into ESPN.</li>
-                    <li>Click three dots in upper-right to open the menu and click Settings.</li>
-                    <li>In the "Search Settings" prompt, search for "Cookies".</li>
-                    <li>Click "Cookies and other site data".</li>
-                    <li>Click "See all cookies and site data".</li>
-                    <li>In the "Search Cookies" prompt, search "ESPN".</li>
-                    <li>Open ESPN.com, and copy SWID Content to SWID below and espn_s2 Content to ESPN S2.</li>
-                </ul>
-                <h5>Firefox:</h5>
-                <ul>
-                    <li>Make sure you're logged into ESPN.</li>
-                    <li>Press F12 to enter Developer Mode.</li>
-                    <li>Click the Storage tab.</li>
-                    <li>Under the Cookies folder, select https://www.espn.com".</li>
-                    <li>SWID Value to SWID below and espn_s2 Value to ESPN S2.</li>
-                </ul>
+                }
             }
-        </div>
+        }
     </div>
 }
 
-<div class="card mt-3">
-    <div class="card-body">
-
-        @if (Model.IsFanTraxConnected)
-        {
-            <h5 class="card-title text-success fw-bold">FanTrax Connected</h5>
-            <form method="post">
-                <a class="btn btn-primary" asp-page-handler="FanTraxList">List Your Leagues</a>
-                <button type="submit" class="btn btn-link" asp-page-handler="FanTraxDisconnect">Disconnect FanTrax</button>
-            </form>
-
-            @if (Model.FanTraxUserLeagueTableModel != null)
-            {
-                <partial name="_UserLeagueTable" model="Model.FanTraxUserLeagueTableModel" />
-            }
-        }
-        else
-        {
-            <h5 class="card-title text-danger fw-bold">FanTrax Not Connected</h5>
-            <div class="p-2">You can find your Secret ID under your <a target="_blank" href='https://www.fantrax.com/newui/userProfile.go'>FanTrax profile</a></div>
-            <div class="row ms-4 mt-2">
-                <form method="post">
-                    <div class="row ms-4 mt-2">
-                        <div class="col-auto p-2">
-                            <input asp-for="FanTraxEmail" placeholder="FanTrax Secret ID" class="form-control" />
-                        </div>
-                        <div class="col-auto p-2">
-                            <button class="btn btn-sm btn-secondary" asp-page-handler="FanTrax">Submit</button>
-                        </div>
-                    </div>
-                </form>
-
-            </div>
-        }
+@*
+    Per league results after an import. Shown rather than folded into one
+    message so a league that failed says why, next to the ones that worked.
+*@
+@if (Model.ImportResult != null && Model.ImportResult.Leagues.Count > 0)
+{
+    <div class="rm-import-panel rm-import-panel--results">
+        <h5>Import results</h5>
+        <table class="rm-import-table">
+            <thead>
+                <tr>
+                    <th>League</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in Model.ImportResult.Leagues)
+                {
+                    <tr>
+                        <td class="rm-import-name">@(string.IsNullOrEmpty(entry.Title) ? entry.LeagueId : entry.Title)</td>
+                        <td>
+                            @if (entry.Imported)
+                            {
+                                <span class="rm-import-pill rm-import-pill--done">Imported</span>
+                                @if (entry.MissingPlayerCount > 0)
+                                {
+                                    <span class="rm-import-muted"> @entry.MissingPlayerCount players not matched</span>
+                                }
+                                @foreach (var warning in entry.Warnings)
+                                {
+                                    <div class="rm-import-muted">@warning</div>
+                                }
+                            }
+                            else if (entry.Skipped)
+                            {
+                                <span class="rm-import-muted">@entry.Message</span>
+                            }
+                            else
+                            {
+                                <span class="rm-import-pill rm-import-pill--failed">Failed</span>
+                                <div class="rm-import-muted">@entry.Message</div>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
+}
 
-    <div class="card-body">
-        <form method="post">
-            <h5 class="card-title text-success fw-bold">Optionally Import using FanTrax League ID</h5>
-            <div class="p-2">Please enter your FanTrax league ID which can be found in your URL.</div>
-            <small class="p-2">Ex: https://www.fantrax.com/fantasy/league/<b>t0xqjo74kpm0ki7k</b>/home the ID is <b>t0xqjo74kpm0ki7k</b></small>
-            <div class="p-2">
-                <input asp-for="FanTraxLeagueId" placeholder="FanTrax League ID" class="form-control" />
-            </div>
-            <div class="p-2">
-                <button class="btn btn-sm btn-secondary" asp-page-handler="ImportFanTrax">Import</button>
-            </div>
-        </form>
-    </div>
+<div class="rm-import-panel">
+    <h5>Create a custom league</h5>
+    <p class="rm-import-muted">
+        Use this if you don't play on Yahoo!, FanTrax or ESPN. It creates a league
+        with default settings that you can then edit.
+    </p>
+    <form method="post">
+        <button class="modern-filter-btn modern-filter-btn-secondary" asp-page-handler="CustomLeague">Create league</button>
+    </form>
 </div>
 
-<div class="card mt-3">
-    <div class="card-body">
-        <h5 class="card-title text-success fw-bold">Create Custom League</h5>
-        <p>Use this if you don't use Yahoo!, FanTrax, or ESPN.  This will create a league with default settings that you can then edit.</p>
-        <div>
-            <form method="post">
-                <button class="btn btn-primary" asp-page-handler="CustomLeague">Create League</button>
-            </form>
-        </div>
-    </div>
-</div>
+@section Scripts {
+    <script>
+        // Select all ticks only the rows that still have a checkbox, so
+        // already imported leagues cannot be selected by accident.
+        // Clicking anywhere on a row that can be imported toggles it, since a
+        // 14px box is a small target for what is the main action on the page.
+        document.querySelectorAll('.rm-import-row--pick').forEach(function (row) {
+            row.addEventListener('click', function (e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON'
+                    || e.target.tagName === 'A' || e.target.tagName === 'LABEL') return;
+
+                var box = row.querySelector('input[type=checkbox]');
+                if (box) box.checked = !box.checked;
+            });
+        });
+
+        // Toggles rather than only selecting, so the same control undoes it.
+        document.querySelectorAll('.rm-import-selectall').forEach(function (toggle) {
+            toggle.addEventListener('click', function () {
+                var form = toggle.closest('form');
+                if (!form) return;
+
+                var boxes = form.querySelectorAll('tbody input[type=checkbox]');
+                if (!boxes.length) return;
+
+                var selectAll = Array.prototype.some.call(boxes, function (box) {
+                    return !box.checked;
+                });
+
+                boxes.forEach(function (box) { box.checked = selectAll; });
+                toggle.textContent = selectAll ? 'Clear all' : 'Select all';
+            });
+        });
+    </script>
+}
