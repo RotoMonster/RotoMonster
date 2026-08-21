@@ -57,13 +57,37 @@
                         <span class="range-badge-header-cell @pos">@cell.DecodedGamesText</span>
                     }
                 }
-                else if (!string.IsNullOrEmpty(cell.Description))
+                else if (cell.HasTooltip)
                 {
                     <span class="bm-tooltip-wrap">
                         <span class="bm-tooltip-trigger" data-bm-tooltip="@cell.TooltipId">
                             @{ await Html.RenderPartialAsync("_MonsterBarBadgeCell", cell); }
                         </span>
-                        <div class="bm-tooltip-content" id="@cell.TooltipId" role="tooltip">@cell.Description</div>
+                        <div class="bm-tooltip-content" id="@cell.TooltipId" role="tooltip">
+                            @if (cell.HasTooltipStats)
+                            {
+                                <div class="mbar-tip">
+                                    @if (!string.IsNullOrEmpty(cell.Description))
+                                    {
+                                        <div class="mbar-tip-title">@cell.Description</div>
+                                    }
+                                    <div class="mbar-tip-stats">
+                                        @if (!string.IsNullOrEmpty(cell.ValueText))
+                                        {
+                                            <span class="mbar-tip-value" style="@cell.ValueBadgeStyle">@cell.ValueText</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(cell.RankText))
+                                        {
+                                            <span class="mbar-tip-rank">Rank @cell.RankText</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                @cell.Description
+                            }
+                        </div>
                     </span>
                 }
                 else

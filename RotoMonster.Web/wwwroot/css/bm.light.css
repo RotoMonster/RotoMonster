@@ -5449,3 +5449,52 @@ a.display-columns-item--membership { cursor: pointer; }
     font-size: 0.75rem; color: var(--color-text-tertiary);
     margin-right: auto; font-variant-numeric: tabular-nums;
 }
+
+/* mbar-tip */
+/* MonsterBar cell tooltip: column description, the player's value on a badge
+   filled with the cell's own color, and the rank. */
+.bm-tooltip-content .mbar-tip {
+    text-align: center;
+    min-width: 110px;
+}
+
+.bm-tooltip-content .mbar-tip-title {
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.6;
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.35rem;
+    border-bottom: 1px solid rgba(128,128,128,0.4);
+}
+
+.bm-tooltip-content .mbar-tip-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+}
+
+.bm-tooltip-content .mbar-tip-value {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3.1rem;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    /* The fills are pale greens and reds, so the text stays dark in BOTH
+       themes rather than inheriting the tooltip's color. The tooltip is dark
+       in light mode and light in dark mode - the badge is neither. */
+    color: #1c1f1d;
+}
+
+.bm-tooltip-content .mbar-tip-rank {
+    font-size: 0.75rem;
+    opacity: 0.75;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}

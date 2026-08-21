@@ -63,6 +63,12 @@ namespace RotoMonster.Models.Shared
                 {
                     Description = item == null ? null : item.Description,
                     ColorCode = valuePlayer.ValuePlayer.LeagueValueColor,
+                    // Same format the value column uses in _PlayerTable, so the
+                    // tooltip and the table never disagree on a rounding.
+                    ValueText = string.Format("{0:#####0.00}", valuePlayer.ValuePlayer.LeagueValue),
+                    RankText = valuePlayer.ValuePlayer.Rank > 0
+                        ? valuePlayer.ValuePlayer.Rank.ToString()
+                        : null,
                     Group = GroupFor(item == null ? null : item.Title),
                     Emphasis = valuePlayer.IsTopPlayer
                         ? MonsterBarEmphasis.Top
@@ -162,6 +168,19 @@ namespace RotoMonster.Models.Shared
 
         public string ColorCode { get; set; }
 
+        /// <summary>
+        /// The player's value for this column, already formatted. Shown in the
+        /// tooltip on a badge filled with the cell's own color.
+        /// </summary>
+        public string ValueText { get; set; }
+
+        /// <summary>
+        /// The player's rank for this column, as a bare number. The partial adds
+        /// the "Rank" label. Null when there is no rank, which is why this is a
+        /// string rather than an int.
+        /// </summary>
+        public string RankText { get; set; }
+
         public MonsterBarEmphasis Emphasis { get; set; } = MonsterBarEmphasis.Dim;
 
         public MonsterBarGroup Group { get; set; } = MonsterBarGroup.None;
@@ -219,6 +238,36 @@ namespace RotoMonster.Models.Shared
                     default:
                         return "";
                 }
+            }
+        }
+
+        /// <summary>
+        /// True when there is more to show than a description. Header cells have
+        /// no player behind them, so they never hit this.
+        /// </summary>
+        public bool HasTooltipStats
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(ValueText) || !string.IsNullOrEmpty(RankText);
+            }
+        }
+
+        public bool HasTooltip
+        {
+            get { return HasTooltipStats || !string.IsNullOrEmpty(Description); }
+        }
+
+        /// <summary>
+        /// Empty rather than "background:;" when there is no color, so the badge
+        /// falls back to the stylesheet instead of emitting a broken declaration.
+        /// </summary>
+        public string ValueBadgeStyle
+        {
+            get
+            {
+                var background = BackgroundColor;
+                return string.IsNullOrEmpty(background) ? "" : "background:" + background + ";";
             }
         }
 
