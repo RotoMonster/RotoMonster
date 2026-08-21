@@ -75,11 +75,14 @@ namespace RotoMonster.Data
                 importedByProviderId[league.ProviderLeagueId] = league;
             }
 
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
             foreach (var league in leagues.Leagues)
             {
                 var listed = new ListedLeague
                 {
                     LeagueId = league.LeagueId,
+                    ProviderLeagueId = league.LeagueId,
                     Title = league.Title,
                     MyTeamTitle = league.MyTeamTitle
                 };
@@ -89,6 +92,7 @@ namespace RotoMonster.Data
                 {
                     listed.IsImported = true;
                     listed.UserLeagueId = imported.Id;
+                    listed.TrackLeague = imported.TrackLeague;
 
                     // The provider's league list does not always say which team
                     // is the user's, but the imported copy already knows.
@@ -96,10 +100,71 @@ namespace RotoMonster.Data
                         listed.MyTeamTitle = imported.MyTeamTitle;
                 }
 
+                seen.Add(league.LeagueId);
                 result.Leagues.Add(listed);
             }
 
+            // Anything in RM that the provider did not hand back. Usually a
+            // league deleted on their end - it still exists here, and hiding it
+            // would leave the user no way to remove or edit it.
+            foreach (var pair in importedByProviderId)
+            {
+                if (seen.Contains(pair.Key)) continue;
+
+                result.Leagues.Add(new ListedLeague
+                {
+                    LeagueId = pair.Key,
+                    ProviderLeagueId = pair.Key,
+                    Title = pair.Value.DisplayTitle ?? pair.Value.Title,
+                    MyTeamTitle = pair.Value.MyTeamTitle,
+                    IsImported = true,
+                    UserLeagueId = pair.Value.Id,
+                    TrackLeague = pair.Value.TrackLeague,
+                    NotAtProvider = true
+                });
+            }
+
             result.Success = true;
+            return result;
+        }
+
+        /// <summary>
+        /// Leagues that came from no provider, or from one RM no longer knows
+        /// about. Without this they would exist in the database and appear
+        /// nowhere on the page.
+        /// </summary>
+        public async Task<LeagueListResult> ListCustomAsync(string userId, IEnumerable<string> providerNames)
+        {
+            var result = new LeagueListResult { ProviderName = "Custom", Success = true };
+
+            var knownProviderIds = new HashSet<int>();
+            foreach (var name in providerNames)
+            {
+                var provider = _db.GetFantasyProvider(name);
+                if (provider != null) knownProviderIds.Add(provider.Id);
+            }
+
+            var existing = await _db.GetUserLeaguesAsync(userId).ConfigureAwait(false);
+
+            foreach (var league in existing)
+            {
+                var belongsToKnownProvider = knownProviderIds.Contains(league.FantasyProviderId)
+                                             && !string.IsNullOrEmpty(league.ProviderLeagueId);
+
+                if (belongsToKnownProvider) continue;
+
+                result.Leagues.Add(new ListedLeague
+                {
+                    LeagueId = league.ProviderLeagueId ?? "",
+                    ProviderLeagueId = league.ProviderLeagueId ?? "",
+                    Title = league.DisplayTitle ?? league.Title,
+                    MyTeamTitle = league.MyTeamTitle,
+                    IsImported = true,
+                    UserLeagueId = league.Id,
+                    TrackLeague = league.TrackLeague
+                });
+            }
+
             return result;
         }
 
@@ -321,6 +386,24 @@ namespace RotoMonster.Data
         /// a second lookup. Zero when not imported.
         /// </summary>
         public int UserLeagueId { get; set; }
+
+        /// <summary>
+        /// Whether RM is tracking this league. Only meaningful once imported.
+        /// </summary>
+        public bool TrackLeague { get; set; }
+
+        /// <summary>
+        /// Imported into RM but no longer in the provider's list, usually
+        /// because it was deleted on their end. Shown rather than hidden, or
+        /// it would be stuck in RM with no way to reach it.
+        /// </summary>
+        public bool NotAtProvider { get; set; }
+
+        /// <summary>
+        /// The provider's own league id, which users need when contacting
+        /// support or matching a league up by hand.
+        /// </summary>
+        public string ProviderLeagueId { get; set; }
     }
 
     public class LeagueImportResult

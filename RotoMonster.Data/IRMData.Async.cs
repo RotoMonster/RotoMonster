@@ -66,6 +66,13 @@ namespace RotoMonster.Data
         Task<List<UserDisplayCategory>> UpdateUserDisplayCategoriesAsync(string userId, List<UserDisplayCategory> userDisplayCategories);
         Task DeleteUserLeagueAsync(int userLeagueId);
         Task<UserLeague> UpdateUserLeagueAsync(UserLeague userLeague);
+
+        /// <summary>
+        /// Flips TrackLeague and nothing else. UpdateUserLeagueAsync rebuilds
+        /// the child collections from the object it is given, so it is the
+        /// wrong tool for a one column change.
+        /// </summary>
+        Task SetUserLeagueTrackAsync(int userLeagueId, bool trackLeague);
         Task<UserLeague> AddUserLeagueAsync(UserLeague userLeague);
         Task<UserLeague> GetNewCustomUserLeagueAsync();
         // Logs

@@ -656,6 +656,18 @@ namespace RotoMonster.Data
             }
         }
 
+        public async Task SetUserLeagueTrackAsync(int userLeagueId, bool trackLeague)
+        {
+            var userLeague = await (from ul in db.UserLeagues
+                                    where ul.Id == userLeagueId
+                                    select ul).FirstOrDefaultAsync();
+
+            if (userLeague == null) return;
+
+            userLeague.TrackLeague = trackLeague;
+            await db.SaveChangesAsync();
+        }
+
         public async Task<UserLeague> UpdateUserLeagueAsync(UserLeague userLeague)
         {
             userLeague.FillUserLeagueCategoriesCode(GetCategories());

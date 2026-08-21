@@ -2434,3 +2434,41 @@ td.value-badge-cell {
 .rm-import-selectall-label {
     display: none;
 }
+
+/* rm-import-merge */
+/* Extra columns from the old UserLeagues page. */
+.rm-import-id {
+    width: 8rem;
+}
+
+.rm-import-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.78rem;
+    color: var(--color-text-secondary);
+}
+
+/* Four actions in a row, so they need spacing and a wider column than the
+   single Remove link did. */
+.rm-import-action {
+    width: 14rem;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.rm-import-action .rm-import-linkbtn,
+.rm-import-action a.rm-import-linkbtn {
+    margin-left: 0.6rem;
+}
+
+.rm-import-action a.rm-import-linkbtn {
+    text-decoration: underline;
+}
+
+.rm-import-name a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.rm-import-name a:hover {
+    text-decoration: underline;
+}

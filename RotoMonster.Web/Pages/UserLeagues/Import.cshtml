@@ -15,7 +15,7 @@
     per league Import link inside the same tab.
 *@
 
-<h1>Add Leagues</h1>
+<h1>Your Leagues</h1>
 
 <div class="rm-import-tabs">
     @foreach (var tab in Model.Tabs)
@@ -27,6 +27,10 @@
             @if (!tab.IsConnected)
             {
                 <span class="rm-import-tab-count rm-import-tab-count--off">Not connected</span>
+            }
+            else if (tab.IsCustom)
+            {
+                <span class="rm-import-tab-count">@tab.TotalCount @(tab.TotalCount == 1 ? "league" : "leagues")</span>
             }
             else if (tab.SupportsBulkImport)
             {
@@ -44,7 +48,15 @@
 {
     <div class="rm-import-panel">
 
-        @if (!tab.IsConnected)
+        @if (tab.IsCustom)
+        {
+            <p class="rm-import-lead">
+                Leagues you created yourself, or that came from a provider RM no
+                longer connects to. They can't be re-imported, but you can still
+                edit or remove them.
+            </p>
+        }
+        else if (!tab.IsConnected)
         {
             @* The Yahoo panel needs the authorization url, and a partial taking
                just the provider name cannot reach the page model. *@
@@ -89,7 +101,11 @@
                     <form method="post">
                         <input type="hidden" name="provider" value="@tab.ProviderName" />
 
-                        @if (selectable > 0)
+                        @if (tab.IsCustom)
+                        {
+                            <text></text>
+                        }
+                        else if (selectable > 0)
                         {
                             <p class="rm-import-lead">
                                 Tick the leagues you want, then choose <b>Import selected</b>.
@@ -108,9 +124,10 @@
                                 <tr>
                                     <th class="rm-import-check"></th>
                                     <th>League</th>
+                                    <th class="rm-import-id">League ID</th>
                                     <th>Your team</th>
                                     <th class="rm-import-status">Status</th>
-                                    <th class="rm-import-action"></th>
+                                    <th class="rm-import-action">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -127,7 +144,26 @@
                                                 </label>
                                             }
                                         </td>
-                                        <td class="rm-import-name">@league.Title</td>
+                                        <td class="rm-import-name">
+                                            @if (league.IsImported)
+                                            {
+                                                <a asp-page="./Edit" asp-route-id="@league.UserLeagueId">@league.Title</a>
+                                            }
+                                            else
+                                            {
+                                                @league.Title
+                                            }
+                                        </td>
+                                        <td class="rm-import-id">
+                                            @if (string.IsNullOrEmpty(league.ProviderLeagueId))
+                                            {
+                                                <span class="rm-import-muted">&mdash;</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="rm-import-mono">@league.ProviderLeagueId</span>
+                                            }
+                                        </td>
                                         <td class="rm-import-team">
                                             @if (string.IsNullOrEmpty(league.MyTeamTitle))
                                             {
@@ -139,18 +175,40 @@
                                             }
                                         </td>
                                         <td class="rm-import-status">
-                                            @if (league.IsImported)
+                                            @if (!league.IsImported)
                                             {
-                                                <span class="rm-import-pill rm-import-pill--done">Imported</span>
+                                                <span class="rm-import-pill">Available</span>
+                                            }
+                                            else if (league.TrackLeague)
+                                            {
+                                                <span class="rm-import-pill rm-import-pill--done">Tracked</span>
                                             }
                                             else
                                             {
-                                                <span class="rm-import-pill">Available</span>
+                                                <span class="rm-import-pill">Not tracked</span>
+                                            }
+                                            @if (league.NotAtProvider)
+                                            {
+                                                @* It exists here but the provider stopped
+                                                   returning it, so say so rather than
+                                                   leaving the user to wonder. *@
+                                                <div class="rm-import-muted">Not at @tab.ProviderName</div>
                                             }
                                         </td>
                                         <td class="rm-import-action">
                                             @if (league.IsImported)
                                             {
+                                                <button type="submit" class="rm-import-linkbtn"
+                                                        asp-page-handler="ToggleTrack"
+                                                        asp-route-userLeagueId="@league.UserLeagueId"
+                                                        asp-route-provider="@tab.ProviderName">
+                                                    @(league.TrackLeague ? "Untrack" : "Track")
+                                                </button>
+                                                <a class="rm-import-linkbtn" asp-page-handler="UpdateRosters"
+                                                   asp-route-id="@league.UserLeagueId"
+                                                   asp-route-tab="@tab.ProviderName">Rosters</a>
+                                                <a class="rm-import-linkbtn" asp-page="./Edit"
+                                                   asp-route-id="@league.UserLeagueId">Edit</a>
                                                 <button type="submit" class="rm-import-linkbtn rm-import-linkbtn--danger"
                                                         asp-page-handler="RemoveLeague"
                                                         asp-route-userLeagueId="@league.UserLeagueId"
@@ -164,7 +222,7 @@
                             </tbody>
                         </table>
 
-                        @if (selectable > 0)
+                        @if (selectable > 0 && !tab.IsCustom)
                         {
                             <div class="rm-import-actions">
                                 <button type="submit" class="modern-filter-btn modern-filter-btn-primary"

@@ -26,15 +26,17 @@ namespace RotoMonster.Pages.UserLeagues
         {
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        // The Import page now lists and manages leagues as well as adding
+        // them, so this one exists only to keep old links working. Everything
+        // that used to redirect here lands there instead.
+        public IActionResult OnGet()
         {
-            SelectedUserLeagues = await db.GetUserLeaguesAsync(UserId);
-            return Page();
+            return RedirectToPage("./Import");
         }
 
         public IActionResult OnPost()
         {
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Import");
         }
 
     }

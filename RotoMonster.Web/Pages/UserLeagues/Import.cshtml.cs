@@ -22,6 +22,7 @@ namespace RotoMonster.Pages.UserLeagues
         public const string YahooProvider = "Yahoo!";
         public const string ESPNProvider = "ESPN";
         public const string FanTraxProvider = "FanTrax";
+        public const string CustomProvider = "Custom";
 
         [BindProperty]
         public string YahooCode { get; set; }
@@ -116,6 +117,24 @@ namespace RotoMonster.Pages.UserLeagues
                 Tabs.Add(await BuildTabAsync(ESPNProvider, IsESPNConnected, false));
 
             Tabs.Add(await BuildTabAsync(FanTraxProvider, IsFanTraxConnected, false));
+
+            // Leagues that belong to no provider would otherwise exist in the
+            // database and show up nowhere.
+            var custom = await importService.ListCustomAsync(
+                UserId,
+                new[] { YahooProvider, ESPNProvider, FanTraxProvider });
+
+            if (custom.Leagues.Count > 0)
+            {
+                Tabs.Add(new ImportTab
+                {
+                    ProviderName = CustomProvider,
+                    IsConnected = true,
+                    SupportsBulkImport = true,
+                    IsCustom = true,
+                    Leagues = custom.Leagues
+                });
+            }
 
             // Fall back to the first tab rather than showing nothing when the
             // requested one does not exist.
@@ -230,6 +249,45 @@ namespace RotoMonster.Pages.UserLeagues
             // screen instead of being lost to a fresh GET.
             await BuildTabsAsync(provider);
             return Page();
+        }
+
+        public async Task<IActionResult> OnGetUpdateRostersAsync(int id, string tab)
+        {
+            var userLeague = await db.GetUserLeagueAsync(UserId, id);
+
+            if (userLeague == null)
+            {
+                AddErrorMessage("That league could not be found.");
+            }
+            else
+            {
+                // Inherited from RMPageModel, same call the front page uses.
+                RefreshRosters(userLeague);
+                AddMessage("Refreshed rosters for " + userLeague.DisplayTitle + ".");
+            }
+
+            return RedirectToPage("./Import", new { tab });
+        }
+
+        public async Task<IActionResult> OnPostToggleTrackAsync(int userLeagueId, string provider)
+        {
+            var leagues = await db.GetUserLeaguesAsync(UserId);
+            var owned = leagues.FirstOrDefault(l => l.Id == userLeagueId);
+
+            if (owned == null)
+            {
+                AddErrorMessage("That league could not be found.");
+            }
+            else
+            {
+                // Targeted update. UpdateUserLeagueAsync rebuilds the child
+                // collections from what it is handed, which would wipe the
+                // categories and roster spots this league already has.
+                await db.SetUserLeagueTrackAsync(userLeagueId, !owned.TrackLeague);
+                await db.CommitAsync();
+            }
+
+            return RedirectToPage("./Import", new { tab = provider });
         }
 
         public async Task<IActionResult> OnPostRemoveLeagueAsync(int userLeagueId, string provider)
@@ -425,6 +483,12 @@ namespace RotoMonster.Pages.UserLeagues
         /// </summary>
         public bool SupportsBulkImport { get; set; }
 
+        /// <summary>
+        /// The catch all tab. Nothing here can be imported, since these
+        /// leagues have no provider to import from.
+        /// </summary>
+        public bool IsCustom { get; set; }
+
         public List<ListedLeague> Leagues { get; set; } = new List<ListedLeague>();
 
         public UserLeagueTableModel LegacyTable { get; set; }
@@ -447,6 +511,11 @@ namespace RotoMonster.Pages.UserLeagues
         public int ImportedCount
         {
             get { return SupportsBulkImport ? Leagues.Count(l => l.IsImported) : 0; }
+        }
+
+        public int TrackedCount
+        {
+            get { return Leagues.Count(l => l.IsImported && l.TrackLeague); }
         }
 
         /// <summary>
