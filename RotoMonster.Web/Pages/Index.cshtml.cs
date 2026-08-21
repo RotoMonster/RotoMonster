@@ -392,6 +392,7 @@ namespace RotoMonster.Pages
             // back together rather than one round trip each.
             var yahooProvider = db.GetFantasyProvider("Yahoo!");
             var handledByProvider = new HashSet<int>();
+            var totalRefreshed = 0;
 
             if (yahooProvider != null)
             {
@@ -404,11 +405,9 @@ namespace RotoMonster.Pages
                 }
                 else
                 {
-                    if (refreshed.RefreshedCount > 0)
-                    {
-                        AddMessage("Refreshed rosters for " + refreshed.RefreshedCount
-                                   + (refreshed.RefreshedCount == 1 ? " league." : " leagues."));
-                    }
+                    // Counted rather than announced, so the total below covers
+                    // every provider in one line.
+                    totalRefreshed += refreshed.RefreshedCount;
 
                     foreach (var failed in refreshed.Leagues.Where(l => !l.Refreshed))
                         AddErrorMessage(failed.Title + ": " + failed.Message);
@@ -427,7 +426,17 @@ namespace RotoMonster.Pages
                     continue;
 
                 UserLeague userLeague = await db.GetUserLeagueAsync(UserId, ul.Id);
-                RefreshRosters(userLeague);
+
+                // announce false so these do not each add their own line.
+                RefreshRosters(userLeague, false);
+                if (LastRefreshSucceeded)
+                    totalRefreshed++;
+            }
+
+            if (totalRefreshed > 0)
+            {
+                AddMessage("Refreshed rosters for " + totalRefreshed
+                           + (totalRefreshed == 1 ? " league." : " leagues."));
             }
 
             return RedirectToPage("./Index");

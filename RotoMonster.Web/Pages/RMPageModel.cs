@@ -179,8 +179,22 @@ namespace RotoMonster.Pages
             return AddMessageToList("warningmessages", msg);
         }
 
-        public UserLeague RefreshRosters(UserLeague userLeague)
+        /// <summary>
+        /// True when the last RefreshRosters call actually updated something.
+        /// The method returns the league either way, so there was no way to
+        /// tell a refresh apart from a no-op when counting a batch.
+        /// </summary>
+        public bool LastRefreshSucceeded { get; private set; }
+
+        /// <summary>
+        /// announce false suppresses the per league success message, for
+        /// callers doing several at once that want to report a total instead.
+        /// Errors are still shown either way.
+        /// </summary>
+        public UserLeague RefreshRosters(UserLeague userLeague, bool announce = true)
         {
+            LastRefreshSucceeded = false;
+
             if (userLeague == null)
                 return null;
 
@@ -214,7 +228,9 @@ namespace RotoMonster.Pages
                         else
                         {
                             tmpDB.UpdateUserLeagueTeams(userLeague.Id, teams, missingPlayers, null);
-                            AddMessage(userLeague.DisplayTitle + " rosters updated");
+                            LastRefreshSucceeded = true;
+                            if (announce)
+                                AddMessage(userLeague.DisplayTitle + " rosters updated");
                             //var draft = tmpDB.GetDraft(userLeague.FantasyProvider, userLeague.ProviderLeagueId);
                             //if (draft == null)
                             //    tmpSharedDB.ImportDraft(userAuth, tmpDB.GetDefaultSeason(), userLeague.ProviderLeagueId, tmpDB.GetFantasyProviderPlayers(tmpDB.GetFantasyProvider("yahoo")), logger);
@@ -234,7 +250,9 @@ namespace RotoMonster.Pages
                     List<UserLeagueTeam> teams = fantrax.GetUserLeagueTeams(userAuth, tmpDB.Sport.Title, userLeague, tmpDB.GetFantasyProviderPlayers(tmpDB.GetFantasyProvider("fantrax")), missingPlayers);
                     tmpDB.UpdateUserLeagueTeams(userLeague.Id, teams, missingPlayers, userLeague.UserLeagueWaiverPlayers);
                     outUserLeague = tmpDB.GetUserLeague(userLeague.Id);
-                    AddMessage(userLeague.DisplayTitle + " rosters updated");
+                    LastRefreshSucceeded = true;
+                    if (announce)
+                        AddMessage(userLeague.DisplayTitle + " rosters updated");
                 }
 
                 else if (userLeague.FantasyProviderId == 2)
@@ -244,7 +262,9 @@ namespace RotoMonster.Pages
                     List<UserLeagueTeam> teams = espn.GetUserLeagueTeams(userAuth, tmpDB.Sport, tmpDB.GetDefaultSeason(), userLeague, tmpDB.GetFantasyProviderPlayers(tmpDB.GetFantasyProvider("espn")), db.GetPlayers(), missingPlayers);
                     tmpDB.UpdateUserLeagueTeams(userLeague.Id, teams, missingPlayers, userLeague.UserLeagueWaiverPlayers);
                     outUserLeague = tmpDB.GetUserLeague(userLeague.Id);
-                    AddMessage(userLeague.DisplayTitle + " rosters updated");
+                    LastRefreshSucceeded = true;
+                    if (announce)
+                        AddMessage(userLeague.DisplayTitle + " rosters updated");
                 }
             }
 
