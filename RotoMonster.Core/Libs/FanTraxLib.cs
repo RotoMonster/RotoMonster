@@ -150,7 +150,13 @@ namespace RotoMonster.Core.Libs
             league.IsProLeague = league.Title.Contains("Classic Draft");
             league.NumberOfTeams = rss["teamInfo"].Count();
             league.PlayersPerTeam = Convert.ToInt32(rss["rosterInfo"]["maxTotalPlayers"]);
-            league.DisplayTitle = league.Title = "FanTrax " + fanTraxLeagueId;
+            // Only the league list call returns the name, so when the caller
+            // has it, it is passed in. Falls back to the id for the callers
+            // that do not, which is what this always used to do.
+            if (string.IsNullOrWhiteSpace(leagueTitle))
+                league.DisplayTitle = league.Title = "FanTrax " + fanTraxLeagueId;
+            else
+                league.DisplayTitle = league.Title = leagueTitle.Trim();
 
             foreach (JProperty p in rss["rosterInfo"]["positionConstraints"])
             {
@@ -184,7 +190,26 @@ namespace RotoMonster.Core.Libs
             }
             else
             {
-                throw new Exception("Unknown scoringType " + scoringType + " " + fanTraxLeagueId);
+                // Fantrax has more than two. Head to head leagues scored on
+                // categories come back as things like head_to_head_roti_multi_win,
+                // which is categories scoring in a head to head format.
+                //
+                // The two parts are read separately rather than matched against
+                // a fixed list, since Fantrax keeps adding variants and an
+                // unknown one used to throw and lose the whole import.
+                bool isPoints = scoringType.Contains("point");
+                bool isHeadToHead = scoringType.Contains("head_to_head") || scoringType.Contains("h2h");
+
+                league.ScoringSystem = isPoints ? "P" : "C";
+                league.LeagueType = isHeadToHead ? "H" : "R";
+
+                if (!isPoints && !isHeadToHead && !scoringType.Contains("roti"))
+                {
+                    // Nothing recognisable in it, so the defaults above are a
+                    // guess. Recorded so it shows up rather than being silent.
+                    league.AddError("Unrecognised FanTrax scoring type \"" + scoringType
+                        + "\", treated as categories roto. Check the league settings.");
+                }
             }
 
             CategoryLib catLib = new CategoryLib();

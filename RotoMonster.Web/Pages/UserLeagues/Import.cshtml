@@ -237,16 +237,12 @@
                         }
                     </form>
                 }
-            }
-            else
-            {
-                @if (tab.LegacyTable != null)
-                {
-                    <partial name="_UserLeagueTable" model="tab.LegacyTable" />
-                }
 
                 @if (tab.ProviderName == RotoMonster.Pages.UserLeagues.ImportModel.FanTraxProvider)
                 {
+                    @* Kept as a fallback. The list covers the normal case now,
+                       but a league the Secret ID does not reach can still be
+                       added by id. *@
                     <form method="post" class="rm-import-manual">
                         <h6>Import using a FanTrax league ID</h6>
                         <p>
@@ -259,6 +255,13 @@
                             <button class="modern-filter-btn modern-filter-btn-secondary" asp-page-handler="ImportFanTrax">Import</button>
                         </div>
                     </form>
+                }
+            }
+            else
+            {
+                @if (tab.LegacyTable != null)
+                {
+                    <partial name="_UserLeagueTable" model="tab.LegacyTable" />
                 }
             }
         }

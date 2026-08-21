@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using RotoMonster.Core;
+using RotoMonster.Core.Libs;
 using RotoMonsterExternalAPIs.Client.Models.Providers;
 using RotoMonsterExternalAPIs.Client.Services.Providers;
 using RotoMonsterExternalAPIs.Client.Services.Yahoo;
@@ -43,21 +44,36 @@ namespace RotoMonster.Data
         {
             var result = new LeagueListResult { ProviderName = providerName };
 
-            var provider = GetProvider(providerName);
-            if (provider == null)
+            List<ProviderLeague> providerLeagues;
+
+            if (Normalize(providerName) == "fantrax")
             {
-                result.ErrorMessage = providerName + " is not set up yet.";
-                return result;
+                // Fantrax has no implementation behind the layer, and would
+                // gain nothing from one - its API is a call per league either
+                // way. Its existing lib does the listing, so the page behaves
+                // the same without any parsing being rewritten.
+                providerLeagues = ListFanTraxLeagues(userId);
             }
-
-            var leagues = await provider.GetLeaguesAsync(userId, SeasonKeyFor(providerName))
-                .ConfigureAwait(false);
-
-            if (!leagues.Success)
+            else
             {
-                result.ErrorMessage = leagues.ErrorMessage;
-                result.NeedsReauthorization = leagues.NeedsReauthorization;
-                return result;
+                var provider = GetProvider(providerName);
+                if (provider == null)
+                {
+                    result.ErrorMessage = providerName + " is not set up yet.";
+                    return result;
+                }
+
+                var leagues = await provider.GetLeaguesAsync(userId, SeasonKeyFor(providerName))
+                    .ConfigureAwait(false);
+
+                if (!leagues.Success)
+                {
+                    result.ErrorMessage = leagues.ErrorMessage;
+                    result.NeedsReauthorization = leagues.NeedsReauthorization;
+                    return result;
+                }
+
+                providerLeagues = leagues.Leagues;
             }
 
             var existing = await _db.GetUserLeaguesAsync(userId).ConfigureAwait(false);
@@ -77,7 +93,7 @@ namespace RotoMonster.Data
 
             var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var league in leagues.Leagues)
+            foreach (var league in providerLeagues)
             {
                 var listed = new ListedLeague
                 {
@@ -189,10 +205,11 @@ namespace RotoMonster.Data
                 return result;
             }
 
-            var provider = GetProvider(providerName);
+            var isFanTrax = Normalize(providerName) == "fantrax";
+            var provider = isFanTrax ? null : GetProvider(providerName);
             var fantasyProvider = _db.GetFantasyProvider(providerName);
 
-            if (provider == null || fantasyProvider == null)
+            if ((provider == null && !isFanTrax) || fantasyProvider == null)
             {
                 result.ErrorMessage = providerName + " is not set up yet.";
                 return result;
@@ -219,6 +236,12 @@ namespace RotoMonster.Data
 
             if (toImport.Count == 0)
                 return Finish(result);
+
+            if (isFanTrax)
+            {
+                ImportFanTrax(userId, fantasyProvider, toImport, result);
+                return Finish(result);
+            }
 
             var data = await provider.GetLeagueDataAsync(
                 userId,
@@ -416,6 +439,143 @@ namespace RotoMonster.Data
         {
             result.Success = true;
             return result;
+        }
+
+        // -------------------------------------------------------------------
+        // FanTrax
+        // -------------------------------------------------------------------
+        //
+        // FanTrax keeps using FanTraxLib rather than moving behind
+        // IFantasyProvider. Two reasons. Its API is a request per league, so
+        // there is no batching to win - the thing that made the layer worth
+        // building for Yahoo does not apply. And its parsing carries a lot of
+        // hard won detail: a deeply nested category walk, NFL points against
+        // ranges, an Ohtani hitter and pitcher split, an extra call just to
+        // read the current period. Rewriting that would risk working imports
+        // to gain tidiness.
+        //
+        // The page does not care. Listing and importing go through here either
+        // way, so FanTrax gets the same checkboxes and the same one button.
+
+        private List<ProviderLeague> ListFanTraxLeagues(string userId)
+        {
+            var leagues = new List<ProviderLeague>();
+
+            var userAuth = _sharedDb.GetUserAuth(userId);
+            if (userAuth == null || string.IsNullOrEmpty(userAuth.FanTraxEmail))
+                return leagues;
+
+            var lib = new FanTraxLib(_config, null);
+            var json = lib.GetLeaguesJson(userAuth.FanTraxEmail);
+
+            if (string.IsNullOrEmpty(json))
+                return leagues;
+
+            foreach (var league in lib.GetLeagues(json, _db.Sport.Title))
+            {
+                leagues.Add(new ProviderLeague
+                {
+                    LeagueId = league.ProviderLeagueId,
+                    Title = league.Title,
+                    MyTeamId = league.MyProviderTeamId,
+                    MyTeamTitle = league.MyTeamTitle
+                });
+            }
+
+            return leagues;
+        }
+
+        private void ImportFanTrax(
+            string userId,
+            FantasyProvider fantasyProvider,
+            List<string> leagueIds,
+            LeagueImportResult result)
+        {
+            var userAuth = _sharedDb.GetUserAuth(userId);
+            if (userAuth == null)
+            {
+                result.ErrorMessage = "There is no FanTrax authorization on your account.";
+                return;
+            }
+
+            var lib = new FanTraxLib(_config, null);
+            var season = _db.GetDefaultSeason();
+
+            // Read once for the batch rather than per league, the same saving
+            // the Yahoo path makes.
+            var providerPlayers = _db.GetFantasyProviderPlayers(fantasyProvider);
+            var rosterSpots = _db.GetActiveRosterSpots();
+            var categories = _db.GetCategories();
+
+            // The league list carries the user's own team, which the per league
+            // import does not return. Fetched once so it can be filled in
+            // afterwards rather than per league.
+            var allLeagues = new List<UserLeague>();
+            if (!string.IsNullOrEmpty(userAuth.FanTraxEmail))
+            {
+                var json = lib.GetLeaguesJson(userAuth.FanTraxEmail);
+                if (!string.IsNullOrEmpty(json))
+                    allLeagues = lib.GetLeagues(json, _db.Sport.Title);
+            }
+
+            foreach (var leagueId in leagueIds)
+            {
+                var entry = new ImportedLeague { LeagueId = leagueId };
+
+                try
+                {
+                    // The settings call does not return the league name, only
+                    // the list does, so it is passed in rather than leaving the
+                    // league stored as "FanTrax <id>".
+                    var known = allLeagues.FirstOrDefault(l => l.ProviderLeagueId == leagueId);
+                    var title = known != null ? known.Title : "";
+
+                    var league = lib.ImportUserLeague(userAuth, season, leagueId, title,
+                        rosterSpots, categories);
+
+                    if (league == null)
+                    {
+                        entry.Message = "FanTrax did not return settings for this league.";
+                        result.Leagues.Add(entry);
+                        continue;
+                    }
+
+                    var missingPlayers = new List<UserLeagueMissingPlayer>();
+                    league.UserLeagueTeams = lib.GetUserLeagueTeams(userAuth, _db.Sport.Title,
+                        league, providerPlayers, missingPlayers);
+
+                    if (known != null)
+                    {
+                        league.MyProviderTeamId = known.MyProviderTeamId;
+                        league.MyTeamTitle = known.MyTeamTitle;
+                    }
+
+                    // Falling back to the first team keeps the league usable
+                    // rather than leaving it with no team set at all.
+                    if (string.IsNullOrEmpty(league.MyProviderTeamId) && league.UserLeagueTeams.Count > 0)
+                    {
+                        league.MyProviderTeamId = league.UserLeagueTeams.First().ProviderId;
+                        entry.Warnings.Add("Could not tell which team is yours, so the first was used.");
+                    }
+
+                    _db.AddUserLeagueAsync(league).GetAwaiter().GetResult();
+
+                    var draft = lib.ImportDraft(userAuth, league, providerPlayers);
+                    if (draft != null)
+                        _db.AddDraftAsync(draft).GetAwaiter().GetResult();
+
+                    entry.Imported = true;
+                    entry.Title = league.DisplayTitle ?? league.Title;
+                    entry.MissingPlayerCount = missingPlayers.Count;
+                }
+                catch (Exception ex)
+                {
+                    // One league failing should not lose the rest.
+                    entry.Message = ex.Message;
+                }
+
+                result.Leagues.Add(entry);
+            }
         }
 
         // -------------------------------------------------------------------

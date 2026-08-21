@@ -31,7 +31,7 @@ namespace RotoMonster.Pages.UserLeagues
         [BindProperty]
         public string ESPNPassword { get; set; }
         [BindProperty]
-        public string FanTraxSecretId { get; set; }
+        public string FanTraxEmail { get; set; }
         [BindProperty]
         public string FanTraxLeagueId { get; set; }
 
@@ -116,7 +116,7 @@ namespace RotoMonster.Pages.UserLeagues
             if (Sport.IsNBA || Sport.IsMLB || Sport.IsNFL)
                 Tabs.Add(await BuildTabAsync(ESPNProvider, IsESPNConnected, false));
 
-            Tabs.Add(await BuildTabAsync(FanTraxProvider, IsFanTraxConnected, false));
+            Tabs.Add(await BuildTabAsync(FanTraxProvider, IsFanTraxConnected, true));
 
             // Leagues that belong to no provider would otherwise exist in the
             // database and show up nowhere.
@@ -168,9 +168,8 @@ namespace RotoMonster.Pages.UserLeagues
             }
             else
             {
-                // ESPN and FanTrax have no provider implementation yet, so they
-                // keep listing through their existing libs. Same table either
-                // way, only the import action differs.
+                // ESPN has no bulk path yet, so it keeps listing through its
+                // existing lib with a per league Import link.
                 tab.LegacyTable = BuildLegacyTable(providerName);
             }
 
@@ -345,29 +344,19 @@ namespace RotoMonster.Pages.UserLeagues
 
         public IActionResult OnPostFanTrax()
         {
-            if (!string.IsNullOrEmpty(FanTraxSecretId))
+            if (!string.IsNullOrEmpty(FanTraxEmail))
             {
-                var secretId = FanTraxSecretId.Trim();
+                var email = FanTraxEmail.Trim();
                 var lib = new FanTraxLib(config, logger);
-
-                // Despite the name, this does not check email format. It calls
-                // Fantrax with the value and checks that leagues come back, so
-                // it works unchanged for a Secret ID.
-                if (lib.IsEmailValid(secretId))
+                if (lib.IsEmailValid(email))
                 {
-                    // Still stored on UserAuth.FanTraxEmail. Renaming that
-                    // column needs a migration and touches shared data, so it
-                    // is left for its own change.
-                    sharedDb.AddFanTraxUserAuth(userManager.GetUserId(User), secretId);
-                    AddMessage("Connected to FanTrax.");
+                    sharedDb.AddFanTraxUserAuth(userManager.GetUserId(User), email);
+                    AddMessage("You have successfully authorized with FanTrax.");
                     return RedirectToPage("./Import", new { tab = FanTraxProvider });
                 }
-
-                AddErrorMessage("FanTrax did not recognise that Secret ID.");
-                return RedirectToPage("./Import", new { tab = FanTraxProvider });
             }
 
-            AddErrorMessage("Enter your FanTrax Secret ID.");
+            AddErrorMessage("An error occurred authorizing FanTrax.");
             return RedirectToPage("./Import", new { tab = FanTraxProvider });
         }
 
@@ -406,28 +395,19 @@ namespace RotoMonster.Pages.UserLeagues
 
             if (provider == FanTraxProvider)
             {
-                var providerPlayers = db.GetFantasyProviderPlayers(db.GetFantasyProvider("fantrax"));
-                league = fanTrax.ImportUserLeague(UserAuth, db.GetDefaultSeason(), id, "", db.GetActiveRosterSpots(), db.GetCategories());
-                var missingPlayers = new List<UserLeagueMissingPlayer>();
-                league.UserLeagueTeams = fanTrax.GetUserLeagueTeams(UserAuth, db.Sport.Title, league, providerPlayers, missingPlayers);
+                // Same path the checkboxes use, so the manual box cannot drift
+                // from the list.
+                var fanTraxResult = await importService.ImportAsync(UserId, FanTraxProvider,
+                    new List<string> { id });
 
-                if (UserAuth.FanTraxEmail.Length > 0)
-                {
-                    var allLeaguesJson = fanTrax.GetLeaguesJson(UserAuth.FanTraxEmail);
-                    var allLeagues = fanTrax.GetLeagues(allLeaguesJson, db.Sport.Title);
-                    var matchLeague = allLeagues.FirstOrDefault(l => l.ProviderLeagueId == league.ProviderLeagueId);
-                    if (matchLeague != null)
-                        league.MyProviderTeamId = matchLeague.MyProviderTeamId;
-                }
+                if (fanTraxResult.ImportedCount > 0)
+                    AddMessage("Imported the FanTrax league.");
+                else
+                    AddErrorMessage(fanTraxResult.ErrorMessage ?? "That league could not be imported.");
 
-                if (league.MyProviderTeamId.Length == 0 && league.UserLeagueTeams.Count > 0)
-                    league.MyProviderTeamId = league.UserLeagueTeams.First().ProviderId;
-
-                await db.AddUserLeagueAsync(league);
-                var draft = fanTrax.ImportDraft(UserAuth, league, providerPlayers);
-                await db.AddDraftAsync(draft);
-                AddMessage("You have imported the FanTrax league " + league.Title + ". Make sure to edit the league to set your team.");
+                return RedirectToPage("./Import", new { tab = FanTraxProvider });
             }
+
             else if (provider == ESPNProvider)
             {
                 var providerPlayers = db.GetFantasyProviderPlayers(db.GetFantasyProvider("espn"));
