@@ -2490,3 +2490,37 @@ td.value-badge-cell {
 .rm-import-action {
     width: 11rem;
 }
+
+/* rm-gamestate-badge */
+/* The lineup badge holds a play or pause icon, sometimes a batting order, and
+   sometimes a lock. They were inline elements on the text baseline, so each
+   sat at a different height and the badge stretched to contain them.
+   A flex row puts them on one centre line.
+
+   The font size is fixed rather than relative because this badge lives inside
+   a <small> and .badge scales again on top of that, which compounded the
+   number down to about 8px. */
+.pgs-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 6px;
+    font-size: 11px;
+    line-height: 1;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+/* Block removes the baseline gap under an inline svg, which was adding a few
+   stray pixels to the badge height. */
+.pgs-badge svg {
+    display: block;
+    flex: none;
+}
+
+.pgs-detail {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}

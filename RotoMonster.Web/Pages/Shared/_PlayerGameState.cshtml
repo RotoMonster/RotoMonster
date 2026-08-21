@@ -8,20 +8,20 @@
     var tipId = Context.NextTooltipId();
 
     <span class="bm-tooltip-wrap">
-    <span class="me-1 badge bm-tooltip-trigger bm-tooltip-trigger--hover"
+    <span class="me-1 badge pgs-badge bm-tooltip-trigger bm-tooltip-trigger--hover"
           data-bm-tooltip="@tipId"
           style="color:white;background-color:#@stateType.TextColor">
         @if (hasIcon)
         {
-            @Html.Raw(new Icon(new IconInput { Type = stateIcon, Size = 13, Color = "#fff" }).Render())
+            @Html.Raw(new Icon(new IconInput { Type = stateIcon, Size = 14, Color = "#fff" }).Render())
         }
         @if (Model.PlayerGameState.Details != null && Model.PlayerGameState.Details.Length > 0)
         {
-            <span>@Model.PlayerGameState.Details</span>
+            <span class="pgs-detail">@Model.PlayerGameState.Details</span>
         }
         @if (stateType.ShowLockAfterStart & Model.PlayerGameState.Game.HasStarted)
         {
-            @Html.Raw(new Icon(new IconInput { Type = IconType.Lock, Size = 13, Color = "#fff" }).Render())
+            @Html.Raw(new Icon(new IconInput { Type = IconType.Lock, Size = 14, Color = "#fff" }).Render())
         }
     </span>
     <div class="bm-tooltip-content" id="@tipId" role="tooltip">@stateType.Title</div>
