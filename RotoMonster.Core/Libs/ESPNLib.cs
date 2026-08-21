@@ -51,7 +51,16 @@ namespace RotoMonster.Core.Libs
             if (userAuth.ESPNswid.Length == 0 | userAuth.ESPNs2.Length == 0)
                 return "";
 
-            string url = $"https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2026/segments/0/leagues/{leagueId}?{tags}";
+            // Sport and season come from the caller. These used to be
+            // hardcoded to fba and 2026, so every non basketball import asked
+            // ESPN for a basketball league and failed.
+            string espnCode = (sport != null && !string.IsNullOrEmpty(sport.ESPNCode))
+                ? sport.ESPNCode.ToLower()
+                : "fba";
+
+            string season = string.IsNullOrEmpty(espnYear) ? "2026" : espnYear;
+
+            string url = $"https://lm-api-reads.fantasy.espn.com/apis/v3/games/{espnCode}/seasons/{season}/segments/0/leagues/{leagueId}?{tags}";
 
             string data = "";
 
@@ -72,7 +81,10 @@ namespace RotoMonster.Core.Libs
             }
             catch (Exception ex)
             {
-                throw new Exception("An error occurred reading from ESPN. Please try again.");
+                // The original message said nothing about what failed, which
+                // made a wrong sport in the url look the same as a bad cookie.
+                throw new Exception("Could not read league " + leagueId
+                    + " from ESPN [" + espnCode + " " + season + "]: " + ex.Message);
             }
 
             return data;

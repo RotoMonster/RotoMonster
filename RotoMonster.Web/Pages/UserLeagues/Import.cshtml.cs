@@ -114,7 +114,7 @@ namespace RotoMonster.Pages.UserLeagues
             Tabs.Add(await BuildTabAsync(YahooProvider, IsYahooConnected, true));
 
             if (Sport.IsNBA || Sport.IsMLB || Sport.IsNFL)
-                Tabs.Add(await BuildTabAsync(ESPNProvider, IsESPNConnected, false));
+                Tabs.Add(await BuildTabAsync(ESPNProvider, IsESPNConnected, true));
 
             Tabs.Add(await BuildTabAsync(FanTraxProvider, IsFanTraxConnected, true));
 
@@ -158,59 +158,13 @@ namespace RotoMonster.Pages.UserLeagues
             if (!isConnected)
                 return tab;
 
-            if (useBulkImport)
-            {
-                var result = await importService.ListAsync(UserId, providerName);
+            var result = await importService.ListAsync(UserId, providerName);
 
-                tab.Leagues = result.Leagues;
-                tab.ErrorMessage = result.ErrorMessage;
-                tab.NeedsReauthorization = result.NeedsReauthorization;
-            }
-            else
-            {
-                // ESPN has no bulk path yet, so it keeps listing through its
-                // existing lib with a per league Import link.
-                tab.LegacyTable = BuildLegacyTable(providerName);
-            }
+            tab.Leagues = result.Leagues;
+            tab.ErrorMessage = result.ErrorMessage;
+            tab.NeedsReauthorization = result.NeedsReauthorization;
 
             return tab;
-        }
-
-        private UserLeagueTableModel BuildLegacyTable(string providerName)
-        {
-            try
-            {
-                if (providerName == ESPNProvider)
-                {
-                    return new UserLeagueTableModel
-                    {
-                        ProviderUserLeagues = espn.GetLeagues(UserAuth.ESPNswid, db.Sport),
-                        CurrentUserLeagues = SelectedUserLeagues,
-                        FantasyProvider = db.GetFantasyProvider("espn"),
-                        ShowMyTeam = false
-                    };
-                }
-
-                if (providerName == FanTraxProvider)
-                {
-                    var json = fanTrax.GetLeaguesJson(UserAuth.FanTraxEmail);
-                    return new UserLeagueTableModel
-                    {
-                        ProviderUserLeagues = fanTrax.GetLeagues(json, db.Sport.Title),
-                        CurrentUserLeagues = SelectedUserLeagues,
-                        FantasyProvider = db.GetFantasyProvider("fantrax"),
-                        ShowMyTeam = true
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                // A provider being down should not take the whole page with it,
-                // since the other tabs are still usable.
-                AddErrorMessage("Could not read your " + providerName + " leagues [" + ex.Message + "]");
-            }
-
-            return null;
         }
 
         // -------------------------------------------------------------------
@@ -408,15 +362,13 @@ namespace RotoMonster.Pages.UserLeagues
                 return RedirectToPage("./Import", new { tab = FanTraxProvider });
             }
 
-            else if (provider == ESPNProvider)
-            {
-                var providerPlayers = db.GetFantasyProviderPlayers(db.GetFantasyProvider("espn"));
-                league = espn.ImportUserLeague(db.Sport, UserAuth, db.GetDefaultSeason(), id, db.GetActiveRosterSpots(), db.GetCategories());
-                var missingPlayers = new List<UserLeagueMissingPlayer>();
-                league.UserLeagueTeams = espn.GetUserLeagueTeams(UserAuth, db.Sport, db.GetDefaultSeason(), league, providerPlayers, db.GetPlayers(), missingPlayers);
-                await db.AddUserLeagueAsync(league);
-                AddMessage("You have imported the ESPN league " + league.Title);
-            }
+            var importResult = await importService.ImportAsync(UserId, provider,
+                new List<string> { id });
+
+            if (importResult.ImportedCount > 0)
+                AddMessage("Imported the league.");
+            else
+                AddErrorMessage(importResult.ErrorMessage ?? "That league could not be imported.");
 
             return RedirectToPage("./Import", new { tab = provider });
         }
@@ -450,8 +402,9 @@ namespace RotoMonster.Pages.UserLeagues
         public bool IsConnected { get; set; }
 
         /// <summary>
-        /// True once the provider has an IFantasyProvider implementation, which
-        /// is what enables checkboxes and one button for the lot.
+        /// Every provider lists and imports the same way now, whether it runs
+        /// through the provider layer or its own lib. Kept so the Custom tab,
+        /// which imports from nothing, can still say so.
         /// </summary>
         public bool SupportsBulkImport { get; set; }
 
@@ -463,21 +416,13 @@ namespace RotoMonster.Pages.UserLeagues
 
         public List<ListedLeague> Leagues { get; set; } = new List<ListedLeague>();
 
-        public UserLeagueTableModel LegacyTable { get; set; }
-
         public string ErrorMessage { get; set; }
 
         public bool NeedsReauthorization { get; set; }
 
         public int TotalCount
         {
-            get
-            {
-                if (SupportsBulkImport) return Leagues.Count;
-                return LegacyTable == null || LegacyTable.ProviderUserLeagues == null
-                    ? 0
-                    : LegacyTable.ProviderUserLeagues.Count;
-            }
+            get { return Leagues.Count; }
         }
 
         public int ImportedCount

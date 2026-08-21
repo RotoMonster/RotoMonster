@@ -46,7 +46,15 @@ namespace RotoMonster.Data
 
             List<ProviderLeague> providerLeagues;
 
-            if (Normalize(providerName) == "fantrax")
+            if (Normalize(providerName) == "espn")
+            {
+                // Same reasoning as FanTrax below. ESPN reads a whole league in
+                // one call already, and has no endpoint for several leagues at
+                // once, so there is no batching to win by moving it behind the
+                // layer. The page gets the bulk flow either way.
+                providerLeagues = ListESPNLeagues(userId);
+            }
+            else if (Normalize(providerName) == "fantrax")
             {
                 // Fantrax has no implementation behind the layer, and would
                 // gain nothing from one - its API is a call per league either
@@ -206,10 +214,13 @@ namespace RotoMonster.Data
             }
 
             var isFanTrax = Normalize(providerName) == "fantrax";
-            var provider = isFanTrax ? null : GetProvider(providerName);
+            var isESPN = Normalize(providerName) == "espn";
+            var usesOwnLib = isFanTrax || isESPN;
+
+            var provider = usesOwnLib ? null : GetProvider(providerName);
             var fantasyProvider = _db.GetFantasyProvider(providerName);
 
-            if ((provider == null && !isFanTrax) || fantasyProvider == null)
+            if ((provider == null && !usesOwnLib) || fantasyProvider == null)
             {
                 result.ErrorMessage = providerName + " is not set up yet.";
                 return result;
@@ -240,6 +251,12 @@ namespace RotoMonster.Data
             if (isFanTrax)
             {
                 ImportFanTrax(userId, fantasyProvider, toImport, result);
+                return Finish(result);
+            }
+
+            if (isESPN)
+            {
+                ImportESPN(userId, fantasyProvider, toImport, result);
                 return Finish(result);
             }
 
@@ -439,6 +456,120 @@ namespace RotoMonster.Data
         {
             result.Success = true;
             return result;
+        }
+
+        // -------------------------------------------------------------------
+        // ESPN
+        // -------------------------------------------------------------------
+        //
+        // Left on ESPNLib for the same reason as FanTrax. ESPN already reads a
+        // whole league in one request - settings, roster, draft and teams all
+        // come back together - and has no endpoint for several leagues at once,
+        // so the batching that made the layer worth building for Yahoo does not
+        // apply here.
+
+        private List<ProviderLeague> ListESPNLeagues(string userId)
+        {
+            var leagues = new List<ProviderLeague>();
+
+            var userAuth = _sharedDb.GetUserAuth(userId);
+            if (userAuth == null || string.IsNullOrEmpty(userAuth.ESPNswid))
+                return leagues;
+
+            var lib = new ESPNLib(_config, null);
+
+            foreach (var league in lib.GetLeagues(userAuth.ESPNswid, _db.Sport))
+            {
+                leagues.Add(new ProviderLeague
+                {
+                    LeagueId = league.ProviderLeagueId,
+                    Title = league.Title,
+                    MyTeamId = league.MyProviderTeamId,
+                    MyTeamTitle = league.MyTeamTitle
+                });
+            }
+
+            return leagues;
+        }
+
+        private void ImportESPN(
+            string userId,
+            FantasyProvider fantasyProvider,
+            List<string> leagueIds,
+            LeagueImportResult result)
+        {
+            var userAuth = _sharedDb.GetUserAuth(userId);
+            if (userAuth == null)
+            {
+                result.ErrorMessage = "There is no ESPN authorization on your account.";
+                return;
+            }
+
+            var lib = new ESPNLib(_config, null);
+            var season = _db.GetDefaultSeason();
+
+            // Read once for the batch rather than per league.
+            var providerPlayers = _db.GetFantasyProviderPlayers(fantasyProvider);
+            var rosterSpots = _db.GetActiveRosterSpots();
+            var categories = _db.GetCategories();
+            var allPlayers = _db.GetPlayers();
+
+            // ESPN's settings call does not carry the league name or the user's
+            // own team, only the fan list does, so it is read once up front.
+            var allLeagues = new List<UserLeague>();
+            if (!string.IsNullOrEmpty(userAuth.ESPNswid))
+                allLeagues = lib.GetLeagues(userAuth.ESPNswid, _db.Sport);
+
+            foreach (var leagueId in leagueIds)
+            {
+                var entry = new ImportedLeague { LeagueId = leagueId };
+
+                try
+                {
+                    var league = lib.ImportUserLeague(_db.Sport, userAuth, season, leagueId,
+                        rosterSpots, categories);
+
+                    if (league == null)
+                    {
+                        entry.Message = "ESPN did not return settings for this league.";
+                        result.Leagues.Add(entry);
+                        continue;
+                    }
+
+                    var missingPlayers = new List<UserLeagueMissingPlayer>();
+                    league.UserLeagueTeams = lib.GetUserLeagueTeams(userAuth, _db.Sport, season,
+                        league, providerPlayers, allPlayers, missingPlayers);
+
+                    var known = allLeagues.FirstOrDefault(l => l.ProviderLeagueId == leagueId);
+                    if (known != null)
+                    {
+                        league.MyProviderTeamId = known.MyProviderTeamId;
+                        league.MyTeamTitle = known.MyTeamTitle;
+
+                        if (string.IsNullOrWhiteSpace(league.Title))
+                            league.DisplayTitle = league.Title = known.Title;
+                    }
+
+                    if (string.IsNullOrEmpty(league.MyProviderTeamId) && league.UserLeagueTeams.Count > 0)
+                    {
+                        league.MyProviderTeamId = league.UserLeagueTeams.First().ProviderId;
+                        entry.Warnings.Add("Could not tell which team is yours, so the first was used.");
+                    }
+
+                    _db.AddUserLeagueAsync(league).GetAwaiter().GetResult();
+
+                    entry.Imported = true;
+                    entry.Title = league.DisplayTitle ?? league.Title;
+                    entry.MissingPlayerCount = missingPlayers.Count;
+                }
+                catch (Exception ex)
+                {
+                    // One league failing should not lose the rest.
+                    entry.Message = ex.Message;
+                }
+
+                result.Leagues.Add(entry);
+            }
         }
 
         // -------------------------------------------------------------------
