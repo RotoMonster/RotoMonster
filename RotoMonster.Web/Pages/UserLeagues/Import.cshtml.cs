@@ -13,6 +13,7 @@ using RotoMonster.Core;
 using RotoMonster.Core.Libs;
 using RotoMonster.Models.Shared;
 using RotoMonster.Data;
+using RotoMonsterExternalAPIs.Client.Services.Providers;
 
 namespace RotoMonster.Pages.UserLeagues
 {
@@ -22,6 +23,7 @@ namespace RotoMonster.Pages.UserLeagues
         public const string YahooProvider = "Yahoo!";
         public const string ESPNProvider = "ESPN";
         public const string FanTraxProvider = "FanTrax";
+        public const string SleeperProvider = "Sleeper";
         public const string CustomProvider = "Custom";
 
         [BindProperty]
@@ -40,6 +42,9 @@ namespace RotoMonster.Pages.UserLeagues
         [BindProperty]
         public string ESPNS2 { get; set; }
 
+        [BindProperty]
+        public string SleeperName { get; set; }
+
         /// <summary>
         /// Which leagues the user ticked. Bound from the checkboxes, so a
         /// single import and a twenty league import are the same post.
@@ -54,6 +59,7 @@ namespace RotoMonster.Pages.UserLeagues
         public string YahooUrl { get; set; }
         public bool IsESPNConnected { get; set; }
         public bool IsFanTraxConnected { get; set; }
+        public bool IsSleeperConnected { get; set; }
 
         /// <summary>
         /// Which tab is showing. Kept in the query string so a postback can
@@ -91,6 +97,11 @@ namespace RotoMonster.Pages.UserLeagues
             IsYahooConnected = yahoo.IsConnected(UserAuth);
             IsESPNConnected = espn.IsConnected(UserAuth);
             IsFanTraxConnected = fanTrax.IsConnected(UserAuth);
+
+            // Sleeper has no library of its own to ask, since there is
+            // nothing to authenticate. Having the id is the whole state.
+            IsSleeperConnected = UserAuth != null
+                && !string.IsNullOrEmpty(UserAuth.SleeperId);
         }
 
         // -------------------------------------------------------------------
@@ -117,12 +128,13 @@ namespace RotoMonster.Pages.UserLeagues
                 Tabs.Add(await BuildTabAsync(ESPNProvider, IsESPNConnected, true));
 
             Tabs.Add(await BuildTabAsync(FanTraxProvider, IsFanTraxConnected, true));
+            Tabs.Add(await BuildTabAsync(SleeperProvider, IsSleeperConnected, true));
 
             // Leagues that belong to no provider would otherwise exist in the
             // database and show up nowhere.
             var custom = await importService.ListCustomAsync(
                 UserId,
-                new[] { YahooProvider, ESPNProvider, FanTraxProvider });
+                new[] { YahooProvider, ESPNProvider, FanTraxProvider, SleeperProvider });
 
             if (custom.Leagues.Count > 0)
             {
@@ -312,6 +324,39 @@ namespace RotoMonster.Pages.UserLeagues
 
             AddErrorMessage("An error occurred authorizing FanTrax.");
             return RedirectToPage("./Import", new { tab = FanTraxProvider });
+        }
+
+        /// <summary>
+        /// Unlike the others this makes a request, because Sleeper only
+        /// knows the user by an id and the user only knows their username.
+        /// The id is stored so this never has to run again.
+        /// </summary>
+        public async Task<IActionResult> OnPostSleeperAsync()
+        {
+            if (!string.IsNullOrEmpty(SleeperName))
+            {
+                var name = SleeperName.Trim();
+                var sleeperId = await SleeperFantasyProvider.GetUserIdAsync(name);
+
+                if (!string.IsNullOrEmpty(sleeperId))
+                {
+                    sharedDb.AddSleeperUserAuth(userManager.GetUserId(User), name, sleeperId);
+                    AddMessage("You have successfully connected Sleeper.");
+                    return RedirectToPage("./Import", new { tab = SleeperProvider });
+                }
+
+                AddErrorMessage("Sleeper does not have a user called " + name + ".");
+                return RedirectToPage("./Import", new { tab = SleeperProvider });
+            }
+
+            AddErrorMessage("Enter your Sleeper username.");
+            return RedirectToPage("./Import", new { tab = SleeperProvider });
+        }
+
+        public IActionResult OnPostSleeperDisconnect()
+        {
+            sharedDb.ClearSleeperAuth(userManager.GetUserId(User));
+            return RedirectToPage("./Import", new { tab = SleeperProvider });
         }
 
         public IActionResult OnPostFanTraxDisconnect()

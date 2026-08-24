@@ -51,6 +51,19 @@ else if (Model == RotoMonster.Pages.UserLeagues.ImportModel.ESPNProvider)
         </ol>
     </div>
 }
+else if (Model == RotoMonster.Pages.UserLeagues.ImportModel.SleeperProvider)
+{
+    <form method="post">
+        <div class="rm-import-connect-row">
+            <input name="SleeperName" placeholder="Your Sleeper username" class="rm-import-input" />
+            <button class="modern-filter-btn modern-filter-btn-primary" asp-page-handler="Sleeper">Connect</button>
+        </div>
+    </form>
+    <div class="rm-import-help">
+        Sleeper does not need a password or a code. Your username is enough,
+        and it is the one shown on your Sleeper profile.
+    </div>
+}
 else
 {
     <form method="post">

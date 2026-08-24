@@ -132,6 +132,42 @@ namespace RotoMonster.Data
             return userAuth;
         }
 
+        /// <summary>
+        /// Both values are stored. The id is what every Sleeper call uses,
+        /// the name is only so it can be shown back to the user.
+        /// </summary>
+        public UserAuth AddSleeperUserAuth(string userId, string sleeperName, string sleeperId)
+        {
+            UserAuth userAuth = GetUserAuth(userId);
+            if (userAuth == null)
+            {
+                userAuth = GetNewUserAuth(userId);
+                userAuth.SleeperName = sleeperName;
+                userAuth.SleeperId = sleeperId;
+                db.UserAuths.Add(userAuth);
+            }
+            else
+            {
+                userAuth.SleeperName = sleeperName;
+                userAuth.SleeperId = sleeperId;
+                userAuth.LastUsed = DateTime.UtcNow;
+            }
+            db.SaveChanges();
+
+            return userAuth;
+        }
+
+        public void ClearSleeperAuth(string userId)
+        {
+            UserAuth auth = GetUserAuth(userId);
+            if (auth != null)
+            {
+                auth.SleeperName = null;
+                auth.SleeperId = null;
+                db.SaveChanges();
+            }
+        }
+
         public void ClearYahooAuth(string userId)
         {
             UserAuth auth = GetUserAuth(userId);
