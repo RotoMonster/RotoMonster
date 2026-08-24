@@ -18,6 +18,8 @@ namespace RotoMonster.Core
             this.CBSUsername = "";
             this.CBSPassword = "";
             this.FanTraxEmail = "";
+            this.SleeperName = "";
+            this.SleeperId = "";
         }
 
         [StringLength(260)]
@@ -42,6 +44,20 @@ namespace RotoMonster.Core
         public string CBSPassword { get; set; }
         [StringLength(100)]
         public string FanTraxEmail { get; set; }
+
+        /// <summary>
+        /// The username the user types in. Kept so it can be shown back
+        /// to them, since the id below means nothing to a person.
+        /// </summary>
+        [StringLength(100)]
+        public string SleeperName { get; set; }
+
+        /// <summary>
+        /// Sleeper's own user id, looked up once from the username. This
+        /// is what every Sleeper call is keyed on.
+        /// </summary>
+        [StringLength(50)]
+        public string SleeperId { get; set; }
 
         [NotMapped] public string BBMUserName { get; set; } = "";
         [NotMapped] public string BBMEmail { get; set; } = "";
@@ -74,6 +90,8 @@ namespace RotoMonster.Core
                 if (ESPNswid.Trim().Length > 0 && ESPNs2.Trim().Length > 0)
                     return true;
                 if (FanTraxEmail.Trim().Length > 0)
+                    return true;
+                if (!string.IsNullOrEmpty(SleeperId) && SleeperId.Trim().Length > 0)
                     return true;
 
                 return false;

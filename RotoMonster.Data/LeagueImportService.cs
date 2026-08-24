@@ -71,7 +71,8 @@ namespace RotoMonster.Data
                     return result;
                 }
 
-                var leagues = await provider.GetLeaguesAsync(userId, SeasonKeyFor(providerName))
+                var leagues = await provider.GetLeaguesAsync(
+                    UserKeyFor(providerName, userId), SeasonKeyFor(providerName))
                     .ConfigureAwait(false);
 
                 if (!leagues.Success)
@@ -261,7 +262,7 @@ namespace RotoMonster.Data
             }
 
             var data = await provider.GetLeagueDataAsync(
-                userId,
+                UserKeyFor(providerName, userId),
                 SeasonKeyFor(providerName),
                 toImport,
                 ProviderLeagueDataParts.All).ConfigureAwait(false);
@@ -371,7 +372,7 @@ namespace RotoMonster.Data
             }
 
             var data = await provider.GetLeagueDataAsync(
-                userId,
+                UserKeyFor(providerName, userId),
                 SeasonKeyFor(providerName),
                 leagues.Select(l => l.ProviderLeagueId).ToList(),
                 ProviderLeagueDataParts.Rosters).ConfigureAwait(false);
@@ -727,6 +728,11 @@ namespace RotoMonster.Data
                         (IYahooTokenStore)_sharedDb);
                     return new YahooFantasyProvider(client);
 
+                case "sleeper":
+                    // Sleeper scopes its league list by sport, and the
+                    // sport does not change for the life of the request.
+                    return new SleeperFantasyProvider(_db.Sport.Title);
+
                 default:
                     return null;
             }
@@ -747,8 +753,32 @@ namespace RotoMonster.Data
                     return season.YahooId ?? "";
                 case "espn":
                     return season.ESPNYear ?? "";
+                case "sleeper":
+                    // Sleeper wants the plain year.
+                    return season.Year.GetValueOrDefault(season.StartDate.Year)
+                        .ToString(System.Globalization.CultureInfo.InvariantCulture);
                 default:
                     return "";
+            }
+        }
+
+        /// <summary>
+        /// The id a provider expects for the user.
+        ///
+        /// Yahoo looks its tokens up by the RM user id, so that is what it
+        /// gets. Sleeper has no auth at all and is keyed on its own user
+        /// id instead, which we store once when the account is linked.
+        /// </summary>
+        private string UserKeyFor(string providerName, string userId)
+        {
+            switch (Normalize(providerName))
+            {
+                case "sleeper":
+                    var userAuth = _sharedDb.GetUserAuth(userId);
+                    return userAuth == null ? "" : (userAuth.SleeperId ?? "");
+
+                default:
+                    return userId;
             }
         }
 
