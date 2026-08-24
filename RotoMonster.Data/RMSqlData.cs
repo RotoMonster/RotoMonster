@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
@@ -4033,7 +4033,18 @@ namespace RotoMonster.Data
                     item.ValuePlayers = GetValuePlayers(playerType, processSeason, startDate, endDate, 0, categorySettings, scoringSystem, perValue, leagueSize, true, out valueAverages);
                 else
                     item.ValuePlayers = new List<ValuePlayer>();
-                item.Title = id;
+                switch (id)
+                {
+                    case "LS":
+                        item.Title = processSeason != null ? MonsterBarYearLabel(processSeason) : id;
+                        break;
+                    case "S":
+                        item.Title = MonsterBarYearLabel(season);
+                        break;
+                    default:
+                        item.Title = id;
+                        break;
+                }
                 item.DisplayOrder = monsterBar.MonsterBarItems.Count + 1;
                 monsterBar.MonsterBarItems.Add(item);
             }
@@ -5359,6 +5370,16 @@ namespace RotoMonster.Data
                 return new NFLDbLib(db);
 
             throw new Exception("Must add support for " + Sport.Title + "DbLib");
+        }
+
+
+        private string MonsterBarYearLabel(Season season)
+        {
+            if (season == null)
+                return "";
+
+            int year = season.Year.GetValueOrDefault(season.StartDate.Year);
+            return "'" + (year % 100).ToString("00");
         }
 
     }

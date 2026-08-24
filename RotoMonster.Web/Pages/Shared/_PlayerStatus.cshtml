@@ -24,7 +24,7 @@
         @if (Model.EstimatedGamesToMiss!=null && Model.EstimatedGamesToMiss.Count>1)
         {
             string g = Model.EstimatedGamesToMiss.Count.ToString() + "g";
-            <small>@g</small>
+            <small class="status-badge-count">@g</small>
         }
         @if (Model.TimeSince.TotalHours <= 8)
         {

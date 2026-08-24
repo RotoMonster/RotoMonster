@@ -1,4 +1,4 @@
-﻿/* rm.light.css - RotoMonster-only overrides.
+/* rm.light.css - RotoMonster-only overrides.
    Loaded AFTER bm.light.css. Nothing shared belongs in here: bm.light.css
    is a verbatim copy of the RotoMonsterUI stylesheet and gets refreshed by
    overwriting it, so any edit made there is lost on the next refresh. */
@@ -2523,4 +2523,10 @@ td.value-badge-cell {
     font-weight: 600;
     line-height: 1;
     font-variant-numeric: tabular-nums;
+}
+
+/* Space between the injury abbreviation and the games count. Sits in
+   rm.light.css because it is spacing, not colour, so it applies in both themes. */
+.badge .status-badge-count {
+    margin-left: 3px;
 }
