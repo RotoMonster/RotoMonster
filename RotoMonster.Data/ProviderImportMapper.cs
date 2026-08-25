@@ -87,8 +87,8 @@ namespace RotoMonster.Data
                 TrackLeague = true,
                 Title = s.Title,
                 DisplayTitle = s.Title,
-                ScoringSystem = s.ScoringSystem,
-                LeagueType = s.LeagueType,
+                ScoringSystem = ToScoringSystem(s),
+                LeagueType = ToLeagueType(s),
                 LineupFrequency = s.LineupFrequency,
                 SameDayTransactions = s.SameDayTransactions,
                 NumberOfTeams = s.NumberOfTeams,
@@ -409,6 +409,49 @@ namespace RotoMonster.Data
             var name = _provider.Name ?? "";
             return name.Replace("!", "").Trim().ToLowerInvariant();
         }
+
+        /// <summary>
+        /// C for categories, P for points per stat.
+        ///
+        /// Providers word this differently and some bundle it with the format,
+        /// so CBS says "Head-to-Head, Points" where Yahoo says "head". The
+        /// surest signal is the categories themselves: a points league gives a
+        /// points value per stat and a categories league does not.
+        /// </summary>
+        private static string ToScoringSystem(ProviderLeagueSettings s)
+        {
+            foreach (var category in s.Categories)
+            {
+                if (category.PointsPerStat.HasValue)
+                    return "P";
+            }
+
+            var raw = (s.ScoringSystem ?? "").ToLowerInvariant();
+            return raw.Contains("point") ? "P" : "C";
+        }
+
+        /// <summary>
+        /// H for head to head, R for rotisserie. Anything that is not clearly
+        /// rotisserie is treated as head to head, which is the commoner case.
+        /// </summary>
+        private static string ToLeagueType(ProviderLeagueSettings s)
+        {
+            var raw = ((s.LeagueType ?? "") + " " + (s.ScoringSystem ?? "")).ToLowerInvariant();
+
+            if (raw.Contains("roto"))
+                return "R";
+
+            if (raw.Contains("head"))
+                return "H";
+
+            // Yahoo reports these as single letters already.
+            var type = (s.LeagueType ?? "").Trim().ToUpperInvariant();
+            if (type == "R" || type == "H")
+                return type;
+
+            return "H";
+        }
+
     }
 
     /// <summary>
@@ -463,5 +506,6 @@ namespace RotoMonster.Data
         {
             get { return UserLeague != null; }
         }
+
     }
 }

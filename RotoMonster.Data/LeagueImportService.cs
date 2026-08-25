@@ -728,6 +728,11 @@ namespace RotoMonster.Data
                         (IYahooTokenStore)_sharedDb);
                     return new YahooFantasyProvider(client);
 
+                case "cbs":
+                    // The sport is carried in the league urls, so the
+                    // provider needs to know which one it is building.
+                    return new CBSFantasyProvider(_db.Sport.Title);
+
                 case "sleeper":
                     // Sleeper scopes its league list by sport, and the
                     // sport does not change for the life of the request.
@@ -776,6 +781,10 @@ namespace RotoMonster.Data
                 case "sleeper":
                     var userAuth = _sharedDb.GetUserAuth(userId);
                     return userAuth == null ? "" : (userAuth.SleeperId ?? "");
+
+                case "cbs":
+                    var cbsAuth = _sharedDb.GetUserAuth(userId);
+                    return cbsAuth == null ? "" : (cbsAuth.CBSPid ?? "");
 
                 default:
                     return userId;

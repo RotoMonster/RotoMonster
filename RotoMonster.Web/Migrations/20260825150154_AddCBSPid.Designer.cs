@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RotoMonster.Data;
 
@@ -11,9 +12,11 @@ using RotoMonster.Data;
 namespace RotoMonster.Migrations
 {
     [DbContext(typeof(RMSharedDbContext))]
-    partial class RotoMonsterContextModelSnapshot : ModelSnapshot
+    [Migration("20260825150154_AddCBSPid")]
+    partial class AddCBSPid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

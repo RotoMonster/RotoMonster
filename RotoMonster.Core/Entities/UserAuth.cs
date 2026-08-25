@@ -17,6 +17,7 @@ namespace RotoMonster.Core
             this.ESPNswid = "";
             this.CBSUsername = "";
             this.CBSPassword = "";
+            this.CBSPid = "";
             this.FanTraxEmail = "";
             this.SleeperName = "";
             this.SleeperId = "";
@@ -42,6 +43,14 @@ namespace RotoMonster.Core
         public string CBSUsername { get; set; }
         [StringLength(100)]
         public string CBSPassword { get; set; }
+
+        /// <summary>
+        /// The CBS pid cookie, which is the whole of their auth. Store
+        /// it exactly as CBS gives it - a URL encoded copy is rejected
+        /// and every request lands on the login page.
+        /// </summary>
+        [StringLength(200)]
+        public string CBSPid { get; set; }
         [StringLength(100)]
         public string FanTraxEmail { get; set; }
 
@@ -92,6 +101,8 @@ namespace RotoMonster.Core
                 if (FanTraxEmail.Trim().Length > 0)
                     return true;
                 if (!string.IsNullOrEmpty(SleeperId) && SleeperId.Trim().Length > 0)
+                    return true;
+                if (!string.IsNullOrEmpty(CBSPid) && CBSPid.Trim().Length > 0)
                     return true;
 
                 return false;

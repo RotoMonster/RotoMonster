@@ -17,11 +17,13 @@ namespace RotoMonster.Data
         UserAuth AddESPNUserAuth(string userId, string swid, string s2);
         UserAuth AddFanTraxUserAuth(string userId, string fanTraxEmail);
         UserAuth AddSleeperUserAuth(string userId, string sleeperName, string sleeperId);
+        UserAuth AddCBSUserAuth(string userId, string cbsPid);
         UserAuth AddUserAuth(UserAuth userAuth);
         void ClearYahooAuth(string userId);
         void ClearESPNAuth(string userId);
         void ClearFanTraxAuth(string userId);
         void ClearSleeperAuth(string userId);
+        void ClearCBSAuth(string userId);
 
         // Yahoo Calls
         string GetYahooAPIXML(UserAuth userAuth, string url);

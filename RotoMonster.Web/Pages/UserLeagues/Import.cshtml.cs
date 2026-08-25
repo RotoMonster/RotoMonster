@@ -24,6 +24,7 @@ namespace RotoMonster.Pages.UserLeagues
         public const string ESPNProvider = "ESPN";
         public const string FanTraxProvider = "FanTrax";
         public const string SleeperProvider = "Sleeper";
+        public const string CBSProvider = "CBS";
         public const string CustomProvider = "Custom";
 
         [BindProperty]
@@ -45,6 +46,9 @@ namespace RotoMonster.Pages.UserLeagues
         [BindProperty]
         public string SleeperName { get; set; }
 
+        [BindProperty]
+        public string CBSPid { get; set; }
+
         /// <summary>
         /// Which leagues the user ticked. Bound from the checkboxes, so a
         /// single import and a twenty league import are the same post.
@@ -60,6 +64,7 @@ namespace RotoMonster.Pages.UserLeagues
         public bool IsESPNConnected { get; set; }
         public bool IsFanTraxConnected { get; set; }
         public bool IsSleeperConnected { get; set; }
+        public bool IsCBSConnected { get; set; }
 
         /// <summary>
         /// Which tab is showing. Kept in the query string so a postback can
@@ -102,6 +107,11 @@ namespace RotoMonster.Pages.UserLeagues
             // nothing to authenticate. Having the id is the whole state.
             IsSleeperConnected = UserAuth != null
                 && !string.IsNullOrEmpty(UserAuth.SleeperId);
+
+            // The pid is the whole of CBS's auth, so having it is the
+            // whole of being connected.
+            IsCBSConnected = UserAuth != null
+                && !string.IsNullOrEmpty(UserAuth.CBSPid);
         }
 
         // -------------------------------------------------------------------
@@ -129,12 +139,13 @@ namespace RotoMonster.Pages.UserLeagues
 
             Tabs.Add(await BuildTabAsync(FanTraxProvider, IsFanTraxConnected, true));
             Tabs.Add(await BuildTabAsync(SleeperProvider, IsSleeperConnected, true));
+            Tabs.Add(await BuildTabAsync(CBSProvider, IsCBSConnected, true));
 
             // Leagues that belong to no provider would otherwise exist in the
             // database and show up nowhere.
             var custom = await importService.ListCustomAsync(
                 UserId,
-                new[] { YahooProvider, ESPNProvider, FanTraxProvider, SleeperProvider });
+                new[] { YahooProvider, ESPNProvider, FanTraxProvider, SleeperProvider, CBSProvider });
 
             if (custom.Leagues.Count > 0)
             {
@@ -351,6 +362,30 @@ namespace RotoMonster.Pages.UserLeagues
 
             AddErrorMessage("Enter your Sleeper username.");
             return RedirectToPage("./Import", new { tab = SleeperProvider });
+        }
+
+        /// <summary>
+        /// No lookup to do, unlike Sleeper. The pid is the credential, so
+        /// it is stored as given. It must not be URL encoded - CBS
+        /// rejects an encoded copy and bounces every request to login.
+        /// </summary>
+        public IActionResult OnPostCBS()
+        {
+            if (!string.IsNullOrEmpty(CBSPid))
+            {
+                sharedDb.AddCBSUserAuth(userManager.GetUserId(User), CBSPid.Trim());
+                AddMessage("You have successfully connected CBS.");
+                return RedirectToPage("./Import", new { tab = CBSProvider });
+            }
+
+            AddErrorMessage("Enter your CBS PID.");
+            return RedirectToPage("./Import", new { tab = CBSProvider });
+        }
+
+        public IActionResult OnPostCBSDisconnect()
+        {
+            sharedDb.ClearCBSAuth(userManager.GetUserId(User));
+            return RedirectToPage("./Import", new { tab = CBSProvider });
         }
 
         public IActionResult OnPostSleeperDisconnect()

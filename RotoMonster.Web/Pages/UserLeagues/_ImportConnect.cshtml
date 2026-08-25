@@ -51,6 +51,24 @@ else if (Model == RotoMonster.Pages.UserLeagues.ImportModel.ESPNProvider)
         </ol>
     </div>
 }
+else if (Model == RotoMonster.Pages.UserLeagues.ImportModel.CBSProvider)
+{
+    <form method="post">
+        <div class="rm-import-connect-row">
+            <input name="CBSPid" placeholder="Paste your CBS PID" class="rm-import-input" />
+            <button class="modern-filter-btn modern-filter-btn-primary" asp-page-handler="CBS">Connect</button>
+        </div>
+    </form>
+    <div class="rm-import-help">
+        <ol>
+            <li>Make sure you are logged in to CBS Sports.</li>
+            <li>Press F12, then open the Application tab.</li>
+            <li>Under Cookies, select https://www.cbssports.com.</li>
+            <li>Copy the value of the cookie named pid into the box above.</li>
+        </ol>
+        Paste it exactly as shown. If it contains %3A or %2F it has been encoded by the browser and will not work.
+    </div>
+}
 else if (Model == RotoMonster.Pages.UserLeagues.ImportModel.SleeperProvider)
 {
     <form method="post">

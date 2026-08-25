@@ -157,6 +157,35 @@ namespace RotoMonster.Data
             return userAuth;
         }
 
+        public UserAuth AddCBSUserAuth(string userId, string cbsPid)
+        {
+            UserAuth userAuth = GetUserAuth(userId);
+            if (userAuth == null)
+            {
+                userAuth = GetNewUserAuth(userId);
+                userAuth.CBSPid = cbsPid;
+                db.UserAuths.Add(userAuth);
+            }
+            else
+            {
+                userAuth.CBSPid = cbsPid;
+                userAuth.LastUsed = DateTime.UtcNow;
+            }
+            db.SaveChanges();
+
+            return userAuth;
+        }
+
+        public void ClearCBSAuth(string userId)
+        {
+            UserAuth auth = GetUserAuth(userId);
+            if (auth != null)
+            {
+                auth.CBSPid = null;
+                db.SaveChanges();
+            }
+        }
+
         public void ClearSleeperAuth(string userId)
         {
             UserAuth auth = GetUserAuth(userId);
