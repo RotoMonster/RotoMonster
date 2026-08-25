@@ -174,6 +174,58 @@ namespace RotoMonster.Data
                     PointsPerStat = category.PointsPerStat.HasValue ? category.PointsPerStat.Value : 0
                 });
             }
+
+            MapPlayerTypes(league);
+        }
+
+        /// <summary>
+        /// One row per player type, holding that type's categories as a colon
+        /// separated list of category ids in ascending order, e.g. hitters
+        /// with HR, RBI, SB, R and AVG becomes "31:32:33:34:42".
+        ///
+        /// The code has to be sorted and in that exact shape, because
+        /// CategoriesStrings is a lookup keyed on it. A differently ordered
+        /// code would create a second row meaning the same thing.
+        ///
+        /// AddUserLeague turns CategoriesCode1 into the id, so nothing here
+        /// needs to touch that table.
+        /// </summary>
+        private void MapPlayerTypes(UserLeague league)
+        {
+            var byType = new Dictionary<int, List<int>>();
+
+            foreach (var ulc in league.UserLeagueCategories)
+            {
+                var category = _categories.FirstOrDefault(c => c.Id == ulc.CategoryId);
+
+                // PlayerType is a navigation property rather than an id, so it
+                // is only here if the category was loaded with it included.
+                if (category == null || category.PlayerType == null) continue;
+
+                var playerTypeId = category.PlayerType.Id;
+
+                List<int> ids;
+                if (!byType.TryGetValue(playerTypeId, out ids))
+                {
+                    ids = new List<int>();
+                    byType[playerTypeId] = ids;
+                }
+
+                if (!ids.Contains(category.Id))
+                    ids.Add(category.Id);
+            }
+
+            foreach (var pair in byType)
+            {
+                var ids = pair.Value;
+                ids.Sort();
+
+                league.UserLeaguePlayerTypes.Add(new UserLeaguePlayerType
+                {
+                    PlayerTypeId = pair.Key,
+                    CategoriesCode1 = string.Join(":", ids)
+                });
+            }
         }
 
         // -------------------------------------------------------------------
@@ -349,6 +401,18 @@ namespace RotoMonster.Data
 
                 case "espn":
                     return _categories.FirstOrDefault(c => c.ESPNId == code);
+
+                case "cbs":
+                    return _categories.FirstOrDefault(c => c.CBSId == code);
+
+                case "sleeper":
+                    // There is no Sleeper column on Category, so this matches on
+                    // the abbreviation instead. Sleeper writes its codes in
+                    // lower case where ours are upper, hence the case
+                    // insensitive compare. Swap this for a SleeperId column if
+                    // the abbreviations ever stop lining up.
+                    return _categories.FirstOrDefault(c =>
+                        string.Equals(c.Abbreviation, code, StringComparison.OrdinalIgnoreCase));
 
                 case "fantrax":
                     // Fantrax scopes its ids by group, so the same id can mean
