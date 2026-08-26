@@ -30,6 +30,12 @@ namespace RotoMonster.Data
         // import re-read the whole provider player table for every league.
         private readonly Dictionary<string, int> _playersByProviderId;
 
+        /// <summary>
+        /// Players some providers split in two, keyed on last name plus the
+        /// suffix RotoMonster names them with, e.g. "Ohtani(P)".
+        /// </summary>
+        private readonly Dictionary<string, int> _splitPlayers;
+
         public ProviderImportMapper(
             FantasyProvider provider,
             Season season,
@@ -43,6 +49,7 @@ namespace RotoMonster.Data
             _rosterSpots = rosterSpots ?? new List<ActiveRosterSpot>();
 
             _playersByProviderId = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            _splitPlayers = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             if (providerPlayers != null)
             {
@@ -56,8 +63,25 @@ namespace RotoMonster.Data
                         ? pp.PlayerId
                         : (pp.Player != null ? pp.Player.Id : 0);
 
-                    if (playerId != 0)
-                        _playersByProviderId[pp.ProviderId] = playerId;
+                    if (playerId == 0) continue;
+
+                    _playersByProviderId[pp.ProviderId] = playerId;
+
+                    // Ohtani and anyone else we carry as two records, so a
+                    // provider that splits them can be matched on the name.
+                    if (pp.Player != null
+                        && !string.IsNullOrEmpty(pp.Player.LastName)
+                        && !string.IsNullOrEmpty(pp.Player.FirstName))
+                    {
+                        var suffix = pp.Player.FirstName.IndexOf("(P)", StringComparison.OrdinalIgnoreCase) >= 0
+                            ? "(P)"
+                            : pp.Player.FirstName.IndexOf("(H)", StringComparison.OrdinalIgnoreCase) >= 0
+                                ? "(H)"
+                                : null;
+
+                        if (suffix != null)
+                            _splitPlayers[pp.Player.LastName.Trim() + suffix] = playerId;
+                    }
                 }
             }
         }
@@ -176,6 +200,11 @@ namespace RotoMonster.Data
             }
 
             MapPlayerTypes(league);
+
+            // Anything the provider could not express properly, in its
+            // own words, shown alongside the match warnings.
+            foreach (var note in settings.Notes)
+                mapping.Warnings.Add(note);
         }
 
         /// <summary>
@@ -263,6 +292,10 @@ namespace RotoMonster.Data
                 foreach (var providerPlayer in providerTeam.Players)
                 {
                     var playerId = FindPlayerId(providerPlayer.PlayerId);
+
+                    if (playerId == 0)
+                        playerId = FindSplitPlayerId(providerPlayer.Name);
+
                     if (playerId == 0)
                     {
                         mapping.MissingPlayers.Add(new UserLeagueMissingPlayer
@@ -307,6 +340,10 @@ namespace RotoMonster.Data
                 foreach (var providerPlayer in providerTeam.Players)
                 {
                     var playerId = FindPlayerId(providerPlayer.PlayerId);
+
+                    if (playerId == 0)
+                        playerId = FindSplitPlayerId(providerPlayer.Name);
+
                     if (playerId == 0)
                     {
                         // Kept rather than dropped, so someone can see who was
@@ -462,6 +499,39 @@ namespace RotoMonster.Data
 
             int playerId;
             return _playersByProviderId.TryGetValue(providerPlayerId, out playerId) ? playerId : 0;
+        }
+
+        /// <summary>
+        /// A player some providers split into two, currently only Ohtani.
+        ///
+        /// Where a provider treats him as separate pitcher and batter entries
+        /// they carry provider ids we have no mapping for, so both halves go
+        /// missing from every roster. This catches them on the name instead.
+        ///
+        /// Matched by name rather than a hardcoded id so it holds up if the
+        /// ids ever differ between databases. Returns 0 for anyone else, so
+        /// the caller still records a genuinely missing player.
+        /// </summary>
+        private int FindSplitPlayerId(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return 0;
+            if (name.IndexOf("Ohtani", StringComparison.OrdinalIgnoreCase) < 0) return 0;
+
+            var isPitcher = name.IndexOf("Pitcher", StringComparison.OrdinalIgnoreCase) >= 0
+                         || name.IndexOf("(P)", StringComparison.OrdinalIgnoreCase) >= 0;
+
+            var isBatter = name.IndexOf("Batter", StringComparison.OrdinalIgnoreCase) >= 0
+                        || name.IndexOf("Hitter", StringComparison.OrdinalIgnoreCase) >= 0
+                        || name.IndexOf("(H)", StringComparison.OrdinalIgnoreCase) >= 0;
+
+            // Not split after all, so there is nothing to disambiguate and the
+            // ordinary id lookup should have found him.
+            if (!isPitcher && !isBatter) return 0;
+
+            var suffix = isPitcher ? "(P)" : "(H)";
+
+            int playerId;
+            return _splitPlayers.TryGetValue("Ohtani" + suffix, out playerId) ? playerId : 0;
         }
 
         /// <summary>
