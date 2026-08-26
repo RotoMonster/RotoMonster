@@ -294,6 +294,9 @@ namespace RotoMonster.Data
                     var playerId = FindPlayerId(providerPlayer.PlayerId);
 
                     if (playerId == 0)
+                        playerId = FindPlayerId(providerPlayer.AlternatePlayerId);
+
+                    if (playerId == 0)
                         playerId = FindSplitPlayerId(providerPlayer.Name);
 
                     if (playerId == 0)
@@ -340,6 +343,9 @@ namespace RotoMonster.Data
                 foreach (var providerPlayer in providerTeam.Players)
                 {
                     var playerId = FindPlayerId(providerPlayer.PlayerId);
+
+                    if (playerId == 0)
+                        playerId = FindPlayerId(providerPlayer.AlternatePlayerId);
 
                     if (playerId == 0)
                         playerId = FindSplitPlayerId(providerPlayer.Name);
