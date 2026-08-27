@@ -1704,6 +1704,13 @@ namespace RotoMonster.Data
                 err.UserLeagueId = userLeague.Id;
                 db.UserLeagueImportErrors.Add(err);
             }
+            foreach (var m in userLeague.UserLeagueMatchups)
+            {
+                m.UserLeague = null;
+                m.Id = 0;
+                m.UserLeagueId = userLeague.Id;
+                db.UserLeagueMatchups.Add(m);
+            }
             db.SaveChanges();
 
             return userLeague;

@@ -52,6 +52,7 @@ namespace RotoMonster.Data
         public DbSet<UserLeagueActiveRosterSpot> UserLeagueActiveRosterSpots { get; set; }
         public DbSet<UserLeagueCategory> UserLeagueCategories { get; set; }
         public DbSet<UserLeagueMissingPlayer> UserLeagueMissingPlayers { get; set; }
+        public DbSet<UserLeagueMatchup> UserLeagueMatchups { get; set; }
         public DbSet<UserLeaguePlayerType> UserLeaguePlayerTypes { get; set; }
         public DbSet<UserLeagueImportError> UserLeagueImportErrors { get; set; }
         public DbSet<UserLeagueWaiverPlayer> UserLeagueWaiverPlayers { get; set; }
@@ -158,6 +159,7 @@ namespace RotoMonster.Data
 
             modelBuilder.Entity<UserLeagueMissingPlayer>().HasKey(s => new { s.UserLeagueId, s.ProviderId });
             modelBuilder.Entity<UserLeagueMissingPlayer>().ToTable("UserLeagueMissingPlayers");
+            modelBuilder.Entity<UserLeagueMatchup>().ToTable("UserLeagueMatchups");
 
             modelBuilder.Entity<UserLeagueWaiverPlayer>().HasKey(s => new { s.UserLeagueId, s.PlayerId });
             modelBuilder.Entity<UserLeagueWaiverPlayer>().ToTable("UserLeagueWaiverPlayers");

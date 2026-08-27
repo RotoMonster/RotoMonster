@@ -146,6 +146,8 @@ namespace RotoMonster.Data
             if (data.DraftPicks != null && data.DraftPicks.Count > 0)
                 mapping.Draft = MapDraft(league, data.DraftPicks);
 
+            MapMatchups(league, data);
+
             mapping.UserLeague = league;
             return mapping;
         }
@@ -205,6 +207,35 @@ namespace RotoMonster.Data
             // own words, shown alongside the match warnings.
             foreach (var note in settings.Notes)
                 mapping.Warnings.Add(note);
+        }
+
+        /// <summary>
+        /// The schedule, where the provider returned one.
+        ///
+        /// The teams stay as the provider's own ids rather than being looked up
+        /// - a roster refresh deletes and recreates the team rows, so an id
+        /// from here would not survive one. Join on UserLeagueTeam.ProviderId
+        /// when the names are needed.
+        /// </summary>
+        private void MapMatchups(UserLeague league, ProviderLeagueData data)
+        {
+            if (data.Matchups == null)
+                return;
+
+            foreach (var matchup in data.Matchups)
+            {
+                if (string.IsNullOrEmpty(matchup.AwayTeamId)
+                    || string.IsNullOrEmpty(matchup.HomeTeamId))
+                    continue;
+
+                league.UserLeagueMatchups.Add(new UserLeagueMatchup
+                {
+                    Period = matchup.Period,
+                    AwayProviderTeamId = matchup.AwayTeamId,
+                    HomeProviderTeamId = matchup.HomeTeamId,
+                    IsPlayoff = matchup.IsPlayoff
+                });
+            }
         }
 
         /// <summary>

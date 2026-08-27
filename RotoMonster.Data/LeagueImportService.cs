@@ -266,7 +266,10 @@ namespace RotoMonster.Data
                 UserKeyFor(providerName, userId),
                 SeasonKeyFor(providerName),
                 toImport,
-                ProviderLeagueDataParts.All).ConfigureAwait(false);
+                // Schedule is outside All because it does not change once set,
+                // so a refresh has no reason to refetch it. An import does.
+                ProviderLeagueDataParts.All | ProviderLeagueDataParts.Schedule)
+                .ConfigureAwait(false);
 
             result.RequestCount = data.RequestCount;
 

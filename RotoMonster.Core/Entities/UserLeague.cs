@@ -20,6 +20,7 @@ namespace RotoMonster.Core
             UserLeaguePlayerTypes = new List<UserLeaguePlayerType>();
             UserLeagueImportErrors = new List<UserLeagueImportError>();
             UserLeagueWaiverPlayers = new List<UserLeagueWaiverPlayer>();
+            UserLeagueMatchups = new List<UserLeagueMatchup>();
             MyProviderTeamId = "";
             MyTeamTitle = "";
             StartWeekday = Convert.ToInt32(DayOfWeek.Monday);
@@ -148,6 +149,11 @@ namespace RotoMonster.Core
 
         [NotMapped]
         public List<UserLeagueWaiverPlayer> UserLeagueWaiverPlayers { get; set; }
+
+        /// <summary>
+        /// The schedule, where the provider gives one. Pairings only.
+        /// </summary>
+        public List<UserLeagueMatchup> UserLeagueMatchups { get; set; }
 
         [NotMapped]
         public List<PlayerStatus> PlayerStatuses { get; set; }

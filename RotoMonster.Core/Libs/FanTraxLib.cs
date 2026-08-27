@@ -149,6 +149,7 @@ namespace RotoMonster.Core.Libs
             league.Title = leagueTitle;
             league.IsProLeague = league.Title.Contains("Classic Draft");
             league.NumberOfTeams = rss["teamInfo"].Count();
+            league.UserLeagueMatchups = GetFanTraxMatchups(rss);
             league.PlayersPerTeam = Convert.ToInt32(rss["rosterInfo"]["maxTotalPlayers"]);
             // Only the league list call returns the name, so when the caller
             // has it, it is passed in. Falls back to the id for the callers
@@ -394,6 +395,78 @@ namespace RotoMonster.Core.Libs
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// The schedule out of a getLeagueInfo response.
+        ///
+        /// Fantrax gives it as a list of periods, each holding that period's
+        /// matchups with the two teams by their own ids. Empty for leagues with
+        /// no schedule - roto leagues, and ones that have not been set up.
+        ///
+        /// Takes the parsed response rather than fetching, since the callers
+        /// already have it.
+        /// </summary>
+        public List<UserLeagueMatchup> GetFanTraxMatchups(JObject leagueInfo)
+        {
+            var matchups = new List<UserLeagueMatchup>();
+
+            if (leagueInfo == null || leagueInfo["matchups"] == null)
+                return matchups;
+
+            // Where the provider says the playoffs start, so a period can be
+            // marked without having to work it out later. "used" is Fantrax
+            // saying whether the league has playoffs at all - it still gives a
+            // first period when they are off.
+            int playoffStart = 0;
+            var playoffs = leagueInfo["playoffs"];
+            if (playoffs != null
+                && playoffs["used"] != null
+                && playoffs["used"].ToString().ToLowerInvariant() == "true"
+                && playoffs["firstPlayoffPeriod"] != null)
+            {
+                int.TryParse(playoffs["firstPlayoffPeriod"].ToString(), out playoffStart);
+            }
+
+            try
+            {
+                foreach (var periodNode in leagueInfo["matchups"])
+                {
+                    if (periodNode["period"] == null || periodNode["matchupList"] == null)
+                        continue;
+
+                    int period;
+                    if (!int.TryParse(periodNode["period"].ToString(), out period))
+                        continue;
+
+                    foreach (var matchupNode in periodNode["matchupList"])
+                    {
+                        var away = matchupNode["away"];
+                        var home = matchupNode["home"];
+
+                        if (away == null || home == null)
+                            continue;
+
+                        if (away["id"] == null || home["id"] == null)
+                            continue;
+
+                        matchups.Add(new UserLeagueMatchup
+                        {
+                            Period = period,
+                            AwayProviderTeamId = away["id"].ToString(),
+                            HomeProviderTeamId = home["id"].ToString(),
+                            IsPlayoff = playoffStart > 0 && period >= playoffStart
+                        });
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // A schedule we cannot read is not worth failing the import for.
+                return new List<UserLeagueMatchup>();
+            }
+
+            return matchups;
         }
 
         public int GetCurrentFanTraxPeriod(string fanTraxLeagueId)
