@@ -522,5 +522,16 @@ namespace RotoMonster.Pages.UserLeagues
         {
             get { return (ProviderName ?? "").Replace("!", "").Replace(" ", "").ToLowerInvariant(); }
         }
+
+        /// <summary>
+        /// The page handler that disconnects this provider. Built from the
+        /// provider name so a new provider works without a case being added
+        /// here - the old version listed two providers and sent every other
+        /// tab to YahooDisconnect.
+        /// </summary>
+        public string DisconnectHandler
+        {
+            get { return (ProviderName ?? "").Replace("!", "").Replace(" ", "") + "Disconnect"; }
+        }
     }
 }

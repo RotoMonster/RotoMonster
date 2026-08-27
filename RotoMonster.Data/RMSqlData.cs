@@ -1639,6 +1639,32 @@ namespace RotoMonster.Data
             return leagues.FirstOrDefault();
         }
 
+        /// <summary>
+        /// The players an import could not match, kept so someone can see
+        /// who was missed and fill the gap in FantasyProviderPlayers. The
+        /// refresh path saves these through UpdateUserLeagueTeams; a first
+        /// import has no teams to update, so it goes through here.
+        /// </summary>
+        public void AddUserLeagueMissingPlayers(int userLeagueId, List<UserLeagueMissingPlayer> missingPlayers)
+        {
+            if (missingPlayers == null || missingPlayers.Count == 0)
+                return;
+
+            foreach (var mp in (from m in db.UserLeagueMissingPlayers
+                                where m.UserLeagueId == userLeagueId
+                                select m).ToList())
+                db.Remove(mp);
+
+            foreach (var mp in missingPlayers)
+            {
+                mp.UserLeague = null;
+                mp.UserLeagueId = userLeagueId;
+                db.UserLeagueMissingPlayers.Add(mp);
+            }
+
+            db.SaveChanges();
+        }
+
         public UserLeague AddUserLeague(UserLeague userLeague)
         {
             userLeague.CreatedDate = DateTime.UtcNow;

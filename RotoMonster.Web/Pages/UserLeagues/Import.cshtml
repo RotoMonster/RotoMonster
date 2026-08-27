@@ -71,7 +71,7 @@
                 </span>
                 <form method="post">
                     <button type="submit" class="rm-import-linkbtn"
-                            asp-page-handler="@(tab.Slug == "espn" ? "ESPNDisconnect" : tab.Slug == "fantrax" ? "FanTraxDisconnect" : "YahooDisconnect")">
+                            asp-page-handler="@tab.DisconnectHandler">
                         Disconnect
                     </button>
                 </form>

@@ -178,6 +178,7 @@ namespace RotoMonster.Data
         List<DisplayCategory> GetBeforeDisplayCategories(PlayerType playerType);
         List<DisplayCategory> GetAfterDisplayCategories(PlayerType playerType);
         UserLeague AddUserLeague(UserLeague userLeague);
+        void AddUserLeagueMissingPlayers(int userLeagueId, List<UserLeagueMissingPlayer> missingPlayers);
         void UpdateUserLeagueUpdatedDate(int userLeagueId, DateTime updatedDate, bool rostersUpdated);
         void DeleteUserLeague(int userLeagueId);
         Draft AddDraft(Draft draft);

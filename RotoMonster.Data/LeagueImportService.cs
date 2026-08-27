@@ -318,6 +318,10 @@ namespace RotoMonster.Data
                     if (mapping.Draft != null && mapping.Draft.DraftPlayers.Count > 0)
                         await _db.AddDraftAsync(mapping.Draft).ConfigureAwait(false);
 
+                    // Kept rather than counted, since the provider ids in
+                    // here are what is needed to fix the mapping.
+                    _db.AddUserLeagueMissingPlayers(saved.Id, mapping.MissingPlayers);
+
                     entry.Imported = true;
                     entry.Title = mapping.UserLeague.Title;
                     entry.Warnings = mapping.Warnings;
