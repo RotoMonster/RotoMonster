@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -220,8 +220,9 @@ namespace RotoMonster.Pages
                 {
                     foreach (var playerType in db.GetPlayerTypes())
                     {
-                        foreach (var dp in db.GetDepthPlayers(playerType, ul.GetCategoriesString(playerType).Code, DateTime.Now, false))
-                            leagueDepthPlayers.Add(dp);
+                        if (ul.GetCategoriesString(playerType) != null)
+                            foreach (var dp in db.GetDepthPlayers(playerType, ul.GetCategoriesString(playerType).Code, DateTime.Now, false))
+                                leagueDepthPlayers.Add(dp);
                     }
                 }
 
