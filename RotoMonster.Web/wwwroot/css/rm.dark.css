@@ -261,3 +261,11 @@ td.tdleft {
     --own-badge-other-ir-fg: #000000;
     --own-badge-waiver-fg: #000000;
 }
+
+/* team-spacing: divider between the team code and the positions so the two
+   colored groups read as separate. Colors themselves are unchanged. */
+.display-player-team {
+    margin-right: 0.5rem !important;
+    padding-right: 0.5rem;
+    border-right: 1px solid var(--color-border);
+}

@@ -1,14 +1,23 @@
 @using RotoMonster.Core
 @model RotoMonster.Models.Shared.PlayerLinkModel
+@inject RotoMonster.Data.IRMData idb
 
 @{
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+
+    var teamCode = Model.DisplayPlayer.SeasonPlayer.Team.Code;
+
+    // CSS variable rather than a hex, so the color follows the light/dark theme.
+    var teamColor = idb.Sport.Title == "NBA"
+        ? RotoMonsterUI.TeamColorHelper.GetNbaTeamColorVar(teamCode)
+        : RotoMonsterUI.TeamColorHelper.GetTeamColorVar(teamCode);
 
     var uiPlayer = new RotoMonsterUI.DisplayPlayerInput
     {
         PlayerId = Model.DisplayPlayer.SeasonPlayer.Player.Id,
         PlayerName = Model.DisplayPlayer.SeasonPlayer.Player.FirstName + " " + Model.DisplayPlayer.SeasonPlayer.Player.LastName,
-        TeamCode = Model.DisplayPlayer.SeasonPlayer.Team.Code,
+        TeamCode = teamCode,
+        TeamColor = teamColor,
         Positions = Model.DisplayPlayer.Positions
             .Select(p => new RotoMonsterUI.DisplayPosition
             {
