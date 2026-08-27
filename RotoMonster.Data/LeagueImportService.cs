@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using RotoMonster.Core;
 using RotoMonster.Core.Libs;
 using RotoMonsterExternalAPIs.Client.Models.Providers;
+using RotoMonsterExternalAPIs.Client.Models.Results;
 using RotoMonsterExternalAPIs.Client.Services.Providers;
 using RotoMonsterExternalAPIs.Client.Services.Yahoo;
 
@@ -375,11 +376,63 @@ namespace RotoMonster.Data
                 return result;
             }
 
-            var data = await provider.GetLeagueDataAsync(
-                UserKeyFor(providerName, userId),
-                SeasonKeyFor(providerName),
-                leagues.Select(l => l.ProviderLeagueId).ToList(),
-                ProviderLeagueDataParts.Rosters).ConfigureAwait(false);
+            // The wire comes back with the rosters, except where the league has
+            // continuous waivers - every player sits on waivers every night in
+            // those, so the answer would be the whole player pool and paging it
+            // would cost dozens of calls to say nothing useful.
+            //
+            // Split here rather than in the provider, which would have to be
+            // asked for Settings to know, where this already does.
+            var withWaivers = leagues
+                .Where(l => !l.ContinuousWaivers)
+                .Select(l => l.ProviderLeagueId)
+                .ToList();
+
+            var rostersOnly = leagues
+                .Where(l => l.ContinuousWaivers)
+                .Select(l => l.ProviderLeagueId)
+                .ToList();
+
+            var userKey = UserKeyFor(providerName, userId);
+            var seasonKey = SeasonKeyFor(providerName);
+
+            GetProviderLeagueDataResult data = null;
+
+            if (withWaivers.Count > 0)
+            {
+                data = await provider.GetLeagueDataAsync(
+                    userKey, seasonKey, withWaivers,
+                    ProviderLeagueDataParts.Rosters | ProviderLeagueDataParts.Waivers)
+                    .ConfigureAwait(false);
+            }
+
+            if (rostersOnly.Count > 0)
+            {
+                var plain = await provider.GetLeagueDataAsync(
+                    userKey, seasonKey, rostersOnly,
+                    ProviderLeagueDataParts.Rosters).ConfigureAwait(false);
+
+                if (data == null)
+                {
+                    data = plain;
+                }
+                else
+                {
+                    // Merged so the rest of this method sees one result, as it
+                    // did when there was only ever one call.
+                    data.Leagues.AddRange(plain.Leagues);
+                    data.RequestCount += plain.RequestCount;
+                    data.Success = data.Success && plain.Success;
+                    data.NeedsReauthorization =
+                        data.NeedsReauthorization || plain.NeedsReauthorization;
+                }
+            }
+
+            if (data == null)
+            {
+                result.Success = true;
+                return result;
+            }
 
             result.RequestCount = data.RequestCount;
 
