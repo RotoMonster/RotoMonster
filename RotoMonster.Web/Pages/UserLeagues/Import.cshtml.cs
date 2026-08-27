@@ -118,8 +118,24 @@ namespace RotoMonster.Pages.UserLeagues
         // Page load
         // -------------------------------------------------------------------
 
-        public async Task OnGetAsync(string tab = null)
+        public async Task OnGetAsync(string tab = null, [FromQuery(Name = "l")] int? leagueId = null)
         {
+            // Nothing on this page depends on the selected league, but the
+            // dropdown lives in _Layout so it is on the page regardless. It has
+            // to show the current one and persist a change, or picking a league
+            // here does nothing and snaps back.
+            var selected = leagueId.HasValue
+                ? await db.SelectUserLeagueAsync(UserId, await db.GetUserLeagueAsync(UserId, leagueId.Value))
+                : await db.SelectUserLeagueAsync(UserId, null);
+
+            // Only bind to a league the dropdown actually offers - GetUserLeague
+            // can return one that is not the user's.
+            if (selected != null && SelectedUserLeagues != null
+                && SelectedUserLeagues.Any(x => x.Id == selected.Id))
+            {
+                SelectedUserLeagueId = selected.Id;
+            }
+
             await BuildTabsAsync(tab);
         }
 

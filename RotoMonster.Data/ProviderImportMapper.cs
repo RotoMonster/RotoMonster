@@ -266,7 +266,64 @@ namespace RotoMonster.Data
         /// already imported. Nothing else about the league is touched, so a
         /// refresh cannot quietly change its settings.
         /// </summary>
-        public ProviderRosterMapping MapRosters(ProviderLeagueData data)
+        /// <summary>
+        /// The wire, matched to real players. Anyone we cannot match is simply
+        /// left out - a waiver list is a convenience rather than a record, so
+        /// there is nothing worth reporting the way there is for a roster.
+        /// </summary>
+        private List<UserLeagueWaiverPlayer> MapWaivers(
+            ProviderLeagueData data, List<UserLeagueWaiverPlayer> existing)
+        {
+            if (data.WaiverPlayers == null)
+                return null;
+
+            var previous = new Dictionary<int, DateTime>();
+            if (existing != null)
+            {
+                foreach (var w in existing)
+                    previous[w.PlayerId] = w.AddedDate;
+            }
+
+            var waivers = new List<UserLeagueWaiverPlayer>();
+            var seen = new HashSet<int>();
+
+            foreach (var providerPlayer in data.WaiverPlayers)
+            {
+                var playerId = FindPlayerId(providerPlayer.PlayerId);
+
+                if (playerId == 0)
+                    playerId = FindPlayerId(providerPlayer.AlternatePlayerId);
+
+                if (playerId == 0)
+                    playerId = FindSplitPlayerId(providerPlayer.Name);
+
+                if (playerId == 0 || !seen.Add(playerId))
+                    continue;
+
+                // Kept from last time where we have it. Yahoo does not say when
+                // a player went on waivers, so stamping now every refresh would
+                // make everyone look newly dropped.
+                DateTime added;
+                if (!previous.TryGetValue(playerId, out added))
+                    added = DateTime.UtcNow;
+
+                waivers.Add(new UserLeagueWaiverPlayer
+                {
+                    PlayerId = playerId,
+                    AddedDate = added
+                });
+            }
+
+            return waivers;
+        }
+
+        /// <summary>
+        /// existingWaivers is passed in rather than looked up, because the
+        /// mapper has no database. It is only used to keep the AddedDate on
+        /// players already on the wire.
+        /// </summary>
+        public ProviderRosterMapping MapRosters(
+            ProviderLeagueData data, List<UserLeagueWaiverPlayer> existingWaivers = null)
         {
             var mapping = new ProviderRosterMapping { LeagueId = data.LeagueId };
 
@@ -318,6 +375,8 @@ namespace RotoMonster.Data
 
                 mapping.Teams.Add(team);
             }
+
+            mapping.WaiverPlayers = MapWaivers(data, existingWaivers);
 
             return mapping;
         }
@@ -600,6 +659,13 @@ namespace RotoMonster.Data
     public class ProviderRosterMapping
     {
         public string LeagueId { get; set; }
+
+        /// <summary>
+        /// The waiver wire, or null where the provider was not asked for it.
+        /// Null and empty mean different things here: null is "not fetched, so
+        /// leave what is stored alone", empty is "fetched, nobody is on it".
+        /// </summary>
+        public List<UserLeagueWaiverPlayer> WaiverPlayers { get; set; }
 
         public List<UserLeagueTeam> Teams { get; set; } = new List<UserLeagueTeam>();
 

@@ -424,7 +424,8 @@ namespace RotoMonster.Data
 
                 try
                 {
-                    var mapping = mapper.MapRosters(leagueData);
+                    var mapping = mapper.MapRosters(
+                        leagueData, _db.GetUserLeagueWaiverPlayers(league));
 
                     // No teams back is treated as a failure, not an empty
                     // roster. Writing it through would wipe the league.
@@ -435,11 +436,16 @@ namespace RotoMonster.Data
                         continue;
                     }
 
+                    // The provider only returns a wire when Waivers was
+                    // asked for, so what is stored stands otherwise.
+                    var waivers = mapping.WaiverPlayers
+                        ?? _db.GetUserLeagueWaiverPlayers(league);
+
                     _db.UpdateUserLeagueTeams(
                         league.Id,
                         mapping.Teams,
                         mapping.MissingPlayers,
-                        _db.GetUserLeagueWaiverPlayers(league));
+                        waivers);
 
                     entry.Refreshed = true;
                     entry.MissingPlayerCount = mapping.MissingPlayers.Count;
