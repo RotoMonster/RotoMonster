@@ -2531,10 +2531,23 @@ td.value-badge-cell {
     margin-left: 3px;
 }
 
-/* team-spacing: divider between the team code and the positions so the two
-   colored groups read as separate. Colors themselves are unchanged. */
+/* team-dot: separates the team code from the positions. The dot is a pseudo
+   element so it takes the row's text color rather than the team color, and
+   the margins either side are equal. */
 .display-player-team {
-    margin-right: 0.5rem !important;
-    padding-right: 0.5rem;
-    border-right: 1px solid var(--color-border);
+    margin-right: 0 !important;
+}
+
+.display-player-team::after {
+    content: "\00b7";
+    display: inline-block;
+    margin: 0 0.4rem;
+    color: var(--color-text-tertiary);
+    font-weight: 400;
+}
+
+/* dot-balance: the first position sits right after the dot and brings its own
+   ml-1, which made the right gap wider than the left. */
+.display-player-team + .display-player-pos {
+    margin-left: 0 !important;
 }
