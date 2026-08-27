@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -303,6 +303,99 @@ namespace RotoMonster.Core.Libs
             return league;
         }
 
+        /// <summary>
+        /// How far ahead rosters are read. See where it is used - it is about
+        /// pending changes rather than about the future.
+        /// </summary>
+        private const int RosterPeriodsAhead = 7;
+
+        /// <summary>
+        /// The teams in the user's own division, or null where divisions do not
+        /// apply and every team counts.
+        ///
+        /// Only where duplicatePlayerType is ACROSS_DIVISIONS. A league can
+        /// have divisions with that set to NONE, which means players are shared
+        /// across them - the divisions are cosmetic then and filtering would
+        /// throw away teams that matter.
+        ///
+        /// Returns null rather than every team id on purpose, so the caller can
+        /// tell "no filtering needed" from "filtered to nothing".
+        /// </summary>
+        public HashSet<string> GetFanTraxDivisionTeamIds(string fanTraxLeagueId, string myProviderTeamId)
+        {
+            if (string.IsNullOrEmpty(myProviderTeamId))
+                return null;
+
+            string url = "https://www.fantrax.com/fxea/general/getLeagueInfo?leagueId=" + fanTraxLeagueId;
+            string data = "";
+
+            try
+            {
+                using (var web = new WebClient())
+                {
+                    web.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+                    data = web.DownloadString(url);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+
+            try
+            {
+                JObject rss = JObject.Parse(data);
+
+                var poolSettings = rss["poolSettings"];
+                var duplicateType = poolSettings != null && poolSettings["duplicatePlayerType"] != null
+                    ? poolSettings["duplicatePlayerType"].ToString()
+                    : "";
+
+                if (duplicateType != "ACROSS_DIVISIONS")
+                    return null;
+
+                var teamInfo = rss["teamInfo"];
+                if (teamInfo == null)
+                    return null;
+
+                // Which division the user is in, read off their own team.
+                string myDivision = null;
+                foreach (JProperty team in teamInfo)
+                {
+                    var id = team.Value["id"];
+                    if (id != null && id.ToString() == myProviderTeamId)
+                    {
+                        var division = team.Value["division"];
+                        myDivision = division == null ? null : division.ToString();
+                        break;
+                    }
+                }
+
+                // No division on their team means there is nothing to filter by,
+                // which is safer than filtering to nothing.
+                if (string.IsNullOrEmpty(myDivision))
+                    return null;
+
+                var ids = new HashSet<string>();
+                foreach (JProperty team in teamInfo)
+                {
+                    var division = team.Value["division"];
+                    if (division != null && division.ToString() == myDivision)
+                    {
+                        var id = team.Value["id"];
+                        if (id != null)
+                            ids.Add(id.ToString());
+                    }
+                }
+
+                return ids;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public int GetCurrentFanTraxPeriod(string fanTraxLeagueId)
         {
             int period = 0;
@@ -350,7 +443,11 @@ namespace RotoMonster.Core.Libs
             //    }
             //}
 
-            string url = "https://www.fantrax.com/fxea/general/getTeamRosters?leagueId=" + userLeague.ProviderLeagueId + "&period=" + (GetCurrentFanTraxPeriod(userLeague.ProviderLeagueId)+1).ToString();
+            // Seven periods ahead, matching Basketball Monster. A roster change
+            // made now may not apply until the next period, and a period can be
+            // a day or a week depending on the league, so one is only far
+            // enough in a daily one.
+            string url = "https://www.fantrax.com/fxea/general/getTeamRosters?leagueId=" + userLeague.ProviderLeagueId + "&period=" + (GetCurrentFanTraxPeriod(userLeague.ProviderLeagueId) + RosterPeriodsAhead).ToString();
             string data = "";
             try
             {
@@ -377,8 +474,17 @@ namespace RotoMonster.Core.Libs
             {
                 if (node.Key == "rosters")
                 {
+                    // Where the league runs divisions with players unique to
+                    // each, the other divisions are a different game and their
+                    // teams do not belong here. Null means no filtering.
+                    var divisionTeamIds = GetFanTraxDivisionTeamIds(
+                        userLeague.ProviderLeagueId, userLeague.MyProviderTeamId);
+
                     foreach(JProperty p in node.Value)
                     {
+                        if (divisionTeamIds != null && !divisionTeamIds.Contains(p.Name))
+                            continue;
+
                         UserLeagueTeam team = new UserLeagueTeam();
                         team.ProviderId = p.Name;
                         team.Title = (string)p.Value["teamName"];
