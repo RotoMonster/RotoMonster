@@ -319,7 +319,12 @@ namespace RotoMonster.Core.Libs
             return league;
         }
 
-        public List<UserLeagueTeam> GetUserLeagueTeams(UserAuth userAuth, Sport sport, Season season, UserLeague userLeague, List<FantasyProviderPlayer> fantasyProviderPlayers, List<Player> allPlayers, List<UserLeagueMissingPlayer> userLeagueMissingPlayers, bool skipWW = false)
+        /// <summary>
+        /// scoringPeriod names a specific period to read rosters from. Left
+        /// null it uses the default, which is fifteen days out for a weekly
+        /// league and whatever ESPN considers current for a daily one.
+        /// </summary>
+        public List<UserLeagueTeam> GetUserLeagueTeams(UserAuth userAuth, Sport sport, Season season, UserLeague userLeague, List<FantasyProviderPlayer> fantasyProviderPlayers, List<Player> allPlayers, List<UserLeagueMissingPlayer> userLeagueMissingPlayers, bool skipWW = false, int? scoringPeriod = null)
         {
             List<UserLeagueTeam> teams = new List<UserLeagueTeam>();
             var now = DateTime.UtcNow;
@@ -327,17 +332,25 @@ namespace RotoMonster.Core.Libs
             string data = "";
             if (userLeague.LineupFrequency == "W")
             {
-                // Fifteen days out, matching Basketball Monster. A roster
-                // change made now may not apply for a while, so today's period
-                // is not what the team will actually field.
-                int scoringPeriod = Convert.ToInt32((DateTime.Today - season.StartDate).TotalDays) + RosterDaysAhead;
-                data = ReadESPNUrl(sport, season.ESPNYear, userLeague.ProviderLeagueId, userAuth, "mScoreboard&view=mTeam&view=mLiveScoring&view=mMatchupScore&scoringPeriodId=" + scoringPeriod.ToString() + "&view=mRoster");
+                // Fifteen days out by default, matching Basketball Monster.
+                // A roster change made now may not apply for a while, so
+                // today's period is not what the team will actually field.
+                int period = scoringPeriod
+                    ?? Convert.ToInt32((DateTime.Today - season.StartDate).TotalDays) + RosterDaysAhead;
+
+                data = ReadESPNUrl(sport, season.ESPNYear, userLeague.ProviderLeagueId, userAuth, "mScoreboard&view=mTeam&view=mLiveScoring&view=mMatchupScore&scoringPeriodId=" + period.ToString() + "&view=mRoster");
             }
             else
             {
                 try
                 {
-                    data = ReadESPNUrl(sport, season.ESPNYear, userLeague.ProviderLeagueId, userAuth, "rosterForTeamId=" + userLeague.MyProviderTeamId + "&view=mDraftDetail&view=mLiveScoring&view=mMatchupScore&view=mPendingTransactions&view=mPositionalRatings&view=mRoster&view=mSettings&view=mTeam&view=modular&view=mNav");
+                    // No period unless one was asked for, which is how this
+                    // has always behaved - ESPN then gives the current one.
+                    var periodTag = scoringPeriod.HasValue
+                        ? "scoringPeriodId=" + scoringPeriod.Value.ToString() + "&"
+                        : "";
+
+                    data = ReadESPNUrl(sport, season.ESPNYear, userLeague.ProviderLeagueId, userAuth, periodTag + "rosterForTeamId=" + userLeague.MyProviderTeamId + "&view=mDraftDetail&view=mLiveScoring&view=mMatchupScore&view=mPendingTransactions&view=mPositionalRatings&view=mRoster&view=mSettings&view=mTeam&view=modular&view=mNav");
                 }
                 catch
                 {
