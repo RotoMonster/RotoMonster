@@ -2897,6 +2897,9 @@ namespace RotoMonster.MLB.Migrations.Migrations
                     b.Property<DateTime>("AddedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("WaiverDate")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("UserLeagueId", "PlayerId");
 
                     b.HasIndex("PlayerId");
@@ -3910,7 +3913,7 @@ namespace RotoMonster.MLB.Migrations.Migrations
             modelBuilder.Entity("RotoMonster.Core.UserLeagueMatchup", b =>
                 {
                     b.HasOne("RotoMonster.Core.UserLeague", "UserLeague")
-                        .WithMany()
+                        .WithMany("UserLeagueMatchups")
                         .HasForeignKey("UserLeagueId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -4080,6 +4083,11 @@ namespace RotoMonster.MLB.Migrations.Migrations
                     b.Navigation("TutorialSections");
 
                     b.Navigation("TutorialSteps");
+                });
+
+            modelBuilder.Entity("RotoMonster.Core.UserLeague", b =>
+                {
+                    b.Navigation("UserLeagueMatchups");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.UserLeagueTeam", b =>

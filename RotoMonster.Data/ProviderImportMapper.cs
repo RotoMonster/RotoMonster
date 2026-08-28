@@ -331,17 +331,29 @@ namespace RotoMonster.Data
                 if (playerId == 0 || !seen.Add(playerId))
                     continue;
 
-                // Kept from last time where we have it. Yahoo does not say when
-                // a player went on waivers, so stamping now every refresh would
-                // make everyone look newly dropped.
+                // The real drop date where the provider found one, since it
+                // knows better than we do. Otherwise kept from last time, and
+                // only stamped now for a player we have not seen before -
+                // stamping every refresh would make everyone look newly
+                // dropped.
                 DateTime added;
-                if (!previous.TryGetValue(playerId, out added))
+                if (providerPlayer.WaiverDate.HasValue)
+                {
+                    // The claim date is the drop plus the waiver period, so
+                    // working back from it is not exact. What matters is that
+                    // it is stable between refreshes, which it is.
+                    added = providerPlayer.WaiverDate.Value;
+                }
+                else if (!previous.TryGetValue(playerId, out added))
+                {
                     added = DateTime.UtcNow;
+                }
 
                 waivers.Add(new UserLeagueWaiverPlayer
                 {
                     PlayerId = playerId,
-                    AddedDate = added
+                    AddedDate = added,
+                    WaiverDate = providerPlayer.WaiverDate
                 });
             }
 

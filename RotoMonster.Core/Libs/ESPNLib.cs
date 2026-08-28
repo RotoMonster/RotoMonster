@@ -324,6 +324,80 @@ namespace RotoMonster.Core.Libs
         /// null it uses the default, which is fifteen days out for a weekly
         /// league and whatever ESPN considers current for a daily one.
         /// </summary>
+        /// <summary>
+        /// The players on waivers, onto userLeague.UserLeagueWaiverPlayers.
+        ///
+        /// ESPN returns free agents and waiver players from the same call and
+        /// tells them apart with a status on each entry, so the free agents are
+        /// dropped here - a free agent is not on waivers and the wire would be
+        /// the whole unowned pool otherwise.
+        ///
+        /// Players it cannot match are skipped rather than reported. A waiver
+        /// list is a convenience rather than a record, unlike a roster where a
+        /// missing player means the roster is wrong.
+        /// </summary>
+        private void ReadESPNWaivers(
+            UserAuth userAuth,
+            Sport sport,
+            Season season,
+            UserLeague userLeague,
+            List<FantasyProviderPlayer> fantasyProviderPlayers,
+            DateTime now)
+        {
+            string data;
+
+            try
+            {
+                data = ReadESPNUrl(sport, season.ESPNYear, userLeague.ProviderLeagueId, userAuth,
+                    "view=kona_player_info");
+            }
+            catch
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(data))
+                return;
+
+            try
+            {
+                JObject rss = JObject.Parse(data);
+                if (rss["players"] == null)
+                    return;
+
+                foreach (JToken entry in rss["players"])
+                {
+                    // FREEAGENT or WAIVERS. Only the second is the wire.
+                    if (entry["status"] == null) continue;
+                    if (entry["status"].ToString() != "WAIVERS") continue;
+
+                    if (entry["id"] == null) continue;
+                    string espnId = entry["id"].ToString();
+
+                    var providerPlayer = (from pp in fantasyProviderPlayers
+                                          where pp.FantasyProvider.Id == 2 && pp.ProviderId == espnId
+                                          select pp).FirstOrDefault();
+
+                    if (providerPlayer == null) continue;
+
+                    if (userLeague.UserLeagueWaiverPlayers.Find(w => w.PlayerId == providerPlayer.PlayerId) != null)
+                        continue;
+
+                    userLeague.UserLeagueWaiverPlayers.Add(new UserLeagueWaiverPlayer
+                    {
+                        UserLeagueId = userLeague.Id,
+                        PlayerId = providerPlayer.PlayerId,
+                        AddedDate = now
+                    });
+                }
+            }
+            catch (Exception)
+            {
+                // A wire we cannot read is not worth failing the roster import
+                // for, which is what the caller actually wanted.
+            }
+        }
+
         public List<UserLeagueTeam> GetUserLeagueTeams(UserAuth userAuth, Sport sport, Season season, UserLeague userLeague, List<FantasyProviderPlayer> fantasyProviderPlayers, List<Player> allPlayers, List<UserLeagueMissingPlayer> userLeagueMissingPlayers, bool skipWW = false, int? scoringPeriod = null)
         {
             List<UserLeagueTeam> teams = new List<UserLeagueTeam>();
@@ -425,6 +499,14 @@ namespace RotoMonster.Core.Libs
                     }
                 }
             }
+
+            if (!skipWW)
+                ReadESPNWaivers(userAuth, sport, season, userLeague, fantasyProviderPlayers, now);
+
+            // Below is Fantrax code that was copy pasted here and never
+            // adapted - it calls fantrax.com and matches on provider id 4, so
+            // it would pull the wrong provider's data into an ESPN league.
+            // ReadESPNWaivers above is the ESPN version.
 
             //if (!skipWW && loadWW)
             //{
