@@ -17,10 +17,10 @@ namespace RotoMonster.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.5")
+                .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("RotoMonster.Core.ActiveRosterSpot", b =>
                 {
@@ -28,7 +28,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("DefaultNumberOf")
                         .HasColumnType("int");
@@ -56,7 +56,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ActiveRosterSpots", (string)null);
+                    b.ToTable("ActiveRosterSpots");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.ActiveRosterSpotPosition", b =>
@@ -80,7 +80,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Byline")
                         .HasColumnType("nvarchar(max)");
@@ -117,7 +117,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Articles", (string)null);
+                    b.ToTable("Articles");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.ArticleGame", b =>
@@ -171,14 +171,14 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("CategoriesStrings", (string)null);
+                    b.ToTable("CategoriesStrings");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.Category", b =>
@@ -187,7 +187,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Abbreviation")
                         .HasColumnType("nvarchar(max)");
@@ -264,7 +264,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("WeightCategoryId");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.CategoryPerValue", b =>
@@ -291,7 +291,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DateCompleted")
                         .HasColumnType("datetime2");
@@ -304,7 +304,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CompletedTasks", (string)null);
+                    b.ToTable("CompletedTasks");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.DisplayCategory", b =>
@@ -313,7 +313,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
@@ -331,7 +331,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("DisplayCategories", (string)null);
+                    b.ToTable("DisplayCategories");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.Division", b =>
@@ -340,7 +340,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -350,7 +350,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Divisions", (string)null);
+                    b.ToTable("Divisions");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.Draft", b =>
@@ -359,7 +359,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
@@ -412,7 +412,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("SeasonId");
 
-                    b.ToTable("Drafts", (string)null);
+                    b.ToTable("Drafts");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.DraftPlayer", b =>
@@ -490,7 +490,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -509,7 +509,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FantasyProviders", (string)null);
+                    b.ToTable("FantasyProviders");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.FantasyProviderPlayer", b =>
@@ -536,7 +536,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("AwayMoneyLine")
                         .HasColumnType("int");
@@ -602,7 +602,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("SeasonId");
 
-                    b.ToTable("Games", (string)null);
+                    b.ToTable("Games");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.GameScoringAlert", b =>
@@ -611,7 +611,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
@@ -641,7 +641,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("GameScoringAlerts", (string)null);
+                    b.ToTable("GameScoringAlerts");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.Helper", b =>
@@ -650,7 +650,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -672,7 +672,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Helpers", (string)null);
+                    b.ToTable("Helpers");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.MLBHitterGame", b =>
@@ -1110,7 +1110,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("AwayMoneyLine")
                         .HasColumnType("int");
@@ -1131,7 +1131,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.ToTable("NFLGames", (string)null);
+                    b.ToTable("NFLGames");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.NFLKickerGame", b =>
@@ -1635,7 +1635,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");
@@ -1667,7 +1667,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("PlayerTypeId");
 
-                    b.ToTable("PerValues", (string)null);
+                    b.ToTable("PerValues");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.Player", b =>
@@ -1676,7 +1676,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Bats")
                         .HasMaxLength(1)
@@ -1713,7 +1713,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Players", (string)null);
+                    b.ToTable("Players");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.PlayerAlias", b =>
@@ -1722,7 +1722,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Alias")
                         .HasColumnType("nvarchar(max)");
@@ -1734,7 +1734,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("PlayerAliases", (string)null);
+                    b.ToTable("PlayerAliases");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.PlayerDefaultPosition", b =>
@@ -1867,7 +1867,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BackgroundColor")
                         .HasColumnType("nvarchar(max)");
@@ -1898,7 +1898,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PlayerGameStateTypes", (string)null);
+                    b.ToTable("PlayerGameStateTypes");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.PlayerInjury", b =>
@@ -1907,7 +1907,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
@@ -1944,7 +1944,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PlayerInjuries", (string)null);
+                    b.ToTable("PlayerInjuries");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.PlayerStatus", b =>
@@ -1953,7 +1953,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
@@ -2011,7 +2011,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("PlayerStatusTypeId");
 
-                    b.ToTable("PlayerStatuses", (string)null);
+                    b.ToTable("PlayerStatuses");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.PlayerStatusTagType", b =>
@@ -2020,7 +2020,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -2036,7 +2036,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PlayerStatusTagTypes", (string)null);
+                    b.ToTable("PlayerStatusTagTypes");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.PlayerStatusType", b =>
@@ -2045,7 +2045,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool?>("AllowFilter")
                         .HasColumnType("bit");
@@ -2100,7 +2100,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PlayerStatusTypes", (string)null);
+                    b.ToTable("PlayerStatusTypes");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.PlayerType", b =>
@@ -2109,7 +2109,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("DefaultPerTeam")
                         .HasColumnType("int");
@@ -2137,7 +2137,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PlayerTypes", (string)null);
+                    b.ToTable("PlayerTypes");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.Position", b =>
@@ -2146,7 +2146,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Abbreviation")
                         .HasColumnType("nvarchar(max)");
@@ -2176,7 +2176,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("PlayerTypeId");
 
-                    b.ToTable("Positions", (string)null);
+                    b.ToTable("Positions");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.PositionSource", b =>
@@ -2185,7 +2185,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("FantasyProviderId")
                         .HasColumnType("int");
@@ -2197,7 +2197,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("FantasyProviderId");
 
-                    b.ToTable("PositionSources", (string)null);
+                    b.ToTable("PositionSources");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.PositionSourcePlayer", b =>
@@ -2242,7 +2242,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Abbreviation")
                         .HasColumnType("nvarchar(max)");
@@ -2276,7 +2276,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Seasons", (string)null);
+                    b.ToTable("Seasons");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.SeasonDivision", b =>
@@ -2395,7 +2395,7 @@ namespace RotoMonster.Data.Migrations
                     b.Property<bool>("UsesPointsPerStat")
                         .HasColumnType("bit");
 
-                    b.ToTable("Sports", (string)null);
+                    b.ToTable("Sports");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.Team", b =>
@@ -2404,7 +2404,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(max)");
@@ -2417,7 +2417,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Teams", (string)null);
+                    b.ToTable("Teams");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.TeamAlias", b =>
@@ -2431,6 +2431,120 @@ namespace RotoMonster.Data.Migrations
                     b.HasKey("TeamId", "Alias");
 
                     b.ToTable("TeamAliases", (string)null);
+                });
+
+            modelBuilder.Entity("RotoMonster.Core.Tutorial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Purpose")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TutorialKey")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TutorialKey")
+                        .IsUnique();
+
+                    b.ToTable("Tutorials");
+                });
+
+            modelBuilder.Entity("RotoMonster.Core.TutorialSection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Heading")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TutorialId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TutorialId");
+
+                    b.ToTable("TutorialSections");
+                });
+
+            modelBuilder.Entity("RotoMonster.Core.TutorialStep", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Placement")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("TargetSelector")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("TutorialId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TutorialId");
+
+                    b.ToTable("TutorialSteps");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.UserDisplayCategory", b =>
@@ -2458,7 +2572,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("AutoEndDate")
                         .HasColumnType("bit");
@@ -2595,7 +2709,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("SeasonId");
 
-                    b.ToTable("UserLeagues", (string)null);
+                    b.ToTable("UserLeagues");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.UserLeagueActiveRosterSpot", b =>
@@ -2653,6 +2767,38 @@ namespace RotoMonster.Data.Migrations
                     b.ToTable("UserLeagueImportErrors", (string)null);
                 });
 
+            modelBuilder.Entity("RotoMonster.Core.UserLeagueMatchup", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AwayProviderTeamId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("HomeProviderTeamId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsPlayoff")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Period")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserLeagueId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserLeagueId");
+
+                    b.ToTable("UserLeagueMatchups", (string)null);
+                });
+
             modelBuilder.Entity("RotoMonster.Core.UserLeagueMissingPlayer", b =>
                 {
                     b.Property<int>("UserLeagueId")
@@ -2692,7 +2838,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("ProviderId")
                         .HasColumnType("nvarchar(max)");
@@ -2710,7 +2856,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasIndex("UserLeagueId");
 
-                    b.ToTable("UserLeagueTeams", (string)null);
+                    b.ToTable("UserLeagueTeams");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.UserLeagueTeamPlayer", b =>
@@ -2749,6 +2895,9 @@ namespace RotoMonster.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("AddedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("WaiverDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("UserLeagueId", "PlayerId");
@@ -2798,7 +2947,7 @@ namespace RotoMonster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("smallint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<short>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<short>("Id"));
 
                     b.Property<string>("Abbreviation")
                         .HasMaxLength(20)
@@ -2846,7 +2995,7 @@ namespace RotoMonster.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserOptionTypes", (string)null);
+                    b.ToTable("UserOptionTypes");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.ActiveRosterSpotPosition", b =>
@@ -3660,6 +3809,28 @@ namespace RotoMonster.Data.Migrations
                     b.Navigation("Team");
                 });
 
+            modelBuilder.Entity("RotoMonster.Core.TutorialSection", b =>
+                {
+                    b.HasOne("RotoMonster.Core.Tutorial", "Tutorial")
+                        .WithMany("TutorialSections")
+                        .HasForeignKey("TutorialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tutorial");
+                });
+
+            modelBuilder.Entity("RotoMonster.Core.TutorialStep", b =>
+                {
+                    b.HasOne("RotoMonster.Core.Tutorial", "Tutorial")
+                        .WithMany("TutorialSteps")
+                        .HasForeignKey("TutorialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tutorial");
+                });
+
             modelBuilder.Entity("RotoMonster.Core.UserDisplayCategory", b =>
                 {
                     b.HasOne("RotoMonster.Core.Category", "Category")
@@ -3732,6 +3903,17 @@ namespace RotoMonster.Data.Migrations
                 {
                     b.HasOne("RotoMonster.Core.UserLeague", "UserLeague")
                         .WithMany()
+                        .HasForeignKey("UserLeagueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserLeague");
+                });
+
+            modelBuilder.Entity("RotoMonster.Core.UserLeagueMatchup", b =>
+                {
+                    b.HasOne("RotoMonster.Core.UserLeague", "UserLeague")
+                        .WithMany("UserLeagueMatchups")
                         .HasForeignKey("UserLeagueId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3894,6 +4076,18 @@ namespace RotoMonster.Data.Migrations
                     b.Navigation("SeasonTeams");
 
                     b.Navigation("TeamAliases");
+                });
+
+            modelBuilder.Entity("RotoMonster.Core.Tutorial", b =>
+                {
+                    b.Navigation("TutorialSections");
+
+                    b.Navigation("TutorialSteps");
+                });
+
+            modelBuilder.Entity("RotoMonster.Core.UserLeague", b =>
+                {
+                    b.Navigation("UserLeagueMatchups");
                 });
 
             modelBuilder.Entity("RotoMonster.Core.UserLeagueTeam", b =>

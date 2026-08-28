@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RotoMonster.Data;
 
 #nullable disable
 
-namespace RotoMonster.NHL.Migrations.Migrations
+namespace RotoMonster.Data.Migrations
 {
     [DbContext(typeof(RMDBContext))]
-    partial class RotoMonsterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260828191330_AddUserLeagueMatchups")]
+    partial class AddUserLeagueMatchups
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
