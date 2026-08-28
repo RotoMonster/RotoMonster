@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
@@ -45,6 +45,12 @@ namespace RotoMonster.Core.Libs
 
             return outSWID;
         }
+
+        /// <summary>
+        /// How far ahead rosters are read. See where it is used - it is about
+        /// pending changes rather than about the future.
+        /// </summary>
+        private const int RosterDaysAhead = 15;
 
         public string ReadESPNUrl(Sport sport, string espnYear, string leagueId, UserAuth userAuth, string tags = "mScoreboard&view=mTeam&view=mLiveScoring&view=mMatchupScore")
         {
@@ -321,7 +327,10 @@ namespace RotoMonster.Core.Libs
             string data = "";
             if (userLeague.LineupFrequency == "W")
             {
-                int scoringPeriod = Convert.ToInt32((DateTime.Today - season.StartDate).TotalDays) + 7;
+                // Fifteen days out, matching Basketball Monster. A roster
+                // change made now may not apply for a while, so today's period
+                // is not what the team will actually field.
+                int scoringPeriod = Convert.ToInt32((DateTime.Today - season.StartDate).TotalDays) + RosterDaysAhead;
                 data = ReadESPNUrl(sport, season.ESPNYear, userLeague.ProviderLeagueId, userAuth, "mScoreboard&view=mTeam&view=mLiveScoring&view=mMatchupScore&scoringPeriodId=" + scoringPeriod.ToString() + "&view=mRoster");
             }
             else
