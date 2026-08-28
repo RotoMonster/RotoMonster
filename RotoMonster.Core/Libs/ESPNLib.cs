@@ -198,6 +198,63 @@ namespace RotoMonster.Core.Libs
             return userLeagues;
         }
 
+        /// <summary>
+        /// The schedule out of an mMatchupScore response.
+        ///
+        /// Each entry is one matchup with a home and an away side, the period
+        /// they meet, and whether it is a playoff round.
+        ///
+        /// A roto league has a schedule too, but every team sits in one entry
+        /// rather than a pair, so there is nothing to pair up and those are
+        /// skipped.
+        /// </summary>
+        public List<UserLeagueMatchup> GetESPNMatchups(JObject leagueInfo)
+        {
+            var matchups = new List<UserLeagueMatchup>();
+
+            if (leagueInfo == null || leagueInfo["schedule"] == null)
+                return matchups;
+
+            try
+            {
+                foreach (JToken node in leagueInfo["schedule"])
+                {
+                    var away = node["away"];
+                    var home = node["home"];
+
+                    // Roto, where the entry holds every team instead.
+                    if (away == null || home == null) continue;
+                    if (away["teamId"] == null || home["teamId"] == null) continue;
+                    if (node["matchupPeriodId"] == null) continue;
+
+                    int period;
+                    if (!int.TryParse(node["matchupPeriodId"].ToString(), out period))
+                        continue;
+
+                    // NONE for a regular round, WINNERS_BRACKET and the like
+                    // once the playoffs start.
+                    var tier = node["playoffTierType"] == null
+                        ? "NONE"
+                        : node["playoffTierType"].ToString();
+
+                    matchups.Add(new UserLeagueMatchup
+                    {
+                        Period = period,
+                        AwayProviderTeamId = away["teamId"].ToString(),
+                        HomeProviderTeamId = home["teamId"].ToString(),
+                        IsPlayoff = tier != "NONE"
+                    });
+                }
+            }
+            catch (Exception)
+            {
+                // A schedule we cannot read is not worth failing the import for.
+                return new List<UserLeagueMatchup>();
+            }
+
+            return matchups;
+        }
+
         public UserLeague ImportUserLeague(
             Sport sport,
             UserAuth userAuth,
@@ -223,6 +280,8 @@ namespace RotoMonster.Core.Libs
 
             if (rss["settings"] == null)
                 throw new Exception("The format of the ESPN file is invalid for the given ESPN League ID.");
+
+            league.UserLeagueMatchups = GetESPNMatchups(rss);
 
             league.Title = rss["settings"]["name"].ToString().Trim();
             league.DisplayTitle = league.Title;
