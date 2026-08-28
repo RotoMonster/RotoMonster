@@ -857,7 +857,9 @@ namespace RotoMonster.Pages
                 dp.DepthPlayer = (from p1 in depthPlayers where p1.SeasonPlayer.PlayerId == seasonPlayer.Player.Id select p1).FirstOrDefault();
                 if (projectionPlayers != null)
                     dp.ProjectionPlayer = (from p1 in projectionPlayers where p1.ValuePlayer.Player.Id == seasonPlayer.Player.Id select p1).FirstOrDefault();
-                dp.IsWaiver = (waiverPlayers.Find(p => p.PlayerId == seasonPlayer.PlayerId) != null);
+                var waiverRow = waiverPlayers.Find(p => p.PlayerId == seasonPlayer.PlayerId);
+                dp.IsWaiver = waiverRow != null;
+                dp.WaiverDate = waiverRow == null ? null : waiverRow.WaiverDate;
                 dp.RecentArticles = db.GetPlayerRecentArticles(seasonPlayer.Player.Id);
                 dp.PlayerPositionPercents = playerPositionPercents != null ? (from pp in playerPositionPercents where pp.Player.Id == seasonPlayer.PlayerId select pp).ToList() : null;
 

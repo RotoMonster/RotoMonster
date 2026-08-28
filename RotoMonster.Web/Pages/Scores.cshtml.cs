@@ -215,7 +215,9 @@ namespace RotoMonster.Pages
                             if (displayPlayer.DepthPlayer != null)
                                 displayPlayer.HigherDepthInjuredDisplayPlayers = displayPlayer.DepthPlayer.GetHigherDepthInjuredDisplayPlayers(playerStatuses);
 
-                            displayPlayer.IsWaiver = (waiverPlayers.Find(p => p.PlayerId == playerId) != null);
+                            var waiverRow = waiverPlayers.Find(p => p.PlayerId == playerId);
+                            displayPlayer.IsWaiver = waiverRow != null;
+                            displayPlayer.WaiverDate = waiverRow == null ? null : waiverRow.WaiverDate;
                             // displayPlayer.RecentArticles = db.GetPlayerRecentArticles(playerId);
                             displayPlayer.PlayerInjury = (from p1 in injuries where p1.PlayerId == playerId select p1).FirstOrDefault();
                             displayPlayer.PlayerStatus = (from p1 in playerStatuses where p1.PlayerId == playerId select p1).FirstOrDefault();

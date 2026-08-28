@@ -48,6 +48,12 @@ namespace RotoMonster.Core
         public bool IsBreak { get; set; } = false;
         public bool IsWaiver { get; set; } = false;
 
+        /// <summary>
+        /// When a player on waivers can be claimed. Null where the
+        /// provider does not tell us, which is most of them.
+        /// </summary>
+        public DateTime? WaiverDate { get; set; }
+
         public ValuePlayer ExtraValuePlayer1 { get; set; } = null;
         public ValuePlayer ExtraValuePlayer2 { get; set; } = null;
         public ValuePlayer ExtraValuePlayer3 { get; set; } = null;

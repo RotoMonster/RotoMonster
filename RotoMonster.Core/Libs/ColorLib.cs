@@ -273,6 +273,15 @@ namespace RotoMonster.Core.Libs
         {
             string title = GetOwnBadgeTitle(state);
 
+            // The badge only has room for a number, so the date goes here.
+            if (state == OwnBadgeState.Waiver)
+            {
+                if (displayPlayer == null || !displayPlayer.WaiverDate.HasValue)
+                    return title;
+
+                return title + " until " + displayPlayer.WaiverDate.Value.ToString("MMM d");
+            }
+
             if (state != OwnBadgeState.OtherStarting
                 && state != OwnBadgeState.OtherBench
                 && state != OwnBadgeState.OtherIR)
@@ -287,6 +296,22 @@ namespace RotoMonster.Core.Libs
                 return title;
 
             return title + " - " + teamTitle.Trim();
+        }
+
+        /// <summary>
+        /// What the WW badge reads. Plain WW when they clear today or tomorrow,
+        /// or when we have no date at all, and WW2 upwards when it is further
+        /// out. Ken's shape: "WW by default and WW2, 3, etc. if more than 1."
+        /// </summary>
+        public string GetWaiverBadgeText(DisplayPlayer displayPlayer)
+        {
+            if (displayPlayer == null || !displayPlayer.WaiverDate.HasValue)
+                return "WW";
+
+            var days = (int)Math.Ceiling(
+                (displayPlayer.WaiverDate.Value.Date - DateTime.Today).TotalDays);
+
+            return days > 1 ? "WW" + days.ToString() : "WW";
         }
 
         public string GetOwnBadgeTitle(OwnBadgeState state)
