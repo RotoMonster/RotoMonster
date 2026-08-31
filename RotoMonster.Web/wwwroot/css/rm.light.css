@@ -2567,7 +2567,7 @@ td.value-badge-cell {
    switches to a column and a fixed-width label would squeeze the controls. */
 
 :root {
-    --rm-filter-label-width: 7.5rem;
+    --rm-filter-label-width: 9rem;
 }
 
 .rm-filter-section[data-title]::before {
