@@ -349,9 +349,7 @@
                                                     @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)
                                                     @if (dp.OwnershipPlayer.PercentOwnershipChange != 0)
                                                     {
-                                                        <small class="text-nowrap float-start pe-1 ps-1 me-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">
-                                                            <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentOwnershipChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentOwnershipChange)
-                                                        </small>
+                                                        <small class="rm-badge-change" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">@String.Format("{0:+##0;-##0;0}", dp.OwnershipPlayer.PercentOwnershipChange)</small>
                                                     }
                                                 </span></td>
 
@@ -359,9 +357,7 @@
                                                     @String.Format("{0:##0}", dp.OwnershipPlayer.ActivePercent)
                                                     @if (dp.OwnershipPlayer.PercentActiveChange != 0)
                                                     {
-                                                        <small class="text-nowrap float-start pe-1 ps-1 me-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentActiveChange)">
-                                                            <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentActiveChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentActiveChange)
-                                                        </small>
+                                                        <small class="rm-badge-change" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentActiveChange)">@String.Format("{0:+##0;-##0;0}", dp.OwnershipPlayer.PercentActiveChange)</small>
                                                     }
                                                 </span></td>
                                             }
@@ -518,9 +514,7 @@
                                                     @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)
                                                     @if (dp.OwnershipPlayer.PercentOwnershipChange != 0)
                                                     {
-                                                        <small class="text-nowrap float-start pe-1 ps-1 me-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">
-                                                            <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentOwnershipChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentOwnershipChange)
-                                                        </small>
+                                                        <small class="rm-badge-change" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentOwnershipChange)">@String.Format("{0:+##0;-##0;0}", dp.OwnershipPlayer.PercentOwnershipChange)</small>
                                                     }
                                                 </span></td>
 
@@ -531,9 +525,7 @@
                                                         @String.Format("{0:##0}", dp.OwnershipPlayer.ActivePercent)
                                                         @if (dp.OwnershipPlayer.PercentActiveChange != 0)
                                                         {
-                                                            <small class="text-nowrap float-start pe-1 ps-1 me-1" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentActiveChange)">
-                                                                <partial name="_ShowPlusIfPositive" model="dp.OwnershipPlayer.PercentActiveChange" />@String.Format("{0:##0}", dp.OwnershipPlayer.PercentActiveChange)
-                                                            </small>
+                                                            <small class="rm-badge-change" style="background-color:#@colorLib.OwnershipPercentChangeColor(dp.OwnershipPlayer.PercentActiveChange)">@String.Format("{0:+##0;-##0;0}", dp.OwnershipPlayer.PercentActiveChange)</small>
                                                         }
                                                     </span></td>
                                                 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -106,13 +106,39 @@ namespace RotoMonster
                     Configuration["EmailSender:Password"]
                 ));
             // RotoMonsterUI links to Basketball Monster by default.
-            RotoMonsterUIUrls.PlayerUrl = id => $"/Players?playerId={id}";
+            // Built from RootPath - this is a raw string, so UsePathBase does
+            // not reach it, and it is the link in Ken's example.
+            string uiRootPath = GetRootPath();
+            RotoMonsterUIUrls.PlayerUrl = id => $"{uiRootPath}/Players?playerId={id}";
 
+        }
+
+        /// <summary>
+        /// The folder the site is served from, e.g. "/mlb" when it sits under
+        /// rotomonster.com/mlb. "/" and "" both mean the site root.
+        /// </summary>
+        private string GetRootPath()
+        {
+            string root = (Configuration["RootPath"] ?? "").Trim();
+
+            if (root.Length == 0 || root == "/")
+                return "";
+
+            if (!root.StartsWith("/"))
+                root = "/" + root;
+
+            return root.TrimEnd('/');
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
         {
+            // Before everything else, so static files, routing and every
+            // generated url all see it.
+            string rootPath = GetRootPath();
+            if (rootPath.Length > 0)
+                app.UsePathBase(rootPath);
+
             if (true || env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
