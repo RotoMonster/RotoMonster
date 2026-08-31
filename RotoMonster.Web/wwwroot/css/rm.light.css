@@ -2551,3 +2551,41 @@ td.value-badge-cell {
 .display-player-team + .display-player-pos {
     margin-left: 0 !important;
 }
+
+/* rm-filter-label-inline -----------------------------------------------
+   Ken, Small RotoMonster Updates: move the controls onto the same line as
+   the headings, and make the headings a fixed width so the items to their
+   right line up.
+
+   The label comes from .rm-filter-section[data-title]::before, which set
+   flex-basis:100% to force a full-width first line. A fixed width puts it
+   inline instead. Appended at the end of the file deliberately - the
+   rm-spacing block earlier already overrides the original ::before, so
+   this has to come after both to win on source order.
+
+   The label reverts to its own line under 992px, where .modern-filter-row
+   switches to a column and a fixed-width label would squeeze the controls. */
+
+:root {
+    --rm-filter-label-width: 7.5rem;
+}
+
+.rm-filter-section[data-title]::before {
+    flex: 0 0 var(--rm-filter-label-width);
+    width: var(--rm-filter-label-width);
+    max-width: var(--rm-filter-label-width);
+    margin-bottom: 0;
+    padding-right: 0.75rem;
+    align-self: center;
+    line-height: 1.2;
+}
+
+@media (max-width: 991px) {
+    .rm-filter-section[data-title]::before {
+        flex-basis: 100%;
+        width: 100%;
+        max-width: none;
+        margin-bottom: 0.35rem;
+        padding-right: 0;
+    }
+}
