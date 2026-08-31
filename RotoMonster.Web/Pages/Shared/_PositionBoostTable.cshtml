@@ -1,39 +1,30 @@
-﻿@using RotoMonster.Models.Shared
+@using RotoMonster.Models.Shared
+@using RotoMonster.Core
 @model PositionBoostHashModel
 @if (Model != null)
 {
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#pvmodal">
-        ?
-    </button>
-
-    <!-- Modal -->
-    <div class="modal fade" id="pvmodal" tabindex="-1" aria-labelledby="Position Value" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body text-dark">
-                    <h5 class="modal-title">Position Value Boosts</h5>
-                    <p>The more positive the value, the harder it is to find that position.</p>
-                    <table class="table">
-                        @foreach (var position in Model.Positions)
-                        {
-                            if (Model.PositionBoostHash.ContainsKey(position.Id))
-                            {
-                                <tr>
-                                    <td><partial name="_ColoredPosition" model="position" /></td>
-                                    <td class="text-nowrap">
-                                        <partial name="_ShowPlusIfPositive" model="Model.PositionBoostHash[position.Id]" />
-                                        @String.Format("{0:#####0.00}",Model.PositionBoostHash[position.Id])
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
+    var pvTipId = Context.NextTooltipId();
+    <span class="bm-tooltip-wrap">
+        <button type="button" class="pv-boost-trigger bm-tooltip-trigger"
+                data-bm-tooltip="@pvTipId" aria-label="Position value boosts">@Html.Raw(new Icon(new IconInput { Type = IconType.Info, Size = 15 }).Render())</button>
+        <div class="bm-tooltip-content pv-boost-tip" id="@pvTipId" role="tooltip">
+            <div class="pv-boost-title">Position Value Boosts</div>
+            <div class="pv-boost-note">The more positive the value, the harder it is to find that position.</div>
+            <table class="pv-boost-table">
+                @foreach (var position in Model.Positions)
+                {
+                    if (Model.PositionBoostHash.ContainsKey(position.Id))
+                    {
+                        <tr>
+                            <td><partial name="_ColoredPosition" model="position" /></td>
+                            <td class="text-nowrap pv-boost-value">
+                                <partial name="_ShowPlusIfPositive" model="Model.PositionBoostHash[position.Id]" />
+                                @String.Format("{0:#####0.00}", Model.PositionBoostHash[position.Id])
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
         </div>
-    </div>
+    </span>
 }

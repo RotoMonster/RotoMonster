@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model RotoMonster.Pages.PlayerRankingsModel
 @{
     ViewData["Title"] = "Rankings";
@@ -211,6 +211,7 @@
 
         <div class="rm-filter-section modern-filter-row">
             <button class="btn btn-primary">Refresh</button>
+            <input type="submit" name="topplayersbutton" value="Top Players" class="btn btn-sm btn-outline-dark" />
             @if (isUser)
             {
                 <input id="rm-tour-myteam" type="submit" name="myteambutton" value="My Team" class="btn btn-sm btn-outline-dark" />

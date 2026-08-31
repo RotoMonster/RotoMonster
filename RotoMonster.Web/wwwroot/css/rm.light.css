@@ -2589,3 +2589,68 @@ td.value-badge-cell {
         padding-right: 0;
     }
 }
+
+/* pv-boost-tip ---------------------------------------------------------
+   Ken, Small RotoMonster Updates: the Positional Value popup was the last
+   bootstrap modal in the table header. It is a bm-tooltip now.
+
+   The base .bm-tooltip-content is text-align:center, which is right for a
+   sentence and wrong for a two column table, so the table is left aligned
+   with the value column pushed right. */
+
+.pv-boost-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    line-height: 1;
+    opacity: 0.9;
+    cursor: pointer;
+    /* The PosV label next to it is a btn-link with its own baseline, so the
+       icon rides high on vertical-align alone. Nudged down to sit on the
+       text baseline instead of the line box. */
+    position: relative;
+    top: 2px;
+}
+
+.pv-boost-trigger:hover {
+    opacity: 1;
+}
+
+.pv-boost-trigger svg {
+    display: block;
+}
+
+.pv-boost-tip {
+    text-align: left;
+    min-width: 190px;
+}
+
+.pv-boost-title {
+    margin-bottom: 0.2rem;
+    font-weight: 700;
+}
+
+.pv-boost-note {
+    margin-bottom: 0.4rem;
+    opacity: 0.75;
+    line-height: 1.3;
+}
+
+.pv-boost-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pv-boost-table td {
+    padding: 0.1rem 0;
+    vertical-align: middle;
+}
+
+.pv-boost-value {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}

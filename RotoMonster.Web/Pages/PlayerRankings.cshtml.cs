@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -129,6 +129,7 @@ namespace RotoMonster.Pages
             string draftmodebutton,
             string livebutton,
             string myteambutton,
+            string topplayersbutton,
             string seasonbutton,
             string onedaybutton,
             string oneweekbutton,
@@ -161,6 +162,12 @@ namespace RotoMonster.Pages
             {
                 sort = "OWN";
                 SelectedFilterId = 4;
+            }
+            else if (!string.IsNullOrEmpty(topplayersbutton))
+            {
+                // Top Players is the default view, so the sort the user
+                // already chose is left alone.
+                SelectedFilterId = 1;
             }
             else if (!string.IsNullOrEmpty(livebutton))
             {
