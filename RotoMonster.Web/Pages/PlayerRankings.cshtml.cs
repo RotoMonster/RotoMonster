@@ -487,7 +487,7 @@ namespace RotoMonster.Pages
             List<OwnershipPlayer> ownershipPlayers = db.GetOwnershipPlayersWithChange(leagueCategoriesCode, DateTime.UtcNow, 24);
 
             var playerDefaultPositions = db.GetUserLeagueSeasonPlayerPositions(userLeague, displaySeason);
-            var positionSourcePositions = (from pp in db.GetPositionSourcePositions(db.GetPositionSource(userLeague.FantasyProvider)) where pp.PlayerType.Id == selectedPlayerType.Id select pp).ToList();
+            var positionSourcePositions = (from pp in db.GetPositionSourcePositions(db.GetPositionSource(fantasyProvider)) where pp.PlayerType.Id == selectedPlayerType.Id select pp).ToList();
             GetPositionValuePlayersResult getPositionValuePlayersResult = null;
             if (PlayerTableModel.UserDisplayColumns.IsSelected("PositionValue"))
             {
@@ -502,7 +502,7 @@ namespace RotoMonster.Pages
                     PositionBoostHashModel = new PositionBoostHashModel();
                     PositionBoostHashModel.PositionBoostHash = getPositionValuePlayersResult.PositionBoostHash;
                     PositionBoostHashModel.ActiveRosterSpotBoostHash = getPositionValuePlayersResult.ActiveRosterSpotBoostHash;
-                    PositionBoostHashModel.Positions = db.GetPositionSourcePositions(db.GetPositionSource(userLeague.FantasyProvider));
+                    PositionBoostHashModel.Positions = db.GetPositionSourcePositions(db.GetPositionSource(fantasyProvider));
                     PositionBoostHashModel.ActiveRosterSpots = db.GetActiveRosterSpots();
                 }
             }

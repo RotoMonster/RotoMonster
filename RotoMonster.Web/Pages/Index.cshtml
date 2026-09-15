@@ -7,19 +7,6 @@
 }
 
 <div class="container-fluid px-4 rm-front">
-    @if (!Model.IsLoggedIn)
-    {
-        <div class="text-center mb-2">
-            <h1>
-                RotoMonster<span style="font-weight: bold; color:#@ViewData["LogoColor"];">
-                    @ViewData["sport"].ToString().ToUpper()
-                </span>
-            </h1>
-            <h5 class="mt-2 mb-3 text-muted">@ViewData["tag"]</h5>
-            @*            <div class="alert alert-warning container">Check your Basketball Monster <a href="https://basketballmonster.com/usersettings.aspx">User Settings</a> to see if you qualify for the beta.</div>
-*@        </div>
-    }
-
     @{
         int monsterBotPlayerCount = 0;
         foreach (var view in Model.UserLeagueViews)
@@ -564,12 +551,13 @@
         $(document).ready(function () {
             function updateContent() {
                 $.ajax({
-                    url: '/Index?handler=FrontGameScores',
+                    url: '@Url.Page("/Index", "FrontGameScores")',
                     type: 'GET',
                     success: function (data) {
                         $('#FrontGameScoresContainer').html(data);
                     },
                     error: function (xhr, status, error) {
+                        console.error('FrontGameScores failed', xhr.status, error);
                         $('#FrontGameScoresContainer').html('Error loading data');
                     }
                 });
