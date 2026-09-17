@@ -1,0 +1,72 @@
+@page "{token}"
+@model RotoMonster.Pages.Support.StatusModel
+@{
+    var v = Model.View;
+    var status = v.Status;
+    var badge = v.IsClosed ? "bg-secondary" : v.WaitingOnCustomer ? "bg-warning text-dark" : "bg-success";
+    var label = v.IsClosed ? "Closed" : v.WaitingOnCustomer ? "Waiting on you" : "Open";
+}
+
+<div class="container" style="max-width: 760px;">
+
+    @if (Model.JustCreated)
+    {
+        <div class="alert alert-success">
+            Your request was sent. @(Model.Emailed ? "We've emailed you a link to this page." : "Bookmark this page to check on it.")
+        </div>
+    }
+    @if (Model.JustReplied)
+    {
+        <div class="alert alert-success">Your reply was sent.</div>
+    }
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <div class="card mb-3">
+        <div class="card-body d-flex justify-content-between align-items-start">
+            <div>
+                <div class="text-muted small">Request #@v.Ticket.TicketNumber</div>
+                <h4 class="mb-1">@v.Ticket.Subject</h4>
+                <div class="text-muted small">Opened @v.Ticket.CreatedDate.ToLocalTime().ToString("MMM d, yyyy h:mm tt")</div>
+            </div>
+            <span class="badge @badge fs-6">@label</span>
+        </div>
+    </div>
+
+    @if (status == null || !status.Success || v.Conversation == null || !v.Conversation.Success)
+    {
+        <div class="alert alert-warning">We couldn't load the latest on this request right now. Please try again in a minute.</div>
+    }
+    else
+    {
+        @foreach (var m in v.Conversation.Messages)
+        {
+            <div class="card mb-2 @(m.FromCustomer ? "" : "border-success")">
+                <div class="card-header d-flex justify-content-between small">
+                    <span class="fw-bold">@(m.FromCustomer ? "You" : "RotoMonster Support")</span>
+                    <span class="text-muted">@m.CreatedTime.ToLocalTime().ToString("MMM d, h:mm tt")</span>
+                </div>
+                <div class="card-body rm-support-message">
+                    @Html.Raw(RotoMonster.Pages.Support.StatusModel.Render(m))
+                </div>
+            </div>
+        }
+    }
+
+    <div class="card mt-3">
+        <div class="card-header fw-bold">@(v.IsClosed ? "Reopen this request" : "Add a reply")</div>
+        <div class="card-body">
+            <form method="post">
+                <textarea asp-for="Reply" class="form-control mb-2" rows="5"></textarea>
+                <span asp-validation-for="Reply" class="text-danger small d-block mb-2"></span>
+                <button type="submit" class="btn btn-primary">Send reply</button>
+            </form>
+        </div>
+    </div>
+
+    <p class="text-muted small mt-3">
+        <a asp-page="/Support/Index">Contact support about something else</a>
+    </p>
+</div>

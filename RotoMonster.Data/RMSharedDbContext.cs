@@ -24,6 +24,7 @@ namespace RotoMonster.Data
         public DbSet<UserAuth> UserAuths { get; set; }
         public DbSet<YahooRequest> YahooRequests { get; set; }
         public DbSet<UserInvitation> UserInvitations { get; set; }
+        public DbSet<SupportTicket> SupportTickets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -34,6 +35,7 @@ namespace RotoMonster.Data
 
             builder.Entity<UserAuth>().HasKey(s => new { s.UserId });
             builder.Entity<UserAuth>().ToTable("UserAuths");
+            builder.Entity<SupportTicket>().ToTable("SupportTickets");
 
         }
 

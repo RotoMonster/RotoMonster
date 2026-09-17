@@ -1,0 +1,81 @@
+@page
+@model RotoMonster.Pages.Support.IndexModel
+
+<div class="container" style="max-width: 760px;">
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    @if (Model.MyTickets.Count > 0)
+    {
+        <div class="card mb-4">
+            <div class="card-header fw-bold">Your requests</div>
+            <div class="list-group list-group-flush">
+                @foreach (var t in Model.MyTickets)
+                {
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                       asp-page="/Support/Status" asp-route-token="@t.Token">
+                        <span>#@t.TicketNumber &middot; @t.Subject</span>
+                        <small class="text-muted">@t.CreatedDate.ToLocalTime().ToString("MMM d")</small>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-header fw-bold">Contact support</div>
+        <div class="card-body">
+            <p class="text-muted mb-4">Tell us what's going on and we'll get back to you. You'll get a link to track your request and reply.</p>
+
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Form.Name" class="form-label">Name</label>
+                        <input asp-for="Form.Name" class="form-control" />
+                        <span asp-validation-for="Form.Name" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Form.Email" class="form-label">Email</label>
+                        <input asp-for="Form.Email" class="form-control" type="email" />
+                        <span asp-validation-for="Form.Email" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Form.Category" class="form-label">What's it about?</label>
+                    <select asp-for="Form.Category" class="form-select">
+                        <option value="">Choose one</option>
+                        @foreach (var c in RotoMonster.Pages.Support.IndexModel.Categories)
+                        {
+                            <option value="@c">@c</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Form.Category" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Form.Subject" class="form-label">Subject</label>
+                    <input asp-for="Form.Subject" class="form-control" />
+                    <span asp-validation-for="Form.Subject" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Form.Description" class="form-label">Details</label>
+                    <textarea asp-for="Form.Description" class="form-control" rows="7"></textarea>
+                    <span asp-validation-for="Form.Description" class="text-danger small"></span>
+                </div>
+
+                <div style="position:absolute; left:-10000px;" aria-hidden="true">
+                    <input asp-for="Form.Website" tabindex="-1" autocomplete="off" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Send request</button>
+            </form>
+        </div>
+    </div>
+</div>
