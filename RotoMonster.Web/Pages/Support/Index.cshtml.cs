@@ -52,6 +52,19 @@ namespace RotoMonster.Pages.Support
 
         public string ErrorMessage { get; set; }
 
+        private static readonly Dictionary<string, string> Sites = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase)
+        {
+            { "bbm", "Basketball Monster" },
+            { "basketball", "Basketball Monster" },
+            { "bsm", "Baseball Monster" },
+            { "baseball", "Baseball Monster" }
+        };
+
+        [BindProperty(Name = "site", SupportsGet = true)]
+        public string SiteKey { get; set; }
+
+        public string SiteLabel => !string.IsNullOrEmpty(SiteKey) && Sites.TryGetValue(SiteKey, out var name) ? name : null;
+
         public bool IsConfigured => _support.IsConfigured;
 
         public async Task OnGetAsync()
@@ -89,7 +102,7 @@ namespace RotoMonster.Pages.Support
                 Subject = Form.Subject,
                 Description = Form.Description,
                 Category = Form.Category,
-                Site = "RotoMonster " + sport
+                Site = SiteLabel ?? ("RotoMonster " + sport)
             }, CurrentUserId(), sport);
 
             if (!result.Success)
