@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading.Tasks;
@@ -48,6 +49,14 @@ namespace RotoMonster.Pages.Support
             View = await _support.GetAsync(token);
             if (View == null) return NotFound();
 
+            var replyStatus = TempData["ReplyStatus"] as string;
+            if (!string.IsNullOrEmpty(replyStatus) && View.Status != null
+                && !string.Equals(View.Status.Status, replyStatus, StringComparison.OrdinalIgnoreCase))
+            {
+                View.Status.Status = replyStatus;
+                View.Status.StatusType = replyStatus;
+            }
+
             JustCreated = created;
             JustReplied = replied;
             Emailed = emailed;
@@ -75,6 +84,7 @@ namespace RotoMonster.Pages.Support
                 return Page();
             }
 
+            TempData["ReplyStatus"] = result.Status;
             return RedirectToPage("/Support/Status", new { token, replied = true });
         }
 
