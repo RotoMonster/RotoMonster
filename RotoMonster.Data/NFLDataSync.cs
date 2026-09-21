@@ -269,6 +269,42 @@ VALUES ({seasonId}, {year}, {title}, {title}, {startDate.Date}, {endDate.Date}, 
             return result;
         }
 
+        public static (int Percent, int Period, string Clock) LiveState(SportsDataGame g, Game current)
+        {
+            const int quarterSeconds = 900;
+            const int regulationSeconds = 3600;
+
+            if (g.IsFinished)
+            {
+                var last = Math.Max(g.CurrentPeriod ?? current.Period, 4);
+                return (100, last, last > 4 ? "Final/OT" : "Final");
+            }
+
+            if (!g.IsInProgress)
+                return (current.PercentComplete, current.Period, current.GameClock);
+
+            if (g.Intermission.HasValue && g.Intermission.Value > 0)
+            {
+                var ended = g.Intermission.Value;
+                var percent = ended >= 4 ? 99 : ended * 25;
+                return (percent, ended, ended == 2 ? "Half" : "End Q" + ended);
+            }
+
+            var quarter = g.CurrentPeriod ?? current.Period;
+            if (quarter <= 0)
+                return (current.PercentComplete, current.Period, current.GameClock);
+
+            var left = Math.Max(0, Math.Min(quarterSeconds, g.PeriodSecondsRemaining ?? quarterSeconds));
+            var clock = (left / 60) + ":" + (left % 60).ToString("00");
+
+            if (quarter > 4)
+                return (99, quarter, clock);
+
+            var elapsed = (quarter - 1) * quarterSeconds + (quarterSeconds - left);
+            var live = Math.Min(99, (int)Math.Round(elapsed * 100.0 / regulationSeconds));
+            return (live, quarter, clock);
+        }
+
         public async Task<Dictionary<string, Game>> SyncGamesAsync(int seasonId, IEnumerable<SportsDataGame> games, NFLSyncResult result)
         {
             var map = new Dictionary<string, Game>();
@@ -312,13 +348,17 @@ VALUES ({seasonId}, {year}, {title}, {title}, {startDate.Date}, {endDate.Date}, 
                     byKey[key] = game;
                 }
 
+                var state = LiveState(pg, game);
+
                 var changed = isNew
                     | Set(game.GameDate, local.Date, v => game.GameDate = v)
                     | Set(game.GameTime, local, v => game.GameTime = v)
                     | Set(game.HomeScore, pg.HomeScore ?? 0, v => game.HomeScore = v)
                     | Set(game.AwayScore, pg.AwayScore ?? 0, v => game.AwayScore = v)
                     | Set(game.IsFinished, pg.IsFinished, v => game.IsFinished = v)
-                    | Set(game.PercentComplete, pg.IsFinished ? 100 : game.PercentComplete, v => game.PercentComplete = v);
+                    | Set(game.PercentComplete, state.Percent, v => game.PercentComplete = v)
+                    | Set(game.Period, state.Period, v => game.Period = v)
+                    | Set(game.GameClock, state.Clock, v => game.GameClock = v);
 
                 if (isNew) result.Created++;
                 else if (changed) result.Updated++;
@@ -329,6 +369,8 @@ VALUES ({seasonId}, {year}, {title}, {title}, {startDate.Date}, {endDate.Date}, 
             await _db.SaveChangesAsync();
             return map;
         }
+
+        public HashSet<string> IgnoredProviderIds { get; } = new HashSet<string>();
 
         public async Task<Dictionary<string, int>> SyncPlayersAsync(int seasonId, IEnumerable<SportsDataPlayer> players, NFLSyncResult result)
         {
@@ -347,7 +389,7 @@ VALUES ({seasonId}, {year}, {title}, {title}, {startDate.Date}, {endDate.Date}, 
 
             var mappedPlayerIds = new HashSet<int>(mappings.Select(m => m.PlayerId));
 
-            var unmapped = list.Where(p => !byProviderId.ContainsKey(p.PlayerId) && IsTracked(p.Position)).ToList();
+            var unmapped = list.Where(p => !byProviderId.ContainsKey(p.PlayerId) && !IgnoredProviderIds.Contains(p.PlayerId) && IsTracked(p.Position)).ToList();
 
             if (unmapped.Count > 0)
             {
