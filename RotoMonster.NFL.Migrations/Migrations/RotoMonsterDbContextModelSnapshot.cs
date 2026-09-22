@@ -587,6 +587,9 @@ namespace RotoMonster.NFL.Migrations.Migrations
                     b.Property<int>("Period")
                         .HasColumnType("int");
 
+                    b.Property<int>("ReprocessCount")
+                        .HasColumnType("int");
+
                     b.Property<int>("SeasonId")
                         .HasColumnType("int");
 

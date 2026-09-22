@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RotoMonster.Data;
 
 #nullable disable
 
-namespace RotoMonster.MLB.Migrations.Migrations
+namespace RotoMonster.NHL.Migrations.Migrations
 {
     [DbContext(typeof(RMDBContext))]
-    partial class RotoMonsterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260922121303_AddGameReprocessCount")]
+    partial class AddGameReprocessCount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

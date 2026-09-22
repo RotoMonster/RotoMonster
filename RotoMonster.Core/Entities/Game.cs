@@ -18,6 +18,7 @@ namespace RotoMonster.Core
         public DateTime GameTime { get; set; }
         public bool IsFinished { get; set; }
         public int PercentComplete { get; set; }
+        public int ReprocessCount { get; set; }
         public bool? IsPostponed { get; set; }
 
         public int Period { get; set; }
