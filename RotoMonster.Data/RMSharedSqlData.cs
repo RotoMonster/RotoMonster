@@ -399,7 +399,8 @@ namespace RotoMonster.Data
                                 if (userLeagueMissingPlayers != null)
                                 {
                                     var missingPlayer = new UserLeagueMissingPlayer();
-                                    missingPlayer.ProviderId = yahooId + "," + fullName;
+                                    missingPlayer.ProviderId = yahooId;
+                                    missingPlayer.FullName = fullName;
                                     userLeagueMissingPlayers.Add(missingPlayer);
                                 }
 

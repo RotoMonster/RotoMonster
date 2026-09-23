@@ -403,7 +403,8 @@ namespace RotoMonster.Data
                     {
                         mapping.MissingPlayers.Add(new UserLeagueMissingPlayer
                         {
-                            ProviderId = providerPlayer.PlayerId + "," + providerPlayer.Name
+                            ProviderId = providerPlayer.PlayerId,
+                            FullName = providerPlayer.Name
                         });
                         continue;
                     }
@@ -458,7 +459,8 @@ namespace RotoMonster.Data
                         // missed instead of the roster quietly coming up short.
                         mapping.MissingPlayers.Add(new UserLeagueMissingPlayer
                         {
-                            ProviderId = providerPlayer.PlayerId + "," + providerPlayer.Name
+                            ProviderId = providerPlayer.PlayerId,
+                            FullName = providerPlayer.Name
                         });
                         continue;
                     }

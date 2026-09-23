@@ -2810,6 +2810,9 @@ namespace RotoMonster.NFL.Migrations.Migrations
                     b.Property<string>("ProviderId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("UserLeagueId", "ProviderId");
 
                     b.ToTable("UserLeagueMissingPlayers", (string)null);

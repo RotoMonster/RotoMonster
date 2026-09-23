@@ -550,6 +550,7 @@ namespace RotoMonster.Core.Libs
                             {
                                 var missingPlayer = new UserLeagueMissingPlayer();
                                 missingPlayer.ProviderId = espnId;
+                                missingPlayer.FullName = fullName;
                                 userLeagueMissingPlayers.Add(missingPlayer);
                             }
                             if (logger != null)

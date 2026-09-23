@@ -8,6 +8,7 @@ namespace RotoMonster.Core
     {
         public int UserLeagueId { get; set; }
         public string ProviderId { get; set; }
+        public string FullName { get; set; }
 
         public UserLeague UserLeague { get; set; }
 
