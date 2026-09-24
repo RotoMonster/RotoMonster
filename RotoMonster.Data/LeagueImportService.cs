@@ -353,7 +353,7 @@ namespace RotoMonster.Data
         /// The old path refreshed one league per call, so twenty leagues meant
         /// twenty round trips to Yahoo. This asks for all of them at once.
         /// </summary>
-        public async Task<RosterRefreshResult> RefreshRostersAsync(string userId, string providerName)
+        public async Task<RosterRefreshResult> RefreshRostersAsync(string userId, string providerName, int? userLeagueId = null)
         {
             var result = new RosterRefreshResult { ProviderName = providerName };
 
@@ -366,11 +366,22 @@ namespace RotoMonster.Data
                 return result;
             }
 
-            var tracked = await _db.GetTrackedUserLeaguesAsync(userId).ConfigureAwait(false);
+            List<UserLeague> tracked;
+
+            if (userLeagueId.HasValue)
+            {
+                var one = await _db.GetUserLeagueAsync(userId, userLeagueId.Value).ConfigureAwait(false);
+                tracked = one == null ? new List<UserLeague>() : new List<UserLeague> { one };
+            }
+            else
+            {
+                tracked = await _db.GetTrackedUserLeaguesAsync(userId).ConfigureAwait(false);
+            }
 
             var leagues = tracked
                 .Where(l => l.FantasyProviderId == fantasyProvider.Id
                             && !string.IsNullOrEmpty(l.ProviderLeagueId))
+                .Where(l => !userLeagueId.HasValue || l.Id == userLeagueId.Value)
                 .ToList();
 
             if (leagues.Count == 0)

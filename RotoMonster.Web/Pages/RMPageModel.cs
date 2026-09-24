@@ -219,15 +219,23 @@ namespace RotoMonster.Pages
                 {
                     try
                     {
-                        var missingPlayers = new List<UserLeagueMissingPlayer>();
-                        List<UserLeagueTeam> teams = tmpSharedDB.GetUserLeagueTeams(userAuth, tmpDB.GetDefaultSeason().YahooId, userLeague, tmpDB.GetFantasyProviderPlayers(tmpDB.GetFantasyProvider("yahoo")), missingPlayers, logger);
-                        if (teams.Count == 0)
+                        var importService = new RotoMonster.Data.LeagueImportService(tmpDB, tmpSharedDB, config);
+                        var refresh = importService
+                            .RefreshRostersAsync(UserId, "yahoo", userLeague.Id)
+                            .GetAwaiter().GetResult();
+
+                        if (!refresh.Success || refresh.Leagues.Count == 0 || !refresh.Leagues[0].Refreshed)
                         {
-                            AddErrorMessage("There were no teams imported for " + userLeague.DisplayTitle + ". Please try again.");
+                            var message = !string.IsNullOrEmpty(refresh.ErrorMessage)
+                                ? refresh.ErrorMessage
+                                : refresh.Leagues.Count > 0 ? refresh.Leagues[0].Message : null;
+
+                            AddErrorMessage(string.IsNullOrEmpty(message)
+                                ? "There were no teams imported for " + userLeague.DisplayTitle + ". Please try again."
+                                : message);
                         }
                         else
                         {
-                            tmpDB.UpdateUserLeagueTeams(userLeague.Id, teams, missingPlayers, null);
                             LastRefreshSucceeded = true;
                             if (announce)
                                 AddMessage(userLeague.DisplayTitle + " rosters updated");
