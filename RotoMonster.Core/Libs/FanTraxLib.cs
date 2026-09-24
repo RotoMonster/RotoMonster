@@ -626,6 +626,8 @@ namespace RotoMonster.Core.Libs
                     rss = JObject.Parse(data);
                     if (rss["playerInfo"] != null)
                     {
+                        var freshWaivers = new List<UserLeagueWaiverPlayer>();
+
                         foreach (JProperty p in rss["playerInfo"])
                         {
                             foreach (JToken t in p)
@@ -641,8 +643,8 @@ namespace RotoMonster.Core.Libs
                                         waiverPlayer.UserLeagueId = userLeague.Id;
                                         waiverPlayer.PlayerId = providerPlayer.PlayerId;
                                         waiverPlayer.AddedDate = now;
-                                        if (userLeague.UserLeagueWaiverPlayers.Find(w => w.PlayerId == waiverPlayer.PlayerId) == null)
-                                            userLeague.UserLeagueWaiverPlayers.Add(waiverPlayer);
+                                        if (freshWaivers.Find(w => w.PlayerId == waiverPlayer.PlayerId) == null)
+                                            freshWaivers.Add(waiverPlayer);
                                     }
                                     else
                                     {
@@ -653,6 +655,9 @@ namespace RotoMonster.Core.Libs
                                 }
                             }
                         }
+
+                        userLeague.UserLeagueWaiverPlayers.Clear();
+                        userLeague.UserLeagueWaiverPlayers.AddRange(freshWaivers);
                     }
                 }
                 catch (Exception ex)
