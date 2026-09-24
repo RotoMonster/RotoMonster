@@ -48,7 +48,8 @@ namespace RotoMonster.Api
         [HttpPost("fill")]
         public async Task<IActionResult> Fill([FromBody] FillOwnershipRequest request, CancellationToken ct)
         {
-            var apiKey = _config["MonitorApiKey"];
+            var apiKey = _config["AdvancedOwnership:ApiKey"];
+            if (string.IsNullOrEmpty(apiKey)) apiKey = _config["MonitorApiKey"];
             if (string.IsNullOrEmpty(apiKey) || Request.Headers["X-API-Key"] != apiKey)
                 return Unauthorized();
 
