@@ -41,6 +41,7 @@ namespace RotoMonster.Api
             public int UserLeagueId { get; set; }
             public string ProviderLeagueId { get; set; }
             public int Teams { get; set; }
+            public int Players { get; set; }
             public string Error { get; set; }
         }
 
@@ -111,6 +112,8 @@ namespace RotoMonster.Api
 
                             result.Teams = teams == null ? 0 : teams.Count;
 
+                            result.Players = teams == null ? 0 : teams.Sum(t => t.UserLeagueTeamPlayers == null ? 0 : t.UserLeagueTeamPlayers.Count);
+
                             if (result.Teams == 0)
                             {
                                 result.Error = "no teams returned";
@@ -118,7 +121,11 @@ namespace RotoMonster.Api
                             else
                             {
                                 db.UpdateUserLeagueTeams(userLeague.Id, teams, missingPlayers, null);
-                                processed.Add(db.GetUserLeague(userLeague.Id));
+
+                                if (result.Players == 0)
+                                    result.Error = "no rostered players";
+                                else
+                                    processed.Add(db.GetUserLeague(userLeague.Id));
                             }
                         }
                     }
@@ -161,7 +168,8 @@ namespace RotoMonster.Api
                 seasonId = season.Id,
                 leaguesFound = candidates.Count,
                 leaguesRefreshed = processed.Count,
-                leaguesFailed = results.Count(r => r.Error != null),
+                leaguesSkipped = results.Count(r => r.Error == "no rostered players"),
+                leaguesFailed = results.Count(r => r.Error != null && r.Error != "no rostered players"),
                 ownershipFilled = filled,
                 fillError,
                 durationSeconds = Math.Round((DateTime.UtcNow - started).TotalSeconds, 1),
