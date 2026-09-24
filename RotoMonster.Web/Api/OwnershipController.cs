@@ -69,7 +69,7 @@ namespace RotoMonster.Api
                 var ids = db.GetUserLeagueIdsWithCategoriesCode(code, season);
                 candidates = ids
                     .Select(id => db.GetUserLeague(id))
-                    .Where(ul => ul != null && ul.FantasyProviderId == 1 && !string.IsNullOrEmpty(ul.ProviderLeagueId))
+                    .Where(ul => ul != null && ul.FantasyProviderId == 1 && ul.IsProLeague && !string.IsNullOrEmpty(ul.ProviderLeagueId))
                     .GroupBy(ul => ul.ProviderLeagueId)
                     .Select(g => g.First())
                     .OrderBy(ul => ul.ProviderLeagueId, StringComparer.Ordinal)
