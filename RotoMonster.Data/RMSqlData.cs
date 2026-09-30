@@ -2378,7 +2378,7 @@ namespace RotoMonster.Data
             FillOwnershipPlayers(categoriesCode, sourceUserLeagues, 0, null);
         }
 
-        public void FillOwnershipPlayers(string categoriesCode, List<UserLeague> sourceUserLeagues, int seasonId, Dictionary<int, int> categoriesStringIdsByPlayerType)
+        public Dictionary<int, int> FillOwnershipPlayers(string categoriesCode, List<UserLeague> sourceUserLeagues, int seasonId, Dictionary<int, int> categoriesStringIdsByPlayerType)
         {
             DateTime gameDate = GetCurrentOwnershipGameDate(categoriesCode, false);
             CategoriesString categoriesString = GetCategoriesString(categoriesCode);
@@ -2386,7 +2386,7 @@ namespace RotoMonster.Data
             var processUserLeagues = (from ul in sourceUserLeagues select ul).ToList();
 
             if (processUserLeagues.Count == 0)
-                return;
+                return new Dictionary<int, int>();
 
             var leagues = new List<List<UserLeagueTeamPlayer>>();
             Dictionary<string, bool> processed = new Dictionary<string, bool>();
@@ -2474,6 +2474,10 @@ namespace RotoMonster.Data
 
             db.OwnershipPlayers.AddRange(ownershipPlayers.Values);
             db.SaveChanges();
+
+            return ownershipPlayers.Values
+                .GroupBy(op => op.CategoriesStringId)
+                .ToDictionary(g => g.Key, g => g.Count());
         }
 
         public DateTime GetCurrentOwnershipGameDate(string categoriesCode, bool existingOnly)

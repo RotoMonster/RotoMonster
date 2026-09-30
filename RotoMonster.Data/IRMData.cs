@@ -207,7 +207,7 @@ namespace RotoMonster.Data
         List<OwnershipPlayer> GetOwnershipPlayersWithChange(string categoriesCode, DateTime gameDate, int hoursBack);
         List<OwnershipPlayer> GetTrendingPlayers();
         void FillOwnershipPlayers(string categoriesCode, List<UserLeague> sourceUserLeagues);
-        void FillOwnershipPlayers(string categoriesCode, List<UserLeague> sourceUserLeagues, int seasonId, Dictionary<int, int> categoriesStringIdsByPlayerType);
+        Dictionary<int, int> FillOwnershipPlayers(string categoriesCode, List<UserLeague> sourceUserLeagues, int seasonId, Dictionary<int, int> categoriesStringIdsByPlayerType);
         public DateTime GetCurrentOwnershipGameDate(string categoriesCode, bool existingOnly);
 
         List<UserDisplayCategory> GetUserDisplayCategories(string userId, UserLeague userLeague);

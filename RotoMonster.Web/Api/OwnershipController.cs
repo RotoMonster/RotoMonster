@@ -64,6 +64,9 @@ namespace RotoMonster.Api
             public int LeaguesFailed { get; set; }
             public bool OwnershipFilled { get; set; }
             public string FillError { get; set; }
+            public int OffensePlayers { get; set; }
+            public int KickerPlayers { get; set; }
+            public int DefensePlayers { get; set; }
             public double DurationSeconds { get; set; }
             public List<LeagueResult> Failures { get; set; } = new List<LeagueResult>();
         }
@@ -146,6 +149,9 @@ namespace RotoMonster.Api
                     leaguesFailed = last.LeaguesFailed,
                     ownershipFilled = last.OwnershipFilled,
                     fillError = last.FillError,
+                    offensePlayers = last.OffensePlayers,
+                    kickerPlayers = last.KickerPlayers,
+                    defensePlayers = last.DefensePlayers,
                     durationSeconds = last.DurationSeconds,
                     failures = last.Failures
                 }
@@ -249,11 +255,17 @@ namespace RotoMonster.Api
                         var db = scope.ServiceProvider.GetRequiredService<IRMData>();
                         if (code == ProCategoriesCode)
                         {
-                            db.FillOwnershipPlayers(code, processed, season.Id, new Dictionary<int, int>
+                            var counts = db.FillOwnershipPlayers(code, processed, season.Id, new Dictionary<int, int>
                             {
                                 { KickerPlayerTypeId, KickerCategoriesStringId },
                                 { DefensePlayerTypeId, DefenseCategoriesStringId }
                             });
+
+                            counts.TryGetValue(KickerCategoriesStringId, out var kickers);
+                            counts.TryGetValue(DefenseCategoriesStringId, out var defenses);
+                            summary.KickerPlayers = kickers;
+                            summary.DefensePlayers = defenses;
+                            summary.OffensePlayers = counts.Where(c => c.Key != KickerCategoriesStringId && c.Key != DefenseCategoriesStringId).Sum(c => c.Value);
                         }
                         else
                         {
