@@ -2375,6 +2375,11 @@ namespace RotoMonster.Data
 
         public void FillOwnershipPlayers(string categoriesCode, List<UserLeague> sourceUserLeagues)
         {
+            FillOwnershipPlayers(categoriesCode, sourceUserLeagues, 0, null);
+        }
+
+        public void FillOwnershipPlayers(string categoriesCode, List<UserLeague> sourceUserLeagues, int seasonId, Dictionary<int, int> categoriesStringIdsByPlayerType)
+        {
             DateTime gameDate = GetCurrentOwnershipGameDate(categoriesCode, false);
             CategoriesString categoriesString = GetCategoriesString(categoriesCode);
 
@@ -2383,64 +2388,91 @@ namespace RotoMonster.Data
             if (processUserLeagues.Count == 0)
                 return;
 
-            List<OwnershipPlayer> ownershipPlayers = new List<OwnershipPlayer>();
+            var leagues = new List<List<UserLeagueTeamPlayer>>();
             Dictionary<string, bool> processed = new Dictionary<string, bool>();
-
             int leagueSize = 0;
-            int validLeagueCount = 0;
 
             foreach (var ul in processUserLeagues)
             {
-                if (!processed.ContainsKey(ul.ProviderLeagueId))
+                if (processed.ContainsKey(ul.ProviderLeagueId))
+                    continue;
+
+                if (leagueSize == 0)
+                    leagueSize = ul.NumberOfTeams * ul.PlayersPerTeam;
+
+                var teamPlayers = GetUserLeagueTeamPlayers(ul);
+                if (teamPlayers.Count > 0)
+                    leagues.Add(teamPlayers);
+
+                processed[ul.ProviderLeagueId] = true;
+            }
+
+            var useTypes = seasonId > 0 && categoriesStringIdsByPlayerType != null && categoriesStringIdsByPlayerType.Count > 0;
+            var playerTypeIds = new Dictionary<int, int>();
+
+            if (useTypes)
+            {
+                var playerIds = leagues.SelectMany(l => l.Select(p => p.PlayerId)).Distinct().ToList();
+                playerTypeIds = db.SeasonPlayers.AsNoTracking()
+                    .Where(sp => sp.SeasonId == seasonId && playerIds.Contains(sp.PlayerId))
+                    .Select(sp => new { sp.PlayerId, sp.PlayerTypeId })
+                    .ToList()
+                    .GroupBy(sp => sp.PlayerId)
+                    .ToDictionary(g => g.Key, g => g.First().PlayerTypeId);
+            }
+
+            var ownershipPlayers = new Dictionary<(int, int), OwnershipPlayer>();
+
+            foreach (var teamPlayers in leagues)
+            {
+                var playerUsed = new HashSet<int>();
+
+                foreach (var p in teamPlayers)
                 {
-                    Dictionary<int, bool> playerUsed = new Dictionary<int, bool>();
+                    if (!playerUsed.Add(p.PlayerId))
+                        continue;
 
-                    if (leagueSize == 0)
-                        leagueSize = ul.NumberOfTeams * ul.PlayersPerTeam;
-
-                    var teamPlayers = GetUserLeagueTeamPlayers(ul);
-                    if (teamPlayers.Count > 0)
+                    int categoriesStringId = categoriesString.Id;
+                    if (useTypes
+                        && playerTypeIds.TryGetValue(p.PlayerId, out var playerTypeId)
+                        && categoriesStringIdsByPlayerType.TryGetValue(playerTypeId, out var typeCategoriesStringId))
                     {
-                        validLeagueCount++;
-                        foreach (var p in teamPlayers)
-                        {
-                            if (!playerUsed.ContainsKey(p.PlayerId))
-                            {
-                                var ownershipPlayer = (from op in ownershipPlayers where op.PlayerId == p.PlayerId select op).FirstOrDefault();
-                                if (ownershipPlayer == null)
-                                {
-                                    ownershipPlayer = new OwnershipPlayer();
-                                    ownershipPlayer.CategoriesStringId = categoriesString.Id;
-                                    ownershipPlayer.PlayerId = p.PlayerId;
-                                    ownershipPlayer.LeagueSize = leagueSize;
-                                    ownershipPlayer.GameDate = gameDate;
-                                    ownershipPlayers.Add(ownershipPlayer);
-                                }
-                                ownershipPlayer.OwnCount++;
-                                if (p.IsActive)
-                                    ownershipPlayer.ActiveCount++;
-                                if (p.IsIR)
-                                    ownershipPlayer.IRCount++;
-                                playerUsed[p.PlayerId] = true;
-                            }
-                        }
+                        categoriesStringId = typeCategoriesStringId;
                     }
 
-                    processed[ul.ProviderLeagueId] = true;
+                    var key = (categoriesStringId, p.PlayerId);
+                    if (!ownershipPlayers.TryGetValue(key, out var ownershipPlayer))
+                    {
+                        ownershipPlayer = new OwnershipPlayer();
+                        ownershipPlayer.CategoriesStringId = categoriesStringId;
+                        ownershipPlayer.PlayerId = p.PlayerId;
+                        ownershipPlayer.LeagueSize = leagueSize;
+                        ownershipPlayer.GameDate = gameDate;
+                        ownershipPlayers[key] = ownershipPlayer;
+                    }
+
+                    ownershipPlayer.OwnCount++;
+                    if (p.IsActive)
+                        ownershipPlayer.ActiveCount++;
+                    if (p.IsIR)
+                        ownershipPlayer.IRCount++;
                 }
             }
 
-            foreach (var op in ownershipPlayers)
-                op.LeagueCount = validLeagueCount;
+            foreach (var op in ownershipPlayers.Values)
+                op.LeagueCount = leagues.Count;
 
-            // delete old matches
-            foreach (var op in (from op1 in db.OwnershipPlayers where op1.GameDate == gameDate && op1.CategoriesStringId == categoriesString.Id select op1))
-                db.OwnershipPlayers.Remove(op);
+            var categoriesStringIds = new List<int> { categoriesString.Id };
+            if (useTypes)
+                categoriesStringIds.AddRange(categoriesStringIdsByPlayerType.Values.Where(v => !categoriesStringIds.Contains(v)).ToList());
+
+            var oldRows = db.OwnershipPlayers
+                .Where(op => op.GameDate == gameDate && categoriesStringIds.Contains(op.CategoriesStringId))
+                .ToList();
+            db.OwnershipPlayers.RemoveRange(oldRows);
             db.SaveChanges();
 
-            foreach (var op in ownershipPlayers)
-                db.OwnershipPlayers.Add(op);
-
+            db.OwnershipPlayers.AddRange(ownershipPlayers.Values);
             db.SaveChanges();
         }
 

@@ -17,6 +17,10 @@ namespace RotoMonster.Api
     public class OwnershipController : ControllerBase
     {
         public const string ProCategoriesCode = "1p6:2p6:3p0.1:4p0.1:5p4:6p0.04:7p0.5:12p-2:29p-1:31p6:32p2:33p6";
+        public const int KickerPlayerTypeId = 5;
+        public const int DefensePlayerTypeId = 6;
+        public const int KickerCategoriesStringId = 1433;
+        public const int DefenseCategoriesStringId = 1861;
 
         private static int _running;
         private static RunSummary _lastRun;
@@ -243,7 +247,18 @@ namespace RotoMonster.Api
                     using (var scope = _scopeFactory.CreateScope())
                     {
                         var db = scope.ServiceProvider.GetRequiredService<IRMData>();
-                        db.FillOwnershipPlayers(code, processed);
+                        if (code == ProCategoriesCode)
+                        {
+                            db.FillOwnershipPlayers(code, processed, season.Id, new Dictionary<int, int>
+                            {
+                                { KickerPlayerTypeId, KickerCategoriesStringId },
+                                { DefensePlayerTypeId, DefenseCategoriesStringId }
+                            });
+                        }
+                        else
+                        {
+                            db.FillOwnershipPlayers(code, processed);
+                        }
                         summary.OwnershipFilled = true;
                     }
                 }
