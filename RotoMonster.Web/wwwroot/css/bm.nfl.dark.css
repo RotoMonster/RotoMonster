@@ -5,3 +5,44 @@
     --brand-primary-dark: #86592d;
     --brand-accent: #d4a373;
 }
+
+/* nfl-team-colors */
+:root {
+    --team-nfl-ari: #CB919F;
+    --team-nfl-atl: #D38C98;
+    --team-nfl-bal: #928BB9;
+    --team-nfl-buf: #8099C6;
+    --team-nfl-car: #80C2E4;
+    --team-nfl-chi: #858A94;
+    --team-nfl-cin: #FDA78A;
+    --team-nfl-cle: #988E80;
+    --team-nfl-dal: #809ACA;
+    --team-nfl-den: #FDA78A;
+    --team-nfl-det: #80BADA;
+    --team-nfl-gb: #909B98;
+    --team-nfl-hou: #819097;
+    --team-nfl-ind: #8096AF;
+    --team-nfl-jax: #80B3BC;
+    --team-nfl-jac: #80B3BC;
+    --team-nfl-kc: #F18C9B;
+    --team-nfl-lac: #80C0E2;
+    --team-nfl-lar: #809ACA;
+    --team-nfl-la: #809ACA;
+    --team-nfl-lv: #808080;
+    --team-nfl-oak: #808080;
+    --team-nfl-mia: #80C6CB;
+    --team-nfl-min: #A792C1;
+    --team-nfl-ne: #8090A2;
+    --team-nfl-no: #CFC4AC;
+    --team-nfl-nyg: #8590B2;
+    --team-nfl-nyj: #88ABA0;
+    --team-nfl-phi: #80A6AA;
+    --team-nfl-pit: #888C90;
+    --team-nfl-sea: #8090A2;
+    --team-nfl-sf: #D48080;
+    --team-nfl-tb: #EA8484;
+    --team-nfl-ten: #8691A0;
+    --team-nfl-was: #AC8A8A;
+    --team-nfl-wsh: #AC8A8A;
+}
+/* end nfl-team-colors */

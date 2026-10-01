@@ -282,3 +282,11 @@ td.tdleft {
 .display-player-team + .display-player-pos {
     margin-left: 0 !important;
 }
+
+/* rm-pp-team-dark */
+.rm-pp-team {
+    background: transparent;
+    color: var(--pp-team, var(--brand-primary));
+    border: 1px solid var(--pp-team, var(--brand-primary));
+}
+/* end rm-pp-team-dark */

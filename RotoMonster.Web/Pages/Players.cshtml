@@ -5,6 +5,8 @@
     ViewData["Title"] = "Details";
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
     bool hasGameLog = Model.GameLogGames != null && Model.GameLogGames.Count() > 0;
+    string sportCode = (ViewData["sport"] ?? "").ToString().ToLower();
+    string teamCode = Model.SeasonPlayer != null && Model.SeasonPlayer.Team != null ? Model.SeasonPlayer.Team.Code : "FA";
 }
 
 <div class="container-fluid px-4 rm-players rm-pp">
@@ -26,7 +28,7 @@
             <div class="rm-pp-hero-main">
                 <h1 class="rm-pp-name">@Model.Player.FirstName @Model.Player.LastName</h1>
                 <div class="rm-pp-sub">
-                    <span class="rm-pp-team">@(Model.SeasonPlayer != null ? Model.SeasonPlayer.Team.Code : "FA")</span>
+                    <span class="rm-pp-team" style="--pp-team: var(--team-@(sportCode)-@(teamCode.Trim().ToLower()), var(--brand-primary));">@teamCode</span>
                     @foreach (var psp in Model.PositionSourcePlayers)
                     {
                         <span class="rm-pp-pos"><partial name="_ColoredPosition" model="psp.Position" /></span>
