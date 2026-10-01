@@ -2948,3 +2948,104 @@ td.value-badge-cell {
     color: #1e293b;
 }
 /* end rm-player-page */
+
+/* rm-own-analysis */
+.rm-oa {
+    display: inline-block;
+    max-width: 100%;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border-light);
+    border-radius: 12px;
+    padding: 0.85rem 1rem 0.5rem;
+    margin: 0.75rem 0 1rem;
+}
+
+.rm-oa-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+}
+
+.rm-oa-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+table.table.rm-oa-table {
+    width: auto;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    --bs-table-bg: transparent;
+}
+
+table.table.rm-oa-table > :not(caption) > * > * {
+    text-align: center;
+    vertical-align: middle;
+    padding: 5px 10px;
+    white-space: nowrap;
+    font-size: 0.82rem;
+    border: none;
+    border-bottom: 1px solid var(--color-border-light);
+    background-color: transparent;
+    box-shadow: none;
+}
+
+table.table.rm-oa-table > thead > tr > th {
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-secondary);
+    border-bottom: 2px solid var(--brand-primary);
+}
+
+table.table.rm-oa-table > :not(caption) > tr > .rm-oa-team {
+    text-align: left;
+    font-weight: 600;
+}
+
+table.table.rm-oa-table > tbody > tr:last-child > td {
+    border-bottom: none;
+}
+
+table.table.rm-oa-table > tbody > tr:hover > td {
+    background-color: rgba(var(--brand-primary-rgb), 0.07);
+}
+
+.rm-oa-num {
+    color: var(--color-text-secondary);
+}
+
+.rm-oa-chip {
+    display: inline-block;
+    min-width: 4.3rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.rm-oa-count {
+    display: inline-block;
+    min-width: 1.4rem;
+    margin-left: 4px;
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+    text-align: left;
+}
+
+.rm-oa-none {
+    color: var(--color-text-tertiary);
+}
+/* end rm-own-analysis */
+
+/* rm-badge-change-room */
+.rm-badge:has(> .rm-badge-change),
+.pct-badge:has(> .rm-badge-change),
+.value-badge:has(> .rm-badge-change) {
+    justify-content: flex-end;
+    padding-left: 32px;
+    min-width: 72px;
+}
+/* end rm-badge-change-room */
