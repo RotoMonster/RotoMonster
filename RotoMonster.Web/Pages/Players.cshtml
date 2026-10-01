@@ -4,126 +4,148 @@
 @{
     ViewData["Title"] = "Details";
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+    bool hasGameLog = Model.GameLogGames != null && Model.GameLogGames.Count() > 0;
 }
 
-<div class="container-fluid px-4 rm-players">
+<div class="container-fluid px-4 rm-players rm-pp">
 
-    <form method="get">
-        <div class="container ms-3 mb-3" style="max-width: 400px;">
-            <div class="input-group">
-                <input type="search" id="tags" placeholder="Enter player name" class="form-control" asp-for="SearchTerm" />
-                <button class="btn btn-primary ms-1">Search</button>
-            </div>
+    <form method="get" class="rm-pp-search">
+        <div class="input-group">
+            <input type="search" id="tags" placeholder="Enter player name" class="form-control" asp-for="SearchTerm" />
+            <button class="btn btn-primary ms-1">Search</button>
         </div>
     </form>
 
     @if (Model.Player != null)
     {
-        <div>
-            <div class="card">
-                <div class="card-header">
-                    <h1 class="p-0 m-0">
-                        @Model.Player.FirstName @Model.Player.LastName
-                        @(Model.SeasonPlayer!=null ? Model.SeasonPlayer.Team.Code : "X")
-                        @foreach (var psp in Model.PositionSourcePlayers)
-                        {
-                            <partial name="_ColoredPosition" model="psp.Position" />
-                        }
-                    </h1>
+        string initials = (string.IsNullOrEmpty(Model.Player.FirstName) ? "" : Model.Player.FirstName.Substring(0, 1))
+            + (string.IsNullOrEmpty(Model.Player.LastName) ? "" : Model.Player.LastName.Substring(0, 1));
+        <div class="rm-pp-hero">
+            <div class="rm-pp-avatar">@initials</div>
 
-                    <h4 class="ms-1 mt-1">
-                        <span class="pe-2"><partial name="_PlayerHeight" model="Model.Player.Height" /></span>
-                        <span class="pe-2">
-                            <partial name="_PlayerWeight" model="Model.Player.Weight" />
-                        </span>
-                        <span class="pe-2">
-                            <partial name="_PlayerBirthdate" model="Model.Player.Birthdate" />
-                        </span>
-                        <span class="pe-2"><partial name="_PlayerDraft" model="Model.Player" /></span>
-                        <span class="pe-2"><partial name="_PlayerSalary" model="Model.SeasonPlayer" /></span>
-                    </h4>
-
-                    @if (Model.PlayerStatus != null)
+            <div class="rm-pp-hero-main">
+                <h1 class="rm-pp-name">@Model.Player.FirstName @Model.Player.LastName</h1>
+                <div class="rm-pp-sub">
+                    <span class="rm-pp-team">@(Model.SeasonPlayer != null ? Model.SeasonPlayer.Team.Code : "FA")</span>
+                    @foreach (var psp in Model.PositionSourcePlayers)
                     {
-                        <h4 class="mt-1 mb-3">
-                            <span class="ps-2 pe-2 me-1" style="@colorLib.GetPlayerStatusTypeStyle(Model.PlayerStatus.PlayerStatusType)">@Model.PlayerStatus.PlayerStatusType.TextFormat.Replace("{t}", "").Trim()</span>
-                            <span>@Model.PlayerStatus.Comment</span>
-                            <small style="color:black;background-color:#@colorLib.TimeSinceInjuryColorStyle(Model.PlayerStatus)"><partial name="_Timespan" model="Model.PlayerStatus.TimeSince" /></small>
-                        </h4>
+                        <span class="rm-pp-pos"><partial name="_ColoredPosition" model="psp.Position" /></span>
                     }
-
-                    @if (Model.OwnershipPlayer != null)
-                    {
-                        <div class="mt-0">
-                            <span class="me-2 rm-badge rm-badge--inline" style="background-color:#@colorLib.OwnershipGetPercentColor(Model.OwnershipPlayer.OwnershipPercent)">
-                                <partial name="_PlayerOwnershipChange" model="new RotoMonster.Models.Shared.PlayerOwnershipChangeModel(Model.OwnershipPlayer.OwnershipPercent,Model.OwnershipPlayer.PercentOwnershipChange)" />
-                                <small>% Own</small>
-                            </span>
-                            <span class="rm-badge rm-badge--inline" style="background-color:#@colorLib.ActiveGetPercentColor(Model.OwnershipPlayer.ActivePercent)">
-                                <partial name="_PlayerOwnershipChange" model="new RotoMonster.Models.Shared.PlayerOwnershipChangeModel(Model.OwnershipPlayer.ActivePercent,Model.OwnershipPlayer.PercentActiveChange)" />
-                                <small>% Active</small>
-                            </span>
-                            @if (Model.OwnershipPlayer.IRPercent > 0)
-                            {
-                                <span class="rm-badge rm-badge--inline rm-badge--outline ms-2">
-                                    <partial name="_PlayerOwnershipChange" model="new RotoMonster.Models.Shared.PlayerOwnershipChangeModel(Model.OwnershipPlayer.IRPercent,Model.OwnershipPlayer.PercentActiveChange)" />
-                                    <small>% IR</small>
-                                </span>
-                            }
-                        </div>
-                    }
-
                 </div>
+                <div class="rm-pp-facts">
+                    @if (Model.Player.Height > 0)
+                    {
+                        <span class="rm-pp-fact"><span class="rm-pp-fact-label">Ht</span><partial name="_PlayerHeight" model="Model.Player.Height" /></span>
+                    }
+                    @if (Model.Player.Weight > 0)
+                    {
+                        <span class="rm-pp-fact"><span class="rm-pp-fact-label">Wt</span><partial name="_PlayerWeight" model="Model.Player.Weight" /></span>
+                    }
+                    @if (Model.Player.Birthdate.Year > 1900)
+                    {
+                        <span class="rm-pp-fact"><span class="rm-pp-fact-label">Age</span><partial name="_PlayerBirthdate" model="Model.Player.Birthdate" /></span>
+                    }
+                    @if (Model.Player.RookieYear > 0)
+                    {
+                        <span class="rm-pp-fact"><span class="rm-pp-fact-label">Draft</span><partial name="_PlayerDraft" model="Model.Player" /></span>
+                    }
+                    @if (Model.SeasonPlayer != null && Model.SeasonPlayer.Salary.GetValueOrDefault() > 0)
+                    {
+                        <span class="rm-pp-fact"><span class="rm-pp-fact-label">Salary</span><partial name="_PlayerSalary" model="Model.SeasonPlayer" /></span>
+                    }
+                </div>
+                @if (Model.PlayerStatus != null)
+                {
+                    <div class="rm-pp-status">
+                        <span class="rm-pp-status-type" style="@colorLib.GetPlayerStatusTypeStyle(Model.PlayerStatus.PlayerStatusType)">@Model.PlayerStatus.PlayerStatusType.TextFormat.Replace("{t}", "").Trim()</span>
+                        <span class="rm-pp-status-comment">@Model.PlayerStatus.Comment</span>
+                        <small class="rm-pp-status-time" style="background-color:#@colorLib.TimeSinceInjuryColorStyle(Model.PlayerStatus)"><partial name="_Timespan" model="Model.PlayerStatus.TimeSince" /></small>
+                    </div>
+                }
+            </div>
+
+            <div class="rm-pp-hero-side">
+                @if (Model.OwnershipPlayer != null)
+                {
+                    <div class="rm-pp-own">
+                        <span class="rm-badge rm-badge--inline" style="background-color:#@colorLib.OwnershipGetPercentColor(Model.OwnershipPlayer.OwnershipPercent)">
+                            <partial name="_PlayerOwnershipChange" model="new RotoMonster.Models.Shared.PlayerOwnershipChangeModel(Model.OwnershipPlayer.OwnershipPercent,Model.OwnershipPlayer.PercentOwnershipChange)" />
+                            <small>% Own</small>
+                        </span>
+                        <span class="rm-badge rm-badge--inline" style="background-color:#@colorLib.ActiveGetPercentColor(Model.OwnershipPlayer.ActivePercent)">
+                            <partial name="_PlayerOwnershipChange" model="new RotoMonster.Models.Shared.PlayerOwnershipChangeModel(Model.OwnershipPlayer.ActivePercent,Model.OwnershipPlayer.PercentActiveChange)" />
+                            <small>% Active</small>
+                        </span>
+                        @if (Model.OwnershipPlayer.IRPercent > 0)
+                        {
+                            <span class="rm-badge rm-badge--inline rm-badge--outline">
+                                <partial name="_PlayerOwnershipChange" model="new RotoMonster.Models.Shared.PlayerOwnershipChangeModel(Model.OwnershipPlayer.IRPercent,Model.OwnershipPlayer.PercentActiveChange)" />
+                                <small>% IR</small>
+                            </span>
+                        }
+                    </div>
+                }
+                @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
+                {
+                    <form method="post">
+                        <div class="rm-pp-leagues">
+                            <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
+                            <div>
+                                <button class="btn btn-sm btn-primary" name="refresh">Refresh</button>
+                            </div>
+                            <div>
+                                @if (Model.OwnedInUserLeagues != null && Model.OwnedInUserLeagues.Count > 0)
+                                {
+                                    string note = "";
+                                    foreach (var userLeague in Model.OwnedInUserLeagues)
+                                        note += "[" + userLeague.DisplayTitle + "]";
+                                    var tipNote1 = ViewContext.HttpContext.NextTooltipId();
+                                    <span class="bm-tooltip-wrap">
+                                    <span class="badge bg-success bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipNote1">
+                                        Yours in  @Model.OwnedInUserLeagues.Count
+                                    </span>
+                                    <div class="bm-tooltip-content" id="@tipNote1" role="tooltip">@Html.Raw(note)</div>
+                                    </span>
+                                }
+                                @if (Model.AvailableInUserLeagues != null && Model.AvailableInUserLeagues.Count > 0)
+                                {
+                                    string note = "";
+                                    foreach (var userLeague in Model.AvailableInUserLeagues)
+                                        note += "[" + userLeague.DisplayTitle + "]";
+                                    var tipNote2 = ViewContext.HttpContext.NextTooltipId();
+                                    <span class="bm-tooltip-wrap">
+                                    <span class="badge bg-primary bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipNote2">
+                                        Available in @Model.AvailableInUserLeagues.Count
+                                    </span>
+                                    <div class="bm-tooltip-content" id="@tipNote2" role="tooltip">@Html.Raw(note)</div>
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </form>
+                }
             </div>
         </div>
 
-        @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
-        {
-            <form method="post">
-                <div class="mt-2 mb-1 p-2 row">
-                    <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
-                    <div class="col-auto p-1">
-                        <button class="btn btn-sm btn-primary ms-1" name="refresh">Refresh</button>
-                    </div>
-                    <div class="col-auto p-1">
-                        @if (Model.OwnedInUserLeagues != null && Model.OwnedInUserLeagues.Count > 0)
-                        {
-                            string note = "";
-                            foreach (var userLeague in Model.OwnedInUserLeagues)
-                                note += "[" + userLeague.DisplayTitle + "]";
-                            var tipNote1 = ViewContext.HttpContext.NextTooltipId();
-                            <span class="bm-tooltip-wrap">
-                            <span class="badge bg-success bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipNote1">
-                                Yours in  @Model.OwnedInUserLeagues.Count
-                            </span>
-                            <div class="bm-tooltip-content" id="@tipNote1" role="tooltip">@Html.Raw(note)</div>
-                            </span>
-                        }
-                        @if (Model.AvailableInUserLeagues != null && Model.AvailableInUserLeagues.Count > 0)
-                        {
-                            string note = "";
-                            foreach (var userLeague in Model.AvailableInUserLeagues)
-                                note += "[" + userLeague.DisplayTitle + "]";
-                            var tipNote2 = ViewContext.HttpContext.NextTooltipId();
-                            <span class="bm-tooltip-wrap">
-                            <span class="badge bg-primary bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipNote2">
-                                Available in @Model.AvailableInUserLeagues.Count
-                            </span>
-                            <div class="bm-tooltip-content" id="@tipNote2" role="tooltip">@Html.Raw(note)</div>
-                            </span>
-                        }
-                    </div>
+        <div class="rm-pp-card rm-pp-stats">
+            <div class="rm-pp-stats-bar">
+                <div class="rm-pp-tabs" role="tablist">
+                    <button type="button" class="rm-pp-tab rm-pp-tab--on" data-pp-tab="rm-pp-season">Season stats</button>
+                    @if (hasGameLog)
+                    {
+                        <button type="button" class="rm-pp-tab" data-pp-tab="rm-pp-gamelog">Game log</button>
+                    }
                 </div>
-            </form>
-        }
+                <button type="button" class="rm-pp-toggle" data-pp-toggle>Show all stats</button>
+            </div>
 
-        <div class="mt-3">
-            <partial name="_PlayerTable" model="Model.HistoryTableModel" />
-        </div>
+            <div class="rm-pp-panel rm-profile-table" id="rm-pp-season">
+                <partial name="_PlayerTable" model="Model.HistoryTableModel" />
+            </div>
 
-        @if (Model.GameLogGames != null && Model.GameLogGames.Count() > 0)
-        {
-            <div class="container ms-0">
+            @if (hasGameLog)
+            {
+                <div class="rm-pp-panel rm-profile-table" id="rm-pp-gamelog" style="display:none;">
                 <table class="@RotoMonster.Core.RMCss.DataTable">
                     <thead class="@RotoMonster.Core.RMCss.DataTableTHead">
                         <tr>
@@ -245,8 +267,9 @@
                         }
                     </tbody>
                 </table>
-            </div>
-        }
+                </div>
+            }
+        </div>
     }
 </div>
 
@@ -255,4 +278,114 @@
 
 @section scripts{
     <partial name="_PlayerSearchScripts" model='"tags"' />
+    <script>
+        (function () {
+            function isEmptyValue(text) {
+                var t = (text || '').replace(/\s+/g, '');
+                if (t === '' || t === '-') return true;
+                var n = parseFloat(t.replace(/[,$%]/g, ''));
+                return !isNaN(n) && n === 0 && /^-?[0-9.,$%]+$/.test(t);
+            }
+
+            function cellsByColumn(table) {
+                var rows = Array.prototype.slice.call(table.querySelectorAll('tbody tr'));
+                return rows.map(function (row) {
+                    var out = [], col = 0;
+                    Array.prototype.forEach.call(row.children, function (cell) {
+                        var span = parseInt(cell.getAttribute('colspan') || '1', 10);
+                        out.push({ cell: cell, start: col, span: span });
+                        col += span;
+                    });
+                    return out;
+                });
+            }
+
+            function setupTable(table) {
+                var heads = Array.prototype.slice.call(table.querySelectorAll('thead tr:last-child > th'));
+                if (!heads.length) return;
+                var rows = cellsByColumn(table);
+                var empty = [];
+
+                heads.forEach(function (th, i) {
+                    var seen = 0, allEmpty = true;
+                    rows.forEach(function (cells) {
+                        cells.forEach(function (c) {
+                            if (c.span === 1 && c.start === i) {
+                                seen++;
+                                if (!isEmptyValue(c.cell.textContent)) allEmpty = false;
+                            }
+                        });
+                    });
+                    if (seen > 0 && allEmpty) empty.push(i);
+                });
+
+                table._pp = { heads: heads, rows: rows, empty: empty, spans: rows.map(function (cells) {
+                    return cells.map(function (c) { return c.span; });
+                }) };
+            }
+
+            function applyHide(table, hide) {
+                var pp = table._pp;
+                if (!pp) return;
+                var hidden = hide ? pp.empty : [];
+
+                pp.heads.forEach(function (th, i) {
+                    th.style.display = hidden.indexOf(i) > -1 ? 'none' : '';
+                });
+
+                pp.rows.forEach(function (cells, r) {
+                    cells.forEach(function (c, k) {
+                        var original = pp.spans[r][k];
+                        if (original === 1) {
+                            c.cell.style.display = hidden.indexOf(c.start) > -1 ? 'none' : '';
+                        } else {
+                            var removed = 0;
+                            for (var x = c.start; x < c.start + original; x++) if (hidden.indexOf(x) > -1) removed++;
+                            c.cell.setAttribute('colspan', Math.max(1, original - removed));
+                        }
+                    });
+                });
+            }
+
+            function chipify(table) {
+                Array.prototype.forEach.call(table.querySelectorAll('tbody td'), function (td) {
+                    var bg = td.style.backgroundColor;
+                    if (!bg) return;
+                    td.style.backgroundColor = '';
+                    var m = bg.match(/\d+/g);
+                    if (m && m.length >= 3 && +m[0] > 240 && +m[1] > 240 && +m[2] > 240) return;
+                    var chip = document.createElement('span');
+                    chip.className = 'rm-pp-chip';
+                    chip.style.backgroundColor = bg;
+                    while (td.firstChild) chip.appendChild(td.firstChild);
+                    td.appendChild(chip);
+                });
+            }
+
+            var tables = Array.prototype.slice.call(document.querySelectorAll('.rm-pp .rm-pp-panel table'));
+            tables.forEach(chipify);
+            var hiding = true;
+            tables.forEach(function (t) { setupTable(t); applyHide(t, hiding); });
+
+            var toggle = document.querySelector('[data-pp-toggle]');
+            var anyEmpty = tables.some(function (t) { return t._pp && t._pp.empty.length > 0; });
+            if (toggle && !anyEmpty) toggle.style.display = 'none';
+            if (toggle) toggle.addEventListener('click', function () {
+                hiding = !hiding;
+                tables.forEach(function (t) { applyHide(t, hiding); });
+                toggle.textContent = hiding ? 'Show all stats' : 'Hide empty stats';
+            });
+
+            document.querySelectorAll('[data-pp-tab]').forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    document.querySelectorAll('[data-pp-tab]').forEach(function (other) {
+                        var on = other === tab;
+                        other.classList.toggle('rm-pp-tab--on', on);
+                        var panel = document.getElementById(other.getAttribute('data-pp-tab'));
+                        if (panel) panel.style.display = on ? '' : 'none';
+                    });
+                });
+            });
+        })();
+    </script>
 }
