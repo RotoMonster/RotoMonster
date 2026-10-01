@@ -63,6 +63,7 @@ namespace RotoMonster.Api
             public int LeaguesSkipped { get; set; }
             public int LeaguesFailed { get; set; }
             public bool OwnershipFilled { get; set; }
+            public bool CacheCleared { get; set; }
             public string FillError { get; set; }
             public int OffensePlayers { get; set; }
             public int KickerPlayers { get; set; }
@@ -148,6 +149,7 @@ namespace RotoMonster.Api
                     leaguesSkipped = last.LeaguesSkipped,
                     leaguesFailed = last.LeaguesFailed,
                     ownershipFilled = last.OwnershipFilled,
+                    cacheCleared = last.CacheCleared,
                     fillError = last.FillError,
                     offensePlayers = last.OffensePlayers,
                     kickerPlayers = last.KickerPlayers,
@@ -272,6 +274,8 @@ namespace RotoMonster.Api
                             db.FillOwnershipPlayers(code, processed);
                         }
                         summary.OwnershipFilled = true;
+                        db.ClearCache();
+                        summary.CacheCleared = true;
                     }
                 }
                 catch (Exception ex)
