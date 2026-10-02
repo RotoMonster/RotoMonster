@@ -46,6 +46,17 @@ namespace RotoMonster.Pages
 
         public async Task OnGetAsync(int? t, int? hid, int? l, bool? z, bool? gmb, bool? tmb)
         {
+            await LoadAsync(t, hid, l, z, gmb, tmb);
+        }
+
+        public async Task<IActionResult> OnGetChartAsync(int? t, int? l, bool? z, bool? gmb, bool? tmb)
+        {
+            await LoadAsync(t, null, l, z, gmb, tmb);
+            return Partial("_DepthChartsBody", this);
+        }
+
+        private async Task LoadAsync(int? t, int? hid, int? l, bool? z, bool? gmb, bool? tmb)
+        {
             InitGet("Depth Charts");
             if (hid.GetValueOrDefault(0) > 0)
                 ViewData["Helper"] = db.GetHelper(hid.GetValueOrDefault(0));
