@@ -89,7 +89,7 @@
                 }
                 @if (ViewBag.UserLeagueList != null && ViewBag.UserLeagueList.Items.Count > 0)
                 {
-                    <form method="post">
+                    <form method="post" id="ppLeaguesForm" class="rm-live-section" data-rm-live>
                         <div class="rm-pp-leagues">
                             <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
                             <div>

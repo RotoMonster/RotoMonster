@@ -40,10 +40,12 @@ namespace RotoMonster.Pages
         }
 
         public IActionResult OnPost(
+            int? playerId,
             string refresh)
         {
             return RedirectToPage("./Players", new
             {
+                playerId = playerId,
                 l = SelectedUserLeagueId
             });
         }
