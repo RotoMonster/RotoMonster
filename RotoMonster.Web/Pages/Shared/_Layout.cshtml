@@ -262,6 +262,20 @@
                            placeholder="Search players" autocomplete="off" />
                 </form>
 
+                @if (rmModel != null && rmModel.IsLoggedIn && rmModel.SelectedUserLeagues != null && rmModel.SelectedUserLeagues.Count > 0)
+                {
+                    var refreshPairs = Context.Request.Query
+                        .Where(q => !string.Equals(q.Key, "handler", StringComparison.OrdinalIgnoreCase))
+                        .SelectMany(q => q.Value.Select(v => new KeyValuePair<string, string>(q.Key, v)))
+                        .Append(new KeyValuePair<string, string>("handler", "RefreshAllRosters"));
+                    var refreshHref = Context.Request.PathBase + Context.Request.Path + Microsoft.AspNetCore.Http.QueryString.Create(refreshPairs);
+                    <a class="btn btn-secondary rm-page-bar-refresh flex-shrink-0" href="@refreshHref"
+                       title="Refresh rosters for all your leagues" onclick="this.classList.add('rm-live-busy')">
+                        @Html.Raw(new RotoMonsterUI.Icon(new RotoMonsterUI.IconInput { Type = RotoMonsterUI.IconType.RefreshRosters, Size = 16 }).Render())
+                        <span>Refresh Rosters</span>
+                    </a>
+                }
+
                 @if (ViewData["SeasonPercent"] != null)
                 {
                     @* .season-progress is width:100%, so it needs a sized wrapper
@@ -280,7 +294,9 @@
 
     </header>
 
-    <partial name="_Messages" />
+    <div id="rmMessages">
+        <partial name="_Messages" />
+    </div>
 
     @if (ViewData["Helper"] != null)
     {
@@ -320,6 +336,7 @@
     <script src="~/js/rotomonster-ui.js" asp-append-version="true"></script>
     <script src="~/js/custom-dropdown-update.js" asp-append-version="true"></script>
     <script src="~/js/modern-select.js" asp-append-version="true"></script>
+    <script src="~/js/rm-live-form.js" asp-append-version="true"></script>
     <script>
         // Writes the cookie the layout reads on the next request, then reloads
         // so the server emits the other stylesheet. One year, path-wide.

@@ -19,7 +19,6 @@
 
     <div class="mb-2 ms-1">
         <a class="btn btn-primary" asp-page="./UserLeagues/Import">Add Leagues</a>
-        <a class="btn btn-secondary ms-1" asp-page-handler="UpdateAllRosters" alt="Refresh Rosters" title="Refresh Rosters">Refresh Rosters</a>
     </div>
 
     <div class="row">
@@ -285,10 +284,10 @@
             }
         </div>
 
-        <div class="col p-2 rm-league-grid">
+        <div class="col p-2 rm-league-grid" id="rmLeagueGrid">
             @foreach (var ulv in Model.UserLeagueViews)
             {
-                <div class="card mb-3 bg" style="border-color:#@ViewData["LogoColor"];">
+                <div class="card mb-3 bg" id="league-card-@ulv.UserLeague.Id" style="border-color:#@ViewData["LogoColor"];">
 
                     <div class="card-header text-nowrap">
                         <div class="small clearfix">
@@ -297,7 +296,7 @@
                             </div>
                             <div class="float-end ms-2">
                                 <a asp-page="./UserLeagues/Edit" asp-route-id="@ulv.UserLeague.Id" alt="Edit Settings" title="Edit Settings">@Html.Raw(new Icon(new IconInput { Type = IconType.Settings, Size = 16 }).Render())</a>
-                                <a class="ms-2" asp-page-handler="UpdateRosters" asp-route-id="@ulv.UserLeague.Id" alt="Refresh Rosters" title="Refresh Rosters">@Html.Raw(new Icon(new IconInput { Type = IconType.RefreshRosters, Size = 16 }).Render())</a>
+                                <a class="ms-2" data-rm-live="league-card-@ulv.UserLeague.Id" asp-page-handler="UpdateRosters" asp-route-id="@ulv.UserLeague.Id" alt="Refresh Rosters" title="Refresh Rosters">@Html.Raw(new Icon(new IconInput { Type = IconType.RefreshRosters, Size = 16 }).Render())</a>
                             </div>
                         </div>
 

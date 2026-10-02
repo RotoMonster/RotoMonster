@@ -66,68 +66,74 @@
     <div id="ShowAnalysis" class="collapse">
         @if (Model.UserLeagueTeamAnalyses != null)
         {
-            <h5 class="mt-2">Team Ownership Analysis</h5>
-            <div class="container ms-0 p-0">
-                <table class="@RotoMonster.Core.RMCss.DataTable">
-                    <thead class="@RotoMonster.Core.RMCss.DataTableTHead">
-                        <tr>
-                            <th>#</th>
-                            <th>Avg</th>
-                            @foreach (var pt in Model.ShowPlayerTypes)
-                            {
-                                <th>@pt.DisplayTitle</th>
-                            }
-                            <th>Team</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            int num = 1;
-                            foreach (var userLeagueTeamAnalysis in Model.UserLeagueTeamAnalyses)
-                            {
-                                <tr>
-                                    <td>
-                                        @num
-                                    </td>
-
-                                    <td class="text-nowrap rm-badge-cell"><span class="rm-badge" style="background-color:#@colorLib.OwnershipGetPercentColor(userLeagueTeamAnalysis.AverageOwnershipPercent)">
-                                        @String.Format(" {0:##0.0}%", userLeagueTeamAnalysis.AverageOwnershipPercent)
-                                    </span></td>
-
-                                    @foreach (var ptAnalysis in userLeagueTeamAnalysis.UserLeagueTeamAnalysisPlayerTypes)
-                                    {
-                                        <td class="text-nowrap rm-badge-cell"><span class="rm-badge" style="background-color:#@colorLib.OwnershipGetPercentColor(ptAnalysis.AverageOwnershipPercent)">
-                                            @if (ptAnalysis.PlayerCount > 0)
+            <div class="rm-oa">
+                <h5 class="rm-oa-title">Team Ownership Analysis</h5>
+                <div class="rm-oa-scroll">
+                    <table class="table rm-oa-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th class="rm-oa-team">Team</th>
+                                <th>Avg</th>
+                                @foreach (var pt in Model.ShowPlayerTypes)
+                                {
+                                    <th>@pt.DisplayTitle</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int num = 1;
+                                foreach (var userLeagueTeamAnalysis in Model.UserLeagueTeamAnalyses)
+                                {
+                                    <tr>
+                                        <td class="rm-oa-num">@num</td>
+                                        <td class="rm-oa-team">@userLeagueTeamAnalysis.UserLeagueTeam.Title</td>
+                                        <td>
+                                            @if (userLeagueTeamAnalysis.UserLeagueTeamAnalysisPlayerTypes.Sum(p => p.PlayerCount) > 0)
                                             {
-                                                @String.Format("{0:##0.0}%", ptAnalysis.AverageOwnershipPercent)
+                                                <span class="rm-oa-chip" style="background-color:#@colorLib.OwnershipGetPercentColor(userLeagueTeamAnalysis.AverageOwnershipPercent)">@String.Format("{0:##0.0}%", userLeagueTeamAnalysis.AverageOwnershipPercent)</span>
                                             }
-                                            <span class="float-end me-1">@ptAnalysis.PlayerCount</span>
-                                        </span></td>
-                                    }
-
-                                    <td>
-                                        @userLeagueTeamAnalysis.UserLeagueTeam.Title
-                                    </td>
-                                </tr>
-                                num++;
+                                            else
+                                            {
+                                                <span class="rm-oa-none">&ndash;</span>
+                                            }
+                                        </td>
+                                        @foreach (var ptAnalysis in userLeagueTeamAnalysis.UserLeagueTeamAnalysisPlayerTypes)
+                                        {
+                                            <td title="@ptAnalysis.PlayerCount @(ptAnalysis.PlayerCount == 1 ? "player" : "players")">
+                                                @if (ptAnalysis.PlayerCount > 0)
+                                                {
+                                                    <span class="rm-oa-chip" style="background-color:#@colorLib.OwnershipGetPercentColor(ptAnalysis.AverageOwnershipPercent)">@String.Format("{0:##0.0}%", ptAnalysis.AverageOwnershipPercent)</span>
+                                                    <span class="rm-oa-count">@ptAnalysis.PlayerCount</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="rm-oa-none">&ndash;</span>
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                    num++;
+                                }
                             }
-                        }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         }
     </div>
 
-    <form method="post">
+    <form method="post" id="rankingsForm" class="rm-live-section" data-rm-live>
         <input asp-for="DefaultSort" type="hidden" />
 
         <div class="modern-filter-container">
 
         <div class="rm-filter-section modern-filter-row" data-title="Value settings">
             <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
-            <select asp-for="@Model.SelectedFilterId" class="form-control rm-modern-select rm-modern-select-wide" asp-items="ViewBag.FilterList" onchange="this.form.submit()"></select>
-            <select asp-for="@Model.SelectedPerValueId" class="form-control rm-modern-select" asp-items="ViewBag.PerValues" onchange="this.form.submit()"></select>
-            <select asp-for="@Model.SelectedTeamId" class="form-control rm-modern-select" asp-items="ViewBag.TeamList" onchange="this.form.submit()"></select>
+            <select asp-for="@Model.SelectedFilterId" class="form-control rm-modern-select rm-modern-select-wide" asp-items="ViewBag.FilterList" onchange="this.form.requestSubmit()"></select>
+            <select asp-for="@Model.SelectedPerValueId" class="form-control rm-modern-select" asp-items="ViewBag.PerValues" onchange="this.form.requestSubmit()"></select>
+            <select asp-for="@Model.SelectedTeamId" class="form-control rm-modern-select" asp-items="ViewBag.TeamList" onchange="this.form.requestSubmit()"></select>
         </div>
 
         <div class="rm-filter-section modern-filter-row" data-title="Date range">
@@ -149,7 +155,7 @@
                         if (ars.PlayerType.Id == playerType.Id)
                         {
                             <label class="rm-pos-badge text-nowrap">
-                                <input asp-for="SelectedDisplayActiveRosterSpotId" value="@ars.Id" type="radio" onchange="this.form.submit()" />
+                                <input asp-for="SelectedDisplayActiveRosterSpotId" value="@ars.Id" type="radio" onchange="this.form.requestSubmit()" />
                                 <span class="rm-pos-badge-label">
                                     @foreach (var p in ars.Positions)
                                     {
@@ -165,26 +171,26 @@
 
         <div class="rm-filter-section modern-filter-row" data-title="Display">
             <span>
-                <label class="form-check-label">
-                    <input asp-for="ColorStats" onchange="this.form.submit()">
-                    @Html.DisplayNameFor(model => model.ColorStats)
-                </label>
+                <div class="form-check form-switch rm-switch">
+                    <input asp-for="ColorStats" class="form-check-input" role="switch" onchange="this.form.requestSubmit()">
+                    <label class="form-check-label" asp-for="ColorStats"></label>
+                </div>
             </span>
 
             <span class="ms-2">
-                <label class="form-check-label">
-                    <input asp-for="IncludeLive" onchange="this.form.submit()">
-                    @Html.DisplayNameFor(model => model.IncludeLive)
-                </label>
+                <div class="form-check form-switch rm-switch">
+                    <input asp-for="IncludeLive" class="form-check-input" role="switch" onchange="this.form.requestSubmit()">
+                    <label class="form-check-label" asp-for="IncludeLive"></label>
+                </div>
             </span>
 
             @if (isUser)
             {
                 <span class="ms-2">
-                    <label class="form-check-label">
-                        <input asp-for="ShowDraft" onchange="this.form.submit()">
-                        @Html.DisplayNameFor(model => model.ShowDraft)
-                    </label>
+                    <div class="form-check form-switch rm-switch">
+                        <input asp-for="ShowDraft" class="form-check-input" role="switch" onchange="this.form.requestSubmit()">
+                        <label class="form-check-label" asp-for="ShowDraft"></label>
+                    </div>
                 </span>
 
                 <span class="ms-2">
@@ -263,10 +269,10 @@
                 }
 
                 <div class="col-auto ps-3 pe-3 mt-1">
-                    <label class="form-check-label">
-                        <input asp-for="HideDrafted">
-                        @Html.DisplayNameFor(model => model.HideDrafted)
-                    </label>
+                    <div class="form-check form-switch rm-switch">
+                        <input asp-for="HideDrafted" class="form-check-input" role="switch">
+                        <label class="form-check-label" asp-for="HideDrafted"></label>
+                    </div>
                 </div>
 
                 <div class="col-auto ps-2">
@@ -308,3 +314,26 @@
         <partial name="_PlayerTable" model="Model.PlayerTableModel" />
     </form>
 </div>
+
+@section scripts{
+    <script>
+        (function () {
+            function currentSort() {
+                var input = document.querySelector('#rankingsForm input[name="DefaultSort"]');
+                return input ? (input.value || '').toUpperCase() : '';
+            }
+
+            function setupHeaders() {
+                var sorted = currentSort();
+                document.querySelectorAll('#rankingsForm thead button[formaction*="sort="]').forEach(function (btn) {
+                    btn.classList.add('rm-th-sort');
+                    var m = /[?&]sort=([^&#]+)/i.exec(btn.getAttribute('formaction') || '');
+                    btn.classList.toggle('rm-th-sorted', !!(m && sorted && decodeURIComponent(m[1]).toUpperCase() === sorted));
+                });
+            }
+
+            setupHeaders();
+            document.addEventListener('rm:live-updated', setupHeaders);
+        })();
+    </script>
+}

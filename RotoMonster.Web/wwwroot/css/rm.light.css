@@ -3218,3 +3218,16 @@ a.rm-live-busy svg {
     animation: rm-live-spin 0.9s linear infinite;
 }
 /* end rm-live-busy */
+
+/* rm-page-bar-refresh */
+.rm-page-bar-refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.rm-page-bar-refresh svg {
+    flex-shrink: 0;
+}
+/* end rm-page-bar-refresh */

@@ -90,6 +90,12 @@
         });
     }
 
+    window.rmModernSelect = {
+        enhanceAll: function (root) {
+            Array.prototype.forEach.call((root || document).querySelectorAll('select.rm-modern-select'), enhance);
+        }
+    };
+
     function init() {
         var selects = document.querySelectorAll('select.rm-modern-select');
         Array.prototype.forEach.call(selects, enhance);

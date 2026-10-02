@@ -300,5 +300,60 @@ namespace RotoMonster.Pages
             return RedirectToPage("Index");
         }
 
+        public async Task<IActionResult> OnGetRefreshAllRostersAsync()
+        {
+            await RefreshAllRostersAsync();
+            var query = Request.Query
+                .Where(q => !string.Equals(q.Key, "handler", StringComparison.OrdinalIgnoreCase))
+                .SelectMany(q => q.Value.Select(v => new KeyValuePair<string, string>(q.Key, v)));
+            return LocalRedirect(Request.PathBase + Request.Path + QueryString.Create(query));
+        }
+
+        protected async Task RefreshAllRostersAsync()
+        {
+            var yahooProvider = db.GetFantasyProvider("Yahoo!");
+            var handledByProvider = new HashSet<int>();
+            var totalRefreshed = 0;
+
+            if (yahooProvider != null)
+            {
+                var importService = new RotoMonster.Data.LeagueImportService(db, sharedDb, config);
+                var refreshed = await importService.RefreshRostersAsync(UserId, "Yahoo!");
+
+                if (!refreshed.Success && !string.IsNullOrEmpty(refreshed.ErrorMessage))
+                {
+                    AddErrorMessage(refreshed.ErrorMessage);
+                }
+                else
+                {
+                    totalRefreshed += refreshed.RefreshedCount;
+
+                    foreach (var failed in refreshed.Leagues.Where(l => !l.Refreshed))
+                        AddErrorMessage(failed.Title + ": " + failed.Message);
+                }
+
+                handledByProvider.Add(yahooProvider.Id);
+            }
+
+            foreach (var ul in SelectedUserLeagues)
+            {
+                if (!ul.TrackLeague)
+                    continue;
+                if (handledByProvider.Contains(ul.FantasyProviderId))
+                    continue;
+
+                UserLeague userLeague = await db.GetUserLeagueAsync(UserId, ul.Id);
+                RefreshRosters(userLeague, false);
+                if (LastRefreshSucceeded)
+                    totalRefreshed++;
+            }
+
+            if (totalRefreshed > 0)
+            {
+                AddMessage("Refreshed rosters for " + totalRefreshed
+                           + (totalRefreshed == 1 ? " league." : " leagues."));
+            }
+        }
+
     }
 }

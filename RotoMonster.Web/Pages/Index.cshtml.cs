@@ -389,57 +389,7 @@ namespace RotoMonster.Pages
 
         public async Task<IActionResult> OnGetUpdateAllRostersAsync()
         {
-            // Yahoo takes every league key in one request, so all of them come
-            // back together rather than one round trip each.
-            var yahooProvider = db.GetFantasyProvider("Yahoo!");
-            var handledByProvider = new HashSet<int>();
-            var totalRefreshed = 0;
-
-            if (yahooProvider != null)
-            {
-                var importService = new RotoMonster.Data.LeagueImportService(db, sharedDb, config);
-                var refreshed = await importService.RefreshRostersAsync(UserId, "Yahoo!");
-
-                if (!refreshed.Success && !string.IsNullOrEmpty(refreshed.ErrorMessage))
-                {
-                    AddErrorMessage(refreshed.ErrorMessage);
-                }
-                else
-                {
-                    // Counted rather than announced, so the total below covers
-                    // every provider in one line.
-                    totalRefreshed += refreshed.RefreshedCount;
-
-                    foreach (var failed in refreshed.Leagues.Where(l => !l.Refreshed))
-                        AddErrorMessage(failed.Title + ": " + failed.Message);
-                }
-
-                handledByProvider.Add(yahooProvider.Id);
-            }
-
-            // Everything else still goes one at a time, since those providers
-            // have no implementation behind the layer yet.
-            foreach (var ul in SelectedUserLeagues)
-            {
-                if (!ul.TrackLeague)
-                    continue;
-                if (handledByProvider.Contains(ul.FantasyProviderId))
-                    continue;
-
-                UserLeague userLeague = await db.GetUserLeagueAsync(UserId, ul.Id);
-
-                // announce false so these do not each add their own line.
-                RefreshRosters(userLeague, false);
-                if (LastRefreshSucceeded)
-                    totalRefreshed++;
-            }
-
-            if (totalRefreshed > 0)
-            {
-                AddMessage("Refreshed rosters for " + totalRefreshed
-                           + (totalRefreshed == 1 ? " league." : " leagues."));
-            }
-
+            await RefreshAllRostersAsync();
             return RedirectToPage("./Index");
         }
 

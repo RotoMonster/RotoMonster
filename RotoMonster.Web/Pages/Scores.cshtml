@@ -6,7 +6,7 @@
 
 <div class="container-fluid px-4">
 
-    <form method="post">
+    <form method="post" id="scoresForm" class="rm-live-section" data-rm-live>
 
         <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
 
@@ -24,7 +24,7 @@
                     <div class="rm-scores-controls">
                         <input type="submit" name="backbutton" value="Back" class="btn btn-sm btn-primary" />
                         <input type="submit" name="nextbutton" value="Next" class="btn btn-sm btn-primary" />
-                        <input type="date" asp-for="@Model.SelectedDate" class="form-control form-control-sm rm-scores-datebox" onchange="this.form.submit()" />
+                        <input type="date" asp-for="@Model.SelectedDate" class="form-control form-control-sm rm-scores-datebox" onchange="this.form.requestSubmit()" />
                         <button class="btn btn-sm btn-success">Refresh</button>
                     </div>
 
