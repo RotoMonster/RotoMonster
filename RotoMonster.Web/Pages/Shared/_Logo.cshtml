@@ -1,20 +1,25 @@
 ﻿@model RotoMonster.Models.Shared.LogoModel
+@{
+    string title = Model.Sport.ToUpper() == "NFL" ? "Football Monster"
+        : Model.Sport.ToUpper() == "NHL" ? "Hockey Monster"
+        : "RotoMonster " + Model.Sport.ToUpper();
+}
 
 @if (Model.Controller.Length > 0)
 {
-    <a class="@Model.Sport.ToLower() text-white logo navbar-brand" asp-area="" asp-page="@Model.Controller">
-        rM @Model.Sport.ToUpper()
+    <a class="navbar-brand rm-brand" asp-area="" asp-page="@Model.Controller" title="@title" aria-label="@title">
+        <partial name="_SportLogoSvg" model="Model.Sport" />
     </a>
 }
 else if (Model.Url.Length > 0)
 {
-    <a class="@Model.Sport.ToLower() text-white logo navbar-brand" href="@Model.Url">
-        rM @Model.Sport.ToUpper()
+    <a class="navbar-brand rm-brand" href="@Model.Url" title="@title" aria-label="@title">
+        <partial name="_SportLogoSvg" model="Model.Sport" />
     </a>
 }
 else
 {
-    <span>
-        rM @Model.Sport.ToUpper()
+    <span class="rm-brand" title="@title">
+        <partial name="_SportLogoSvg" model="Model.Sport" />
     </span>
 }

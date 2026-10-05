@@ -10,7 +10,9 @@
     // CSS variable rather than a hex, so the color follows the light/dark theme.
     var teamColor = idb.Sport.Title == "NBA"
         ? RotoMonsterUI.TeamColorHelper.GetNbaTeamColorVar(teamCode)
-        : RotoMonsterUI.TeamColorHelper.GetTeamColorVar(teamCode);
+        : idb.Sport.Title == "NFL"
+            ? "var(--team-nfl-" + (teamCode ?? "").Trim().ToLower() + ", var(--brand-primary))"
+            : RotoMonsterUI.TeamColorHelper.GetTeamColorVar(teamCode);
 
     var uiPlayer = new RotoMonsterUI.DisplayPlayerInput
     {

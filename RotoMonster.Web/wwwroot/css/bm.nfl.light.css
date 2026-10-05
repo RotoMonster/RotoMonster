@@ -46,3 +46,25 @@
     --team-nfl-wsh: #5A1414;
 }
 /* end nfl-team-colors */
+
+/* nfl-position-colors */
+:root {
+    --pos-qb: #d6264f;
+    --pos-rb: #0b9e8c;
+    --pos-wr: #2f7fd6;
+    --pos-te: #d9822b;
+    --pos-k: #9b4fd6;
+    --pos-pk: #9b4fd6;
+    --pos-def: #5f6b80;
+    --pos-dst: #5f6b80;
+}
+
+.pos-qb { color: var(--pos-qb); }
+.pos-rb { color: var(--pos-rb); }
+.pos-wr { color: var(--pos-wr); }
+.pos-te { color: var(--pos-te); }
+.pos-k { color: var(--pos-k); }
+.pos-pk { color: var(--pos-pk); }
+.pos-def { color: var(--pos-def); }
+.pos-dst { color: var(--pos-dst); }
+/* end nfl-position-colors */

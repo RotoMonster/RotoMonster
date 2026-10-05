@@ -3066,9 +3066,10 @@ table.table.rm-oa-table > tbody > tr:hover > td {
 .rm-badge:has(> .rm-badge-change),
 .pct-badge:has(> .rm-badge-change),
 .value-badge:has(> .rm-badge-change) {
-    justify-content: flex-end;
-    padding-left: 32px;
-    min-width: 72px;
+    justify-content: center;
+    padding-left: 30px;
+    padding-right: 30px;
+    min-width: 80px;
 }
 /* end rm-badge-change-room */
 
@@ -3231,3 +3232,238 @@ a.rm-live-busy svg {
     flex-shrink: 0;
 }
 /* end rm-page-bar-refresh */
+
+
+/* rm-timezone */
+.rm-scores-tz {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    text-align: left;
+}
+
+.rm-scores-tz a {
+    color: var(--brand-primary);
+}
+
+.rm-tz-form {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: 380px;
+    margin: 0.5rem 0 1.25rem;
+}
+
+.rm-tz-label {
+    margin: 0;
+    white-space: nowrap;
+    font-weight: 600;
+}
+/* end rm-timezone */
+
+/* rm-front-scores */
+.rm-sb {
+    padding: 14px 14px 12px;
+    border-radius: 12px;
+}
+
+.rm-sb-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.rm-sb-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+.rm-sb-title:hover {
+    color: var(--brand-primary);
+}
+
+.rm-sb-count {
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+}
+
+.rm-sb-dates {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.rm-sb-date {
+    flex: 1;
+    text-align: center;
+    font-size: 0.72rem;
+    padding: 2px 6px;
+    border-radius: 6px;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+}
+
+.rm-sb-date:hover {
+    color: var(--brand-primary);
+}
+
+.rm-sb-date--on {
+    background: rgba(var(--brand-primary-rgb), 0.15);
+    color: var(--brand-primary);
+    font-weight: 700;
+}
+
+.rm-sb-list {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    align-items: center;
+}
+
+.rm-sb-list--mine {
+    grid-template-columns: auto auto auto auto auto;
+}
+
+.rm-sb-colhead,
+.rm-sb-game {
+    display: contents;
+}
+
+.rm-sb-colhead > span {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    text-align: center;
+    padding-bottom: 2px;
+}
+
+.rm-sb-game > * {
+    padding: 4px 14px 4px 0;
+    border-top: 1px solid var(--color-border-light);
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.rm-sb-state {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.rm-sb-state--live {
+    color: #16a34a;
+}
+
+.rm-sb-team {
+    gap: 8px;
+    font-size: 0.85rem;
+    min-width: 66px;
+}
+
+.rm-sb-code {
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.rm-sb-mine:last-child,
+.rm-sb-game > :last-child {
+    padding-right: 0;
+}
+
+.rm-sb-at {
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.rm-sb-score {
+    margin-left: auto;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-primary);
+}
+
+.rm-sb-team--lost {
+    opacity: 0.45;
+}
+
+.rm-sb-team--won .rm-sb-score {
+    font-weight: 800;
+}
+
+.rm-sb-mine {
+    justify-content: center;
+}
+
+.rm-sb .rm-scores-tz {
+    margin-top: 8px;
+}
+
+.rm-gp-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35rem;
+    height: 1.2rem;
+    padding: 0 4px;
+    border-radius: 5px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #1e293b;
+    cursor: default;
+}
+
+.rm-gp-count--own {
+    background-color: #99ffff;
+}
+
+.rm-gp-count--act {
+    background-color: #ffff99;
+}
+/* end rm-front-scores */
+
+/* rm-sport-logos */
+:root {
+    --logo-nba: #f08a4b;
+    --logo-mlb: #3f9142;
+    --logo-nfl: #86592d;
+    --logo-nhl: #0077b3;
+}
+
+.rm-sport-logo {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.rm-brand {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.rm-sport-switch {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    transition: transform 0.15s ease;
+}
+
+.rm-sport-switch:hover {
+    transform: translateY(-1px);
+}
+
+.rm-sport-switch--on {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+/* end rm-sport-logos */

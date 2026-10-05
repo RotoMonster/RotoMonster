@@ -125,7 +125,7 @@
                             string cssCode = (sport == code) ? code.ToLower() + " text-white rounded" : code.ToLower() + "-txt";
 
                             <li class="nav-item">
-                                <a class="nav-link p-0 ms-2" title="@code" href="/@code.ToLower()"><span class="p-1 @cssCode" style="display:inline-flex;align-items:center;">@Html.Raw(new Icon(new IconInput { Type = icon, Size = 22 }).Render())</span></a>
+                                <a class="nav-link p-0 ms-2" title="@code" href="/@code.ToLower()"><span class="rm-sport-switch @(sport == code ? "rm-sport-switch--on" : "")"><partial name="_SportLogoSvg" model="code" /></span></a>
                             </li>
                         }
 
