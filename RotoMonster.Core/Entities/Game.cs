@@ -9,6 +9,56 @@ namespace RotoMonster.Core
 {
     public class Game
     {
+        public static readonly (string Id, string Name)[] DisplayZones =
+        {
+            ("Eastern Standard Time", "Eastern Time"),
+            ("Central Standard Time", "Central Time"),
+            ("Mountain Standard Time", "Mountain Time"),
+            ("US Mountain Standard Time", "Arizona Time"),
+            ("Pacific Standard Time", "Pacific Time"),
+            ("Alaskan Standard Time", "Alaska Time"),
+            ("Hawaiian Standard Time", "Hawaii Time")
+        };
+
+        private static readonly System.Threading.AsyncLocal<string> _displayZoneId = new System.Threading.AsyncLocal<string>();
+
+        public static string DisplayZoneId
+        {
+            get
+            {
+                var id = _displayZoneId.Value;
+                return IsDisplayZone(id) ? id : DisplayZones[0].Id;
+            }
+            set { _displayZoneId.Value = value; }
+        }
+
+        public static TimeZoneInfo DisplayZone
+        {
+            get
+            {
+                try { return TimeZoneInfo.FindSystemTimeZoneById(DisplayZoneId); }
+                catch { return TimeZoneInfo.FindSystemTimeZoneById(DisplayZones[0].Id); }
+            }
+        }
+
+        public static string DisplayZoneName
+        {
+            get
+            {
+                foreach (var z in DisplayZones)
+                    if (z.Id == DisplayZoneId) return z.Name;
+                return DisplayZones[0].Name;
+            }
+        }
+
+        public static bool IsDisplayZone(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return false;
+            foreach (var z in DisplayZones)
+                if (z.Id == id) return true;
+            return false;
+        }
+
         public int Id { get; set; }
         public int Number { get; set; }
         public DateTime GameDate { get; set; }
@@ -121,7 +171,7 @@ namespace RotoMonster.Core
         {
             get
             {
-                TimeZoneInfo easternTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+                TimeZoneInfo easternTimeZone = DisplayZone;
 
                 DateTime easternDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, easternTimeZone);
 
@@ -146,12 +196,10 @@ namespace RotoMonster.Core
         {
             get
             {
-                DateTime easternDateTime = EasternTimeNow;
-
-                if (easternDateTime < GameTime)
+                if (DateTime.UtcNow < GameTime)
                     return new TimeSpan();
 
-                return easternDateTime - GameTime;
+                return DateTime.UtcNow - GameTime;
             }
         }
 
@@ -167,7 +215,7 @@ namespace RotoMonster.Core
         {
             get
             {
-                TimeZoneInfo easternTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+                TimeZoneInfo easternTimeZone = DisplayZone;
                 DateTime easternDateTime = TimeZoneInfo.ConvertTimeFromUtc(GameTime, easternTimeZone);
 
                 return easternDateTime;

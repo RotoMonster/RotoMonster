@@ -61,6 +61,21 @@ namespace RotoMonster.Pages
             }
         }
 
+        public IActionResult OnPostTimezone(string tz)
+        {
+            if (RotoMonster.Core.Game.IsDisplayZone(tz))
+            {
+                Response.Cookies.Append("rm_tz", tz, new Microsoft.AspNetCore.Http.CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddYears(1),
+                    IsEssential = true,
+                    HttpOnly = true,
+                    SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax
+                });
+            }
+            return RedirectToPage();
+        }
+
         public async Task<IActionResult> OnPostAsync()
         {
             var userDisplayCategories = new List<UserDisplayCategory>();

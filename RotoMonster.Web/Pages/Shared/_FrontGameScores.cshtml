@@ -1,56 +1,155 @@
 ﻿@using RotoMonster.Models.Shared
 @model FrontGameScoresModel
 @{
-    RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
     RotoMonster.Core.Libs.FileLib fileLib = new Core.Libs.FileLib();
+    string sportKey = (Model.Sport != null ? Model.Sport.Title : "").Trim().ToLower();
+    string periodPrefix = sportKey == "nhl" ? "P" : sportKey == "mlb" ? "Inn " : "Q";
+    bool showMine = Model.OwnedGameUserLeagueTeamPlayers != null && Model.OwnedGameUserLeagueTeamPlayers.Count > 0;
+
+    string TeamColor(RotoMonster.Core.Team team)
+    {
+        if (team == null) return "var(--brand-primary)";
+        return "var(--team-" + sportKey + "-" + (team.Code ?? "").Trim().ToLower() + ", var(--brand-primary))";
+    }
 }
 
 @if (Model.ScheduleGames.Count > 0)
 {
-    <div class="card mb-3 border-info bg">
-        <div class="card-header text-nowrap">
-            <h5 class="p-0 m-0"><a asp-page="Scores" alt="Scores" title="Scores" asp-route-date="@fileLib.GetDateParameter(Model.ScheduleStartDate)">@Model.Sport.Title Scores (@Model.ScheduleGames.Count)</a></h5>
+    <div class="card mb-3 bg rm-sb">
+        <div class="rm-sb-header">
+            <a class="rm-sb-title" asp-page="Scores" title="Scores" asp-route-date="@fileLib.GetDateParameter(Model.ScheduleStartDate)">@Model.Sport.Title Scores</a>
+            <span class="rm-sb-count">@Model.ScheduleGames.Count games</span>
         </div>
 
-        <div class="card-body p-2">
-            <div class="text-center">
-                @if (Model.ScheduleStartDate == Model.ScheduleEndDate)
-                {
+        @if (Model.ScheduleStartDate == Model.ScheduleEndDate)
+        {
+            <div class="rm-sb-dates">
+                @{
                     DateTime currentDate = Model.ScheduleStartDate.AddDays(-1);
                     while (currentDate <= Model.ScheduleEndDate.AddDays(1))
                     {
                         string buttonTitle = currentDate.DayOfWeek.ToString().Substring(0, 3) + " " + String.Format("{0}/{1}", currentDate.Month, currentDate.Day);
-                        string dateCss = currentDate == Model.ScheduleStartDate ? "font-weight-bold" : "";
-                        <a class="btn btn-link @dateCss" asp-page-handler="Index" asp-route-date="@fileLib.GetDateParameter(currentDate)" alt="Back Date" title="Back">@buttonTitle</a>
+                        string dateCss = currentDate == Model.ScheduleStartDate ? "rm-sb-date rm-sb-date--on" : "rm-sb-date";
+                        <a class="@dateCss" asp-page-handler="Index" asp-route-date="@fileLib.GetDateParameter(currentDate)" title="@buttonTitle">@buttonTitle</a>
                         currentDate = currentDate.AddDays(1);
                     }
                 }
             </div>
+        }
 
-            <table class="table table-sm small table-bordered w-auto">
-                <tbody>
-                    @foreach (var game in Model.ScheduleGames)
+        <div class="rm-sb-list @(showMine ? "rm-sb-list--mine" : "")">
+            @foreach (var game in Model.ScheduleGames)
+            {
+                bool postponed = game.IsPostponed == true;
+                bool finished = game.IsFinished;
+                bool live = !finished && !postponed && game.HasStarted;
+                bool showScores = finished || live;
+                int awayScore = game.AwayScore;
+                int homeScore = game.HomeScore;
+                bool awayWon = finished && awayScore > homeScore;
+                bool homeWon = finished && homeScore > awayScore;
+                string stateCss = postponed ? "rm-sb-game--ppd" : finished ? "rm-sb-game--final" : live ? "rm-sb-game--live" : "rm-sb-game--pre";
+
+                <div class="rm-sb-game @stateCss">
+                    <div class="rm-sb-status">
+                        @if (postponed)
+                        {
+                            <span class="rm-sb-state">PPD</span>
+                        }
+                        else if (finished)
+                        {
+                            <span class="rm-sb-state">Final</span>
+                        }
+                        else if (live)
+                        {
+                            <span class="rm-sb-state rm-sb-state--live">
+                                @if (game.Period > 0)
+                                {
+                                    @(periodPrefix + game.Period + (string.IsNullOrEmpty(game.GameClock) ? "" : " " + game.GameClock))
+                                }
+                                else
+                                {
+                                    @("Live")
+                                }
+                            </span>
+                        }
+                        else
+                        {
+                            var until = game.TimeUntilGame;
+                            string label = until.TotalMinutes > 0 && until.TotalHours < 1 ? "in " + Math.Ceiling(until.TotalMinutes) + "m" : game.DayOfWeekString + " " + game.EasternTime.ToString("h:mm");
+                            <span class="rm-sb-state" title="@game.EasternTime.ToString("dddd h:mm tt")">@label</span>
+                        }
+                    </div>
+
+                    <div class="rm-sb-team @(awayWon ? "rm-sb-team--won" : finished && !awayWon ? "rm-sb-team--lost" : "")" style="--tc: @TeamColor(game.AwayTeam);">
+                        <span class="rm-sb-code">@(game.AwayTeam != null ? game.AwayTeam.Code : "")</span>
+                        @if (showScores)
+                        {
+                            <span class="rm-sb-score">@awayScore</span>
+                        }
+                    </div>
+
+                    <div class="rm-sb-team @(homeWon ? "rm-sb-team--won" : finished && !homeWon ? "rm-sb-team--lost" : "")" style="--tc: @TeamColor(game.HomeTeam);">
+                        <span class="rm-sb-code"><span class="rm-sb-at">@@</span>@(game.HomeTeam != null ? game.HomeTeam.Code : "")</span>
+                        @if (showScores)
+                        {
+                            <span class="rm-sb-score">@homeScore</span>
+                        }
+                    </div>
+
+                    @if (showMine)
                     {
-                        <tr>
-                            <td>
-                                <partial name="_TeamGame" model="new RotoMonster.Models.Shared.TeamGameModel() {Sport=Model.Sport,Game=game,Team=game.AwayTeam}" />
-                            </td>
-                            <td class="tdc">
-                                @{
-                                    var gamePlayers = (from gp in Model.OwnedGameUserLeagueTeamPlayers where gp.Game.Id == game.Id select gp).ToList();
-                                }
-                                <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Models.Shared.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=gamePlayers,UseOwnColor=true}" />
+                        var owned = (from gp in Model.OwnedGameUserLeagueTeamPlayers where gp.Game.Id == game.Id select gp).ToList();
+                        var activeKeys = new HashSet<string>((from gp in Model.ActiveGameUserLeagueTeamPlayers
+                                                              where gp.Game.Id == game.Id && gp.UserLeagueTeamPlayer != null
+                                                              select gp.UserLeagueTeamPlayer.UserLeagueTeamId + ":" + gp.UserLeagueTeamPlayer.PlayerId));
+                        var rows = owned
+                            .Where(gp => gp.UserLeagueTeamPlayer != null && gp.UserLeagueTeamPlayer.Player != null)
+                            .Select(gp => new
+                            {
+                                Name = gp.UserLeagueTeamPlayer.Player.ForwardName,
+                                Team = gp.UserLeagueTeamPlayer.UserLeagueTeam != null ? gp.UserLeagueTeamPlayer.UserLeagueTeam.Title : "",
+                                Active = activeKeys.Contains(gp.UserLeagueTeamPlayer.UserLeagueTeamId + ":" + gp.UserLeagueTeamPlayer.PlayerId)
+                            })
+                            .OrderByDescending(r => r.Active)
+                            .ThenBy(r => r.Name)
+                            .ToList();
+                        int activeCount = rows.Count(r => r.Active);
+                        string detailId = "rm-sb-detail-" + game.Id;
 
-                                @{
-                                    var activePlayers = (from gp in Model.ActiveGameUserLeagueTeamPlayers where gp.Game.Id == game.Id select gp).ToList();
+                        <div class="rm-sb-mine">
+                            @if (rows.Count > 0)
+                            {
+                                <button type="button" class="rm-sb-pill" data-sb-toggle="@detailId" aria-expanded="false" aria-controls="@detailId"
+                                        title="@activeCount of your @rows.Count players in this game are active">
+                                    <span class="rm-sb-pill-bar"><span style="width:@(rows.Count == 0 ? 0 : activeCount * 100 / rows.Count)%"></span></span>
+                                    @activeCount/@rows.Count
+                                </button>
+                            }
+                        </div>
+
+                        @if (rows.Count > 0)
+                        {
+                            <div class="rm-sb-detail" id="@detailId">
+                                @foreach (var row in rows)
+                                {
+                                    <div class="rm-sb-detail-row">
+                                        <span class="rm-sb-detail-dot @(row.Active ? "rm-sb-detail-dot--on" : "")"></span>
+                                        <span class="rm-sb-detail-name">@row.Name</span>
+                                        @if (!row.Active)
+                                        {
+                                            <span class="rm-sb-detail-benched">benched</span>
+                                        }
+                                        <span class="rm-sb-detail-team">@row.Team</span>
+                                    </div>
                                 }
-                                <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Models.Shared.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=activePlayers,UseOwnColor=false}" />
-                            </td>
-                        </tr>
+                            </div>
+                        }
                     }
-                </tbody>
-            </table>
+                </div>
+            }
         </div>
+
+        <div class="rm-scores-tz">@RotoMonster.Core.Game.DisplayZoneName &middot; <a asp-page="/DisplaySettings" asp-fragment="timezone">Change timezone</a></div>
     </div>
 }
-

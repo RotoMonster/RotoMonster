@@ -2,22 +2,16 @@
 
 @if (Model.GameUserLeagueTeamPlayers.Count > 0)
 {
-    var colorCode = Model.UseOwnColor ? "#99ffff" : "#ffff99";
-
+    string kindClass = Model.UseOwnColor ? "rm-gp-count--own" : "rm-gp-count--act";
     string tooltip = Model.UseOwnColor ? "Owned: " : "Active: ";
-    foreach (var tp in Model.GameUserLeagueTeamPlayers)
-    {
-        tooltip += " " + tp.UserLeagueTeamPlayer.Player.ForwardName;
-    }
+    tooltip += string.Join(", ", Model.GameUserLeagueTeamPlayers.Select(tp => tp.UserLeagueTeamPlayer.Player.ForwardName));
 
     var tipId = Context.NextTooltipId();
 
     <span class="bm-tooltip-wrap">
-    <span class="badge bm-tooltip-trigger bm-tooltip-trigger--hover"
-      data-bm-tooltip="@tipId"
-      style="background-color:@colorCode">
-        @Model.GameUserLeagueTeamPlayers.Count
-    </span>
-    <div class="bm-tooltip-content" id="@tipId" role="tooltip">@tooltip</div>
+        <span class="rm-gp-count @kindClass bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipId">
+            @Model.GameUserLeagueTeamPlayers.Count
+        </span>
+        <div class="bm-tooltip-content" id="@tipId" role="tooltip">@tooltip</div>
     </span>
 }

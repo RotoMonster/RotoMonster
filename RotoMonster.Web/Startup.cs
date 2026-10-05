@@ -156,6 +156,12 @@ namespace RotoMonster
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
+
+            app.Use(async (context, next) =>
+            {
+                RotoMonster.Core.Game.DisplayZoneId = context.Request.Cookies["rm_tz"];
+                await next();
+            });
             app.UseCookiePolicy();
 
             app.UseAuthentication();

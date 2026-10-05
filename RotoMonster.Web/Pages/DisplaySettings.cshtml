@@ -6,6 +6,16 @@
 }
 
 <div class="container rm-display">
+    <form method="post" asp-page-handler="Timezone" class="rm-tz-form" id="timezone">
+        <label for="rmTimezone" class="rm-tz-label">Show game times in</label>
+        <select id="rmTimezone" name="tz" class="form-control rm-modern-select" onchange="this.form.requestSubmit()">
+            @foreach (var z in RotoMonster.Core.Game.DisplayZones)
+            {
+                <option value="@z.Id" selected="@(z.Id == RotoMonster.Core.Game.DisplayZoneId)">@z.Name</option>
+            }
+        </select>
+    </form>
+
     <form method="post">
 
         <div class="rm-display-bar">

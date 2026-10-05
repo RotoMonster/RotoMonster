@@ -114,3 +114,13 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
 })();
+
+document.addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('[data-sb-toggle]') : null;
+    if (!btn) return;
+    e.preventDefault();
+    var panel = document.getElementById(btn.getAttribute('data-sb-toggle'));
+    if (!panel) return;
+    var open = panel.classList.toggle('rm-sb-detail--open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
