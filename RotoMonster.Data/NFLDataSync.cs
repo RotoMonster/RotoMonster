@@ -353,8 +353,8 @@ VALUES ({seasonId}, {year}, {title}, {title}, {startDate.Date}, {endDate.Date}, 
                 var changed = isNew
                     | Set(game.GameDate, local.Date, v => game.GameDate = v)
                     | Set(game.GameTime, DateTime.SpecifyKind(pg.StartTimeUtc, DateTimeKind.Unspecified), v => game.GameTime = v)
-                    | Set(game.HomeScore, pg.HomeScore ?? 0, v => game.HomeScore = v)
-                    | Set(game.AwayScore, pg.AwayScore ?? 0, v => game.AwayScore = v)
+                    | Set(game.HomeScore, pg.HomeScore ?? game.HomeScore, v => game.HomeScore = v)
+                    | Set(game.AwayScore, pg.AwayScore ?? game.AwayScore, v => game.AwayScore = v)
                     | Set(game.IsFinished, pg.IsFinished, v => game.IsFinished = v)
                     | Set(game.PercentComplete, state.Percent, v => game.PercentComplete = v)
                     | Set(game.Period, state.Period, v => game.Period = v)
