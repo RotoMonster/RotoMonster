@@ -9,15 +9,56 @@ namespace RotoMonster.Core
 {
     public class Game
     {
-        public static readonly (string Id, string Name)[] DisplayZones =
+        public static readonly (string Id, string Name, string Region)[] DisplayZones =
         {
-            ("Eastern Standard Time", "Eastern Time"),
-            ("Central Standard Time", "Central Time"),
-            ("Mountain Standard Time", "Mountain Time"),
-            ("US Mountain Standard Time", "Arizona Time"),
-            ("Pacific Standard Time", "Pacific Time"),
-            ("Alaskan Standard Time", "Alaska Time"),
-            ("Hawaiian Standard Time", "Hawaii Time")
+            ("America/New_York", "Eastern Time", "United States & Canada"),
+            ("America/Chicago", "Central Time", "United States & Canada"),
+            ("America/Denver", "Mountain Time", "United States & Canada"),
+            ("America/Phoenix", "Arizona", "United States & Canada"),
+            ("America/Los_Angeles", "Pacific Time", "United States & Canada"),
+            ("America/Anchorage", "Alaska", "United States & Canada"),
+            ("Pacific/Honolulu", "Hawaii", "United States & Canada"),
+            ("America/Halifax", "Atlantic Time (Canada)", "United States & Canada"),
+            ("America/St_Johns", "Newfoundland", "United States & Canada"),
+            ("America/Regina", "Saskatchewan", "United States & Canada"),
+            ("America/Puerto_Rico", "Puerto Rico", "Latin America & Caribbean"),
+            ("America/Mexico_City", "Mexico City", "Latin America & Caribbean"),
+            ("America/Bogota", "Bogota, Lima", "Latin America & Caribbean"),
+            ("America/Caracas", "Caracas", "Latin America & Caribbean"),
+            ("America/Santiago", "Santiago", "Latin America & Caribbean"),
+            ("America/Argentina/Buenos_Aires", "Buenos Aires", "Latin America & Caribbean"),
+            ("America/Sao_Paulo", "Sao Paulo", "Latin America & Caribbean"),
+            ("Europe/London", "London, Dublin, Lisbon", "Europe"),
+            ("Europe/Paris", "Central Europe - Paris, Berlin, Rome, Madrid", "Europe"),
+            ("Europe/Athens", "Eastern Europe - Athens, Helsinki, Kyiv", "Europe"),
+            ("Europe/Istanbul", "Istanbul", "Europe"),
+            ("Europe/Moscow", "Moscow", "Europe"),
+            ("Africa/Lagos", "West Africa - Lagos", "Africa & Middle East"),
+            ("Africa/Johannesburg", "South Africa", "Africa & Middle East"),
+            ("Africa/Cairo", "Cairo", "Africa & Middle East"),
+            ("Africa/Nairobi", "East Africa - Nairobi", "Africa & Middle East"),
+            ("Asia/Jerusalem", "Jerusalem", "Africa & Middle East"),
+            ("Asia/Riyadh", "Riyadh", "Africa & Middle East"),
+            ("Asia/Dubai", "Dubai", "Africa & Middle East"),
+            ("Asia/Karachi", "Pakistan", "Asia"),
+            ("Asia/Kolkata", "India", "Asia"),
+            ("Asia/Dhaka", "Bangladesh", "Asia"),
+            ("Asia/Bangkok", "Bangkok, Jakarta", "Asia"),
+            ("Asia/Shanghai", "China", "Asia"),
+            ("Asia/Hong_Kong", "Hong Kong", "Asia"),
+            ("Asia/Singapore", "Singapore", "Asia"),
+            ("Asia/Manila", "Philippines", "Asia"),
+            ("Asia/Taipei", "Taiwan", "Asia"),
+            ("Asia/Tokyo", "Japan", "Asia"),
+            ("Asia/Seoul", "Korea", "Asia"),
+            ("Australia/Perth", "Perth", "Australia & Pacific"),
+            ("Australia/Adelaide", "Adelaide", "Australia & Pacific"),
+            ("Australia/Darwin", "Darwin", "Australia & Pacific"),
+            ("Australia/Brisbane", "Brisbane", "Australia & Pacific"),
+            ("Australia/Sydney", "Sydney, Melbourne", "Australia & Pacific"),
+            ("Pacific/Guam", "Guam", "Australia & Pacific"),
+            ("Pacific/Auckland", "New Zealand", "Australia & Pacific"),
+            ("Etc/UTC", "UTC", "Other")
         };
 
         private static readonly System.Threading.AsyncLocal<string> _displayZoneId = new System.Threading.AsyncLocal<string>();
@@ -48,6 +89,24 @@ namespace RotoMonster.Core
                 foreach (var z in DisplayZones)
                     if (z.Id == DisplayZoneId) return z.Name;
                 return DisplayZones[0].Name;
+            }
+        }
+
+        public static string DisplayZoneLabel(string id)
+        {
+            string name = id;
+            foreach (var z in DisplayZones)
+                if (z.Id == id) { name = z.Name; break; }
+            try
+            {
+                var offset = TimeZoneInfo.FindSystemTimeZoneById(id).GetUtcOffset(DateTime.UtcNow);
+                string sign = offset < TimeSpan.Zero ? "-" : "+";
+                var abs = offset.Duration();
+                return "(UTC" + sign + abs.Hours.ToString("00") + ":" + abs.Minutes.ToString("00") + ") " + name;
+            }
+            catch
+            {
+                return name;
             }
         }
 
