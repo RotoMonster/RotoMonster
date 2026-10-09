@@ -3415,7 +3415,7 @@ namespace RotoMonster.Data
                          .Include(i => i.DraftPlayers).ThenInclude(i2 => i2.Player)
                          .AsNoTracking()
                          where d.FantasyProviderId == fantasyProvider.Id && d.ProviderLeagueId == providerLeagueId
-                         select d).FirstOrDefaultAsync();
+                         select d).FirstOrDefaultAsync().ConfigureAwait(false);
 
             if (draft != null)
             {
@@ -3423,7 +3423,7 @@ namespace RotoMonster.Data
                                           .Include(i => i.PlayerType)
                                           where pt.DraftId == draft.Id
                                           orderby pt.PlayerType.DisplayOrder
-                                          select pt).ToListAsync();
+                                          select pt).ToListAsync().ConfigureAwait(false);
             }
 
             return draft;
