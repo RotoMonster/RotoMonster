@@ -85,7 +85,7 @@ namespace RotoMonster.Api
             if (!alreadyRunning)
             {
                 started = true;
-                var code = string.IsNullOrEmpty(request.CategoriesCode) ? ProCategoriesCode : request.CategoriesCode;
+                var code = request.CategoriesCode;
                 var wanted = Math.Max(1, request.LeagueCount);
                 var pause = TimeSpan.FromSeconds(Math.Max(0, request.PauseSeconds));
 
@@ -166,11 +166,17 @@ namespace RotoMonster.Api
 
             List<UserLeague> candidates;
             Season season;
+            Dictionary<int, int> typeMap = null;
 
             using (var scope = _scopeFactory.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<IRMData>();
                 season = db.GetDefaultSeason();
+
+                var resolved = await ResolveCodeAsync(db, code).ConfigureAwait(false);
+                code = resolved.Code;
+                typeMap = resolved.TypeMap;
+                summary.CategoriesCode = code;
 
                 var ids = db.GetUserLeagueIdsWithCategoriesCode(code, season);
                 candidates = ids
@@ -269,6 +275,11 @@ namespace RotoMonster.Api
                             summary.DefensePlayers = defenses;
                             summary.OffensePlayers = counts.Where(c => c.Key != KickerCategoriesStringId && c.Key != DefenseCategoriesStringId).Sum(c => c.Value);
                         }
+                        else if (typeMap != null)
+                        {
+                            var counts = db.FillOwnershipPlayers(code, processed, season.Id, typeMap);
+                            summary.OffensePlayers = counts.Values.Sum();
+                        }
                         else
                         {
                             db.FillOwnershipPlayers(code, processed);
@@ -293,6 +304,28 @@ namespace RotoMonster.Api
             summary.DurationSeconds = Math.Round((summary.FinishedAt - summary.StartedAt).TotalSeconds, 1);
 
             return summary;
+        }
+
+        private static async Task<(string Code, Dictionary<int, int> TypeMap)> ResolveCodeAsync(IRMData db, string code)
+        {
+            if (code == ProCategoriesCode || (string.IsNullOrEmpty(code) && db.Sport.IsNFL))
+                return (ProCategoriesCode, null);
+
+            var defaultLeague = await db.GetDefaultUserLeagueAsync().ConfigureAwait(false);
+            var types = defaultLeague == null || defaultLeague.UserLeaguePlayerTypes == null
+                ? new List<UserLeaguePlayerType>()
+                : defaultLeague.UserLeaguePlayerTypes
+                    .Where(pt => pt.CategoriesString != null && !string.IsNullOrEmpty(pt.CategoriesString.Code))
+                    .OrderBy(pt => pt.PlayerType != null ? pt.PlayerType.DisplayOrder : pt.PlayerTypeId)
+                    .ToList();
+
+            if (string.IsNullOrEmpty(code))
+                code = types.Select(pt => pt.CategoriesString.Code).FirstOrDefault() ?? ProCategoriesCode;
+
+            if (types.Count > 1 && types.Any(pt => pt.CategoriesString.Code == code))
+                return (code, types.GroupBy(pt => pt.PlayerTypeId).ToDictionary(g => g.Key, g => g.First().CategoriesStringId));
+
+            return (code, null);
         }
     }
 }
