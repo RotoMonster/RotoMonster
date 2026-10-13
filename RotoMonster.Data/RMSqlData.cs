@@ -2173,6 +2173,7 @@ namespace RotoMonster.Data
                 var match = (from t in oldTeams where t.ProviderId == newTeam.ProviderId select t).FirstOrDefault();
                 if (match == null)
                 {
+                    newTeam.UserLeagueId = userLeagueId;
                     db.UserLeagueTeams.Add(newTeam);
                 }
                 else
