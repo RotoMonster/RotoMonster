@@ -298,3 +298,118 @@ td.tdleft {
 .rm-lu-card { transition: border-color .15s ease, box-shadow .15s ease; }
 .rm-lu-card:hover { border-color: var(--lu-sport); box-shadow: 0 2px 12px rgba(0, 0, 0, .45); }
 /* rm-lineups-end */
+
+/* rm-lu-nhl */
+:root {
+    --team-nhl-ana: #F9B692;
+    --team-nhl-ari: #C0888F;
+    --team-nhl-bos: #FFD882;
+    --team-nhl-buf: #738DBD;
+    --team-nhl-cgy: #E17C8C;
+    --team-nhl-car: #E47C88;
+    --team-nhl-chi: #E5788B;
+    --team-nhl-col: #B08894;
+    --team-nhl-cbj: #7388A1;
+    --team-nhl-dal: #73AC9A;
+    --team-nhl-det: #E47C88;
+    --team-nhl-edm: #FF9D73;
+    --team-nhl-fla: #E17C8C;
+    --team-nhl-la: #7C7C7C;
+    --team-nhl-lak: #7C7C7C;
+    --team-nhl-min: #7E9A8F;
+    --team-nhl-mtl: #D3838C;
+    --team-nhl-mon: #D3838C;
+    --team-nhl-nsh: #FFD882;
+    --team-nhl-nj: #E47C88;
+    --team-nhl-njd: #E47C88;
+    --team-nhl-nyi: #73A0C8;
+    --team-nhl-nyr: #7392CF;
+    --team-nhl-ott: #DF848E;
+    --team-nhl-phi: #FB9B74;
+    --team-nhl-pit: #FDD67E;
+    --team-nhl-sj: #73AFB3;
+    --team-nhl-sjs: #73AFB3;
+    --team-nhl-sea: #90A1AA;
+    --team-nhl-stl: #738DBD;
+    --team-nhl-tb: #7389AC;
+    --team-nhl-tbl: #7389AC;
+    --team-nhl-tor: #7384A5;
+    --team-nhl-uta: #B1D3F1;
+    --team-nhl-van: #73BB94;
+    --team-nhl-vgk: #D6C6A4;
+    --team-nhl-veg: #D6C6A4;
+    --team-nhl-wsh: #E17C8C;
+    --team-nhl-was: #E17C8C;
+    --team-nhl-wpg: #739DC6;
+    --team-nhl-wpj: #739DC6;
+}
+.rm-lu--nhl { --pos-lw: #5ec4c4; --pos-c: #e3c065; --pos-rw: #b39cf0; --pos-d: #7fb3e6; --pos-g: #f0a0c8; }
+/* end rm-lu-nhl */
+
+/* rm-lu-nhl-teams */
+:root {
+    --team-nhl-ana: #F8A97E;
+    --team-nhl-ari: #B4727A;
+    --team-nhl-bos: #FFD16B;
+    --team-nhl-buf: #5978B1;
+    --team-nhl-cgy: #EB7F82;
+    --team-nhl-car: #DE5959;
+    --team-nhl-chi: #C56A77;
+    --team-nhl-col: #A17281;
+    --team-nhl-cbj: #597290;
+    --team-nhl-dal: #599D87;
+    --team-nhl-det: #DF6472;
+    --team-nhl-edm: #FF8B59;
+    --team-nhl-fla: #DB6477;
+    --team-nhl-la: #C3C8CA;
+    --team-nhl-lak: #C3C8CA;
+    --team-nhl-min: #67877B;
+    --team-nhl-mtl: #CB6D76;
+    --team-nhl-mon: #CB6D76;
+    --team-nhl-nsh: #FFD16B;
+    --team-nhl-nj: #EB6376;
+    --team-nhl-njd: #EB6376;
+    --team-nhl-nyi: #F8AA78;
+    --team-nhl-nyr: #597EC6;
+    --team-nhl-ott: #D0B892;
+    --team-nhl-phi: #FA895B;
+    --team-nhl-pit: #FDCF66;
+    --team-nhl-sj: #59A0A5;
+    --team-nhl-sjs: #59A0A5;
+    --team-nhl-sea: #62B3BB;
+    --team-nhl-stl: #5978B1;
+    --team-nhl-tb: #59739D;
+    --team-nhl-tbl: #59739D;
+    --team-nhl-tor: #596E94;
+    --team-nhl-uta: #A3CBEE;
+    --team-nhl-van: #59AF81;
+    --team-nhl-vgk: #CEBB94;
+    --team-nhl-veg: #CEBB94;
+    --team-nhl-wsh: #5C6D84;
+    --team-nhl-was: #5C6D84;
+    --team-nhl-wpg: #598BBB;
+    --team-nhl-wpj: #598BBB;
+}
+.rm-lu--nhl .rm-lu-thead { background: color-mix(in srgb, var(--tc) 32%, transparent); }
+/* end rm-lu-nhl-teams */
+
+/* rm-lu-toggle-dcolor */
+.rm-lu--nhl { --pos-d: #ff8a7a; }
+/* end rm-lu-toggle-dcolor */
+
+/* rm-season-blue */
+:root { --season-progress-fill: #3b8fe8; --season-progress-pending-border: #3b8fe8; }
+/* end rm-season-blue */
+
+/* rm-lu-datenav */
+.rm-lu-datebox { color-scheme: dark; }
+/* end rm-lu-datenav */
+
+/* rm-lu-datenav-sport */
+.rm-lu-datebox, .rm-lu-dn-date svg, .rm-lu-dn-btn { color: color-mix(in srgb, var(--lu-sport) 60%, #ffffff); }
+/* end rm-lu-datenav-sport */
+
+/* rm-lu-cal */
+.rm-lu-dn-text, .rm-lu-cal-foot button { color: color-mix(in srgb, var(--lu-sport) 60%, #ffffff); }
+.rm-lu-cal { box-shadow: 0 16px 40px rgba(0, 0, 0, .5); }
+/* end rm-lu-cal */

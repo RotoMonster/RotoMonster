@@ -25,6 +25,7 @@ namespace RotoMonster.Pages
         public bool IsOwned { get; set; }
         public bool IsActive { get; set; }
         public bool IsFeatured { get; set; }
+        public string Group { get; set; } = "";
     }
 
     public class LineupRowView
@@ -33,6 +34,7 @@ namespace RotoMonster.Pages
         public bool IsMLB { get; set; }
         public bool IsBench { get; set; }
         public int LeagueId { get; set; }
+        public string Label { get; set; } = "";
     }
 
     public class LineupTeam
@@ -192,17 +194,27 @@ namespace RotoMonster.Pages
                     else if (Sport.IsNHL)
                     {
                         lt.SlotHead = "POS";
-                        lt.Context = "Starting goalie";
-                        foreach (var s in starters)
+                        lt.Context = "Lines";
+                        var goalies = starters.Where(s => IsCode(Pos(s, positions), "G")).ToList();
+                        var skaters = starters.Where(s => !IsCode(Pos(s, positions), "G"))
+                                              .OrderBy(s => NhlSlotOrder(s.Details)).ToList();
+
+                        foreach (var s in skaters)
+                        {
+                            var r = row(s.PlayerId, Pos(s, positions), "", false);
+                            r.Group = NhlGroup(s.Details);
+                            lt.Rows.Add(r);
+                        }
+                        foreach (var s in goalies)
                             lt.Rows.Add(row(s.PlayerId, Pos(s, positions), "G", true));
 
                         var inLineup = new HashSet<int>(starters.Select(s => s.PlayerId));
                         lt.Bench = Roster(seasonPlayers, team, inLineup, row);
-                        lt.BenchTitle = "Roster";
+                        lt.BenchTitle = skaters.Count > 0 ? "Not in lineup" : "Roster";
 
-                        if (starters.Any(s => s.PlayerGameStateTypeId == ConfirmedTypeId)) { lt.Footer = "Starting goalie confirmed"; lt.FooterKind = "ok"; }
-                        else if (starters.Count > 0) { lt.Footer = "Probable goalie"; lt.FooterKind = "proj"; }
-                        else { lt.Footer = "Goalie not set"; lt.FooterKind = "none"; }
+                        if (skaters.Count > 0 && skaters.All(s => s.PlayerGameStateTypeId == ConfirmedTypeId)) { lt.Footer = "Confirmed lines"; lt.FooterKind = "ok"; }
+                        else if (skaters.Count > 0) { lt.Footer = "Projected lines"; lt.FooterKind = "proj"; }
+                        else { lt.Footer = "Lines not posted"; lt.FooterKind = "none"; }
                     }
                     else
                     {
@@ -248,8 +260,30 @@ namespace RotoMonster.Pages
             else { lt.Footer = "Projected lineup"; lt.FooterKind = "proj"; }
         }
 
+        private static int NhlSlotOrder(string details)
+        {
+            var d = (details ?? "").Trim().ToUpperInvariant();
+            if (d.Length < 4 || d[2] != '-' || !char.IsDigit(d[1])) return 999;
+            var group = d[0] == 'L' ? 0 : d[0] == 'D' ? 1 : 2;
+            var side = d.Substring(3);
+            var order = side == "LW" || side == "L" ? 0 : side == "C" ? 1 : 2;
+            return group * 100 + (d[1] - '0') * 10 + order;
+        }
+
+        private static string NhlGroup(string details)
+        {
+            var d = (details ?? "").Trim().ToUpperInvariant();
+            if (d.Length < 2 || !char.IsDigit(d[1])) return "";
+            if (d[0] == 'L') return "Line " + d[1];
+            if (d[0] == 'D') return "D pair " + d[1];
+            return "";
+        }
+
         private void FillOdds(LineupTeam lt, Game game, Team team)
         {
+            if ((Sport.IsNHL || Sport.IsMLB) && game.OverUnder > 0 && game.HomeProjectedPoints == 0 && game.AwayProjectedPoints == 0)
+                game.MoneyLineToWinsAndPoints();
+
             var isHome = game.HomeTeam != null && team.Id == game.HomeTeam.Id;
             double? implied = null;
             var projected = isHome ? game.HomeProjectedPoints : game.AwayProjectedPoints;

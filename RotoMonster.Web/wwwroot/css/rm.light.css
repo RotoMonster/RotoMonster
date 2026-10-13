@@ -3612,6 +3612,8 @@ a.rm-live-busy svg {
 
 .rm-lu-row { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 6px; min-height: 25px; padding: 0 4px; border-bottom: 1px solid var(--color-border); font-size: .84rem; }
 .rm-lu-row:hover { background: rgba(127, 127, 127, .07); }
+.rm-lu-group { margin-top: 6px; padding: 2px 4px 1px; font-size: .62rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--color-text-tertiary); border-bottom: 1px solid var(--color-border); }
+.rm-lu-group:first-of-type { margin-top: 2px; }
 .rm-lu-row--feat { margin-top: 4px; border: 1px solid var(--color-border); border-radius: 6px; background: rgba(127, 127, 127, .06); }
 .rm-lu-slot, .rm-lu-right { font-size: .72rem; font-weight: 700; color: var(--color-text-tertiary); }
 .rm-lu-right { text-align: right; }
@@ -3648,3 +3650,202 @@ a.rm-live-busy svg {
 .rm-lu-card { transition: border-color .15s ease, box-shadow .15s ease; }
 .rm-lu-card:hover { border-color: var(--lu-sport); box-shadow: 0 2px 10px rgba(0, 0, 0, .08); }
 /* rm-lineups-end */
+
+/* rm-lu-nhl */
+:root {
+    --team-nhl-ana: #F47A38;
+    --team-nhl-ari: #8C2633;
+    --team-nhl-bos: #FFB81C;
+    --team-nhl-buf: #003087;
+    --team-nhl-cgy: #C8102E;
+    --team-nhl-car: #CE1126;
+    --team-nhl-chi: #CF0A2C;
+    --team-nhl-col: #6F263D;
+    --team-nhl-cbj: #002654;
+    --team-nhl-dal: #006847;
+    --team-nhl-det: #CE1126;
+    --team-nhl-edm: #FF4C00;
+    --team-nhl-fla: #C8102E;
+    --team-nhl-la: #111111;
+    --team-nhl-lak: #111111;
+    --team-nhl-min: #154734;
+    --team-nhl-mtl: #AF1E2D;
+    --team-nhl-mon: #AF1E2D;
+    --team-nhl-nsh: #FFB81C;
+    --team-nhl-nj: #CE1126;
+    --team-nhl-njd: #CE1126;
+    --team-nhl-nyi: #00539B;
+    --team-nhl-nyr: #0038A8;
+    --team-nhl-ott: #C52032;
+    --team-nhl-phi: #F74902;
+    --team-nhl-pit: #FCB514;
+    --team-nhl-sj: #006D75;
+    --team-nhl-sjs: #006D75;
+    --team-nhl-sea: #355464;
+    --team-nhl-stl: #002F87;
+    --team-nhl-tb: #002868;
+    --team-nhl-tbl: #002868;
+    --team-nhl-tor: #00205B;
+    --team-nhl-uta: #71AFE5;
+    --team-nhl-van: #00843D;
+    --team-nhl-vgk: #B4975A;
+    --team-nhl-veg: #B4975A;
+    --team-nhl-wsh: #C8102E;
+    --team-nhl-was: #C8102E;
+    --team-nhl-wpg: #004C97;
+    --team-nhl-wpj: #004C97;
+}
+.rm-lu--nhl { --pos-lw: #0f8f8f; --pos-c: #b8860b; --pos-rw: #7c5cd6; --pos-d: #2f78c4; --pos-g: #c2417f; }
+.rm-lu--nhl { --lu-name: var(--color-text-primary); }
+.pos-lw { color: var(--pos-lw); }
+.pos-rw { color: var(--pos-rw); }
+.pos-d { color: var(--pos-d); }
+.rm-lu--nhl .rm-lu-thead { padding: 4px 8px; border-radius: 6px 6px 0 0; background: color-mix(in srgb, var(--tc) 22%, transparent); }
+.rm-lu--nhl .rm-lu-pick button[aria-pressed="true"] { background: color-mix(in srgb, var(--tc) 22%, transparent); }
+.rm-lu-line { display: grid; grid-template-columns: 26px minmax(0, 1fr); margin-top: 4px; }
+.rm-lu-line + .rm-lu-line--d:not(.rm-lu-line--d + .rm-lu-line--d) { margin-top: 10px; }
+.rm-lu-line-tag { display: flex; align-items: center; justify-content: center; border-radius: 5px 0 0 5px; font-size: .7rem; font-weight: 800; color: var(--color-text-primary); background: color-mix(in srgb, var(--tc) 30%, transparent); }
+.rm-lu-line--d .rm-lu-line-tag { background: color-mix(in srgb, var(--tc) 14%, transparent); }
+.rm-lu-line-rows { border: 1px solid var(--color-border); border-left: 0; border-radius: 0 5px 5px 0; }
+.rm-lu-line .rm-lu-row { border-bottom: 0; min-height: 24px; }
+.rm-lu-line .rm-lu-row + .rm-lu-row { border-top: 1px solid var(--color-border); }
+.rm-lu-line + .rm-lu-row--feat { margin-top: 10px; }
+.rm-lu-tcode { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rm-lu-implied { flex-shrink: 0; }
+/* end rm-lu-nhl */
+
+/* rm-lu-nhl-teams */
+:root {
+    --team-nhl-ana: #F47A38;
+    --team-nhl-ari: #8C2633;
+    --team-nhl-bos: #FFB81C;
+    --team-nhl-buf: #003087;
+    --team-nhl-cgy: #E03A3E;
+    --team-nhl-car: #CC0000;
+    --team-nhl-chi: #A6192E;
+    --team-nhl-col: #6F263D;
+    --team-nhl-cbj: #002654;
+    --team-nhl-dal: #006847;
+    --team-nhl-det: #CE1126;
+    --team-nhl-edm: #FF4C00;
+    --team-nhl-fla: #C8102E;
+    --team-nhl-la: #A2AAAD;
+    --team-nhl-lak: #A2AAAD;
+    --team-nhl-min: #154734;
+    --team-nhl-mtl: #AF1E2D;
+    --team-nhl-mon: #AF1E2D;
+    --team-nhl-nsh: #FFB81C;
+    --team-nhl-nj: #E00F2C;
+    --team-nhl-njd: #E00F2C;
+    --team-nhl-nyi: #F47D30;
+    --team-nhl-nyr: #0038A8;
+    --team-nhl-ott: #B79257;
+    --team-nhl-phi: #F74902;
+    --team-nhl-pit: #FCB514;
+    --team-nhl-sj: #006D75;
+    --team-nhl-sjs: #006D75;
+    --team-nhl-sea: #0E8A96;
+    --team-nhl-stl: #002F87;
+    --team-nhl-tb: #002868;
+    --team-nhl-tbl: #002868;
+    --team-nhl-tor: #00205B;
+    --team-nhl-uta: #71AFE5;
+    --team-nhl-van: #00843D;
+    --team-nhl-vgk: #B4975A;
+    --team-nhl-veg: #B4975A;
+    --team-nhl-wsh: #041E42;
+    --team-nhl-was: #041E42;
+    --team-nhl-wpg: #004C97;
+    --team-nhl-wpj: #004C97;
+}
+.rm-lu--nhl .rm-lu-thead { background: color-mix(in srgb, var(--tc) 30%, transparent); }
+.rm-lu-line-tag { background: color-mix(in srgb, var(--tc) 38%, transparent); }
+.rm-lu-line--d .rm-lu-line-tag { background: color-mix(in srgb, var(--tc) 20%, transparent); }
+/* end rm-lu-nhl-teams */
+
+
+
+/* rm-lu-header */
+.rm-lu-odds { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px; }
+.rm-lu-odds .rm-lu-implied { font-size: .78rem; color: var(--color-text-primary); }
+/* end rm-lu-header */
+
+/* rm-lu-find */
+.rm-lu-find.form-select {
+    width: auto;
+    min-width: 180px;
+    height: auto;
+    padding: 6px 34px 6px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background-color: var(--color-bg-secondary);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%238b96a8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m4 6 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 10px center;
+    background-size: 14px 14px;
+    color: var(--color-text-secondary);
+    font-size: .85rem;
+    font-weight: 600;
+    box-shadow: none;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease;
+}
+.rm-lu-find.form-select:hover { border-color: var(--lu-sport); color: var(--color-text-primary); }
+.rm-lu-find.form-select:focus { border-color: var(--lu-sport); box-shadow: 0 0 0 2px color-mix(in srgb, var(--lu-sport) 30%, transparent); outline: 0; }
+.rm-lu-find.form-select.is-set { color: var(--color-text-primary); box-shadow: inset 0 -2px 0 var(--lu-sport); }
+.rm-lu-find.form-select.is-set:focus { box-shadow: inset 0 -2px 0 var(--lu-sport), 0 0 0 2px color-mix(in srgb, var(--lu-sport) 30%, transparent); }
+.rm-lu-find option { background: var(--color-bg-secondary); color: var(--color-text-primary); }
+@media (max-width: 576px) { .rm-lu-find.form-select { width: 100%; } }
+/* end rm-lu-find */
+
+/* rm-lu-toggle-dcolor */
+.rm-lu-switch { user-select: none; }
+.rm-lu-switch input { appearance: none; -webkit-appearance: none; position: relative; flex-shrink: 0; width: 34px; height: 20px; margin: 0; border-radius: 999px; background: color-mix(in srgb, var(--color-text-tertiary) 45%, transparent); cursor: pointer; transition: background .15s ease; }
+.rm-lu-switch input::before { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .3); transition: transform .15s ease; }
+.rm-lu-switch input:checked { background: var(--lu-sport); }
+.rm-lu-switch input:checked::before { transform: translateX(14px); }
+.rm-lu-switch input:focus-visible { outline: 2px solid var(--lu-sport); outline-offset: 2px; }
+.rm-lu--nhl { --pos-d: #d14b3a; }
+/* end rm-lu-toggle-dcolor */
+
+/* rm-season-blue */
+:root { --season-progress-fill: #2f7fd8; --season-progress-pending-border: #2f7fd8; }
+/* end rm-season-blue */
+
+/* rm-lu-datenav */
+.rm-lu-datenav { display: inline-flex; align-items: stretch; gap: 0; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; background: var(--color-bg-secondary); }
+.rm-lu-dn-btn { display: flex; align-items: center; justify-content: center; width: 34px; padding: 0; border: 0; background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: background .15s ease, color .15s ease; }
+.rm-lu-dn-btn:hover { background: color-mix(in srgb, var(--lu-sport) 15%, transparent); color: var(--color-text-primary); }
+.rm-lu-dn-date { position: relative; display: flex; align-items: center; gap: 7px; margin: 0; padding: 0 10px; border-left: 1px solid var(--color-border); border-right: 1px solid var(--color-border); cursor: pointer; transition: background .15s ease; }
+.rm-lu-dn-date:hover { background: color-mix(in srgb, var(--lu-sport) 10%, transparent); }
+.rm-lu-dn-date svg { flex-shrink: 0; color: var(--lu-sport); }
+.rm-lu-dn-date:focus-within { box-shadow: inset 0 -2px 0 var(--lu-sport); }
+.rm-lu-datebox { width: auto; padding: 6px 0; border: 0; outline: 0; background: transparent; color: var(--color-text-primary); font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; }
+.rm-lu-datebox::-webkit-calendar-picker-indicator { position: absolute; inset: 0; width: auto; height: auto; margin: 0; opacity: 0; cursor: pointer; }
+.rm-lu-today { padding: 6px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg-secondary); color: var(--color-text-secondary); font-size: .85rem; font-weight: 600; text-decoration: none; transition: border-color .15s ease, color .15s ease; }
+.rm-lu-today:hover { border-color: var(--lu-sport); color: var(--color-text-primary); }
+/* end rm-lu-datenav */
+
+/* rm-lu-datenav-sport */
+.rm-lu-datenav { border-color: color-mix(in srgb, var(--lu-sport) 45%, var(--color-border)); }
+.rm-lu-datebox, .rm-lu-dn-date svg { color: var(--lu-sport); }
+.rm-lu-dn-btn { color: var(--lu-sport); }
+/* end rm-lu-datenav-sport */
+
+/* rm-lu-cal */
+.rm-lu-toolbar { position: relative; }
+.rm-lu-dn-text { padding: 6px 0; font-size: .85rem; font-weight: 600; white-space: nowrap; color: var(--lu-sport); }
+.rm-lu-cal { position: absolute; top: calc(100% + 6px); left: 0; z-index: 50; width: 288px; padding: 12px; border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-bg-secondary); box-shadow: 0 16px 40px rgba(15, 23, 42, .22); }
+.rm-lu-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: .95rem; font-weight: 700; color: var(--color-text-primary); }
+.rm-lu-cal-head button { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: background .15s ease, color .15s ease; }
+.rm-lu-cal-head button:hover { background: color-mix(in srgb, var(--lu-sport) 15%, transparent); color: var(--color-text-primary); }
+.rm-lu-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.rm-lu-cal-wd { padding: 4px 0 6px; text-align: center; font-size: .68rem; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; color: var(--color-text-tertiary); }
+.rm-lu-cal-day { height: 34px; padding: 0; border: 0; border-radius: 9px; background: transparent; color: var(--color-text-primary); font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; transition: background .12s ease; }
+.rm-lu-cal-day:hover { background: color-mix(in srgb, var(--lu-sport) 16%, transparent); }
+.rm-lu-cal-day.is-out { color: var(--color-text-tertiary); opacity: .55; }
+.rm-lu-cal-day.is-today { box-shadow: inset 0 0 0 1.5px var(--lu-sport); }
+.rm-lu-cal-day.is-sel { background: var(--lu-sport); color: #fff; box-shadow: none; }
+.rm-lu-cal-foot { display: flex; justify-content: flex-end; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--color-border); }
+.rm-lu-cal-foot button { padding: 4px 10px; border: 0; border-radius: 7px; background: transparent; color: var(--lu-sport); font: inherit; font-size: .8rem; font-weight: 700; cursor: pointer; }
+.rm-lu-cal-foot button:hover { background: color-mix(in srgb, var(--lu-sport) 15%, transparent); }
+/* end rm-lu-cal */

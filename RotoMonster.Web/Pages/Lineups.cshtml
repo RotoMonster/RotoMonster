@@ -11,10 +11,25 @@
         <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
         <h1 class="rm-lu-title">@Model.Sport.Title Lineups</h1>
         <div class="rm-lu-datenav">
-            <button type="submit" name="backbutton" value="1" class="btn btn-sm btn-secondary" aria-label="Previous day">&lsaquo;</button>
-            <input type="date" asp-for="@Model.SelectedDate" asp-format="{0:yyyy-MM-dd}" class="form-control form-control-sm rm-lu-datebox" onchange="this.form.requestSubmit()" />
-            <button type="submit" name="nextbutton" value="1" class="btn btn-sm btn-secondary" aria-label="Next day">&rsaquo;</button>
+            <button type="submit" name="backbutton" value="1" class="rm-lu-dn-btn" aria-label="Previous day">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+            <div class="rm-lu-dn-date" id="luDateBtn" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" aria-label="Pick a date">
+                <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+                <span class="rm-lu-dn-text">@Model.SelectedDate.ToString("ddd, MMM d")</span>
+                <input type="date" asp-for="@Model.SelectedDate" asp-format="{0:yyyy-MM-dd}" class="rm-lu-datebox" hidden />
+            </div>
+            <button type="submit" name="nextbutton" value="1" class="rm-lu-dn-btn" aria-label="Next day">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
         </div>
+        @{ var luToday = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, RotoMonster.Core.Game.DisplayZone).Date; }
+        <div class="rm-lu-cal" id="luCal" data-today='@luToday.ToString("yyyy-MM-dd")' role="dialog" aria-label="Choose a date" hidden></div>
+        <script src="~/js/rm-lineups-cal.js" asp-append-version="true" defer></script>
+        @if (Model.SelectedDate.Date != luToday)
+        {
+            <a class="rm-lu-today" asp-page="./Lineups" asp-route-date='@luToday.ToString("yyyy-MM-dd")' asp-route-l="@Model.SelectedUserLeagueId">Today</a>
+        }
         <span class="rm-lu-count">@Model.SelectedDate.ToString("dddd, MMM d") &middot; @Model.Games.Count games</span>
         <div class="rm-lu-seg" role="group" aria-label="Filter games">
             <button type="button" data-lu-filter="all" aria-pressed="true">All games</button>
@@ -24,6 +39,13 @@
                 <button type="button" data-lu-filter="mine" aria-pressed="false">My players</button>
             }
         </div>
+        <select class="form-select form-select-sm rm-lu-find" id="luFind" aria-label="Jump to team">
+            <option value="">All teams</option>
+            @foreach (var ft in Model.Games.SelectMany(g => g.Teams).Select(t => t.Team).Where(t => t != null).GroupBy(t => t.Id).Select(g => g.First()).OrderBy(t => string.IsNullOrWhiteSpace(t.Name) ? t.Code : t.Name))
+            {
+                <option value="@((ft.Code ?? "").ToLowerInvariant())">@(string.IsNullOrWhiteSpace(ft.Name) ? ft.Code : ft.Name)</option>
+            }
+        </select>
         @if (anyBench)
         {
             <label class="rm-lu-switch"><input type="checkbox" id="luBenchAll" /> Show benches</label>
@@ -44,11 +66,13 @@
         <div class="rm-lu-empty">No games on this date.</div>
     }
 
+    <div class="rm-lu-empty" id="luNoMatch" hidden>No games match.</div>
+
     <div class="rm-lu-grid">
         @for (int gi = 0; gi < Model.Games.Count; gi++)
         {
             var lg = Model.Games[gi];
-            <article class="rm-lu-card" data-state="@lg.State" data-own="@(lg.HasOwned ? "1" : "0")">
+            <article class="rm-lu-card" data-state="@lg.State" data-own="@(lg.HasOwned ? "1" : "0")" data-teams="@(" " + string.Join(" ", lg.Teams.Select(t => (t.Team.Code ?? "").ToLowerInvariant())) + " ")">
                 <div class="rm-lu-chead">
                     <span class="rm-lu-status rm-lu-status--@lg.State">@lg.StatusText</span>
                     <span class="rm-lu-matchup">@lg.Game.GameText</span>
@@ -72,16 +96,39 @@
                         var lt = lg.Teams[ti];
                         <section class="rm-lu-team@(ti == 0 ? "" : " rm-lu-team--alt")" data-lu-team="@ti" style="--tc:@lt.Color">
                             <div class="rm-lu-thead">
-                                <span class="rm-lu-tcode">@lt.Team.Code</span>
-                                <span class="rm-lu-implied">@lt.Implied</span>
+                                <span class="rm-lu-tcode" title="@lt.Team.Code">@(string.IsNullOrWhiteSpace(lt.Team.Name) ? lt.Team.Code : lt.Team.Name)</span>
                             </div>
-                            @if (!string.IsNullOrEmpty(lt.Line))
+                            @if (!string.IsNullOrEmpty(lt.Implied) || !string.IsNullOrEmpty(lt.Line))
                             {
-                                <div class="rm-lu-odds">@lt.Line</div>
+                                <div class="rm-lu-odds">
+                                    @if (!string.IsNullOrEmpty(lt.Implied))
+                                    {
+                                        <span class="rm-lu-implied">@lt.Implied</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(lt.Implied) && !string.IsNullOrEmpty(lt.Line))
+                                    {
+                                        <span>&middot;</span>
+                                    }
+                                    @lt.Line
+                                </div>
                             }
                             <div class="rm-lu-ctx"><span class="rm-lu-ctx-slot">@lt.SlotHead</span><span class="rm-lu-ctx-main">@lt.Context</span><span>@lt.RightHead</span></div>
 
-                            @foreach (var r in lt.Rows)
+                            @{ var lineGroups = lt.Rows.Where(r => !string.IsNullOrEmpty(r.Group)).GroupBy(r => r.Group).ToList(); }
+                            @foreach (var grp in lineGroups)
+                            {
+                                var isPair = grp.Key.StartsWith("D");
+                                <div class="rm-lu-line@(isPair ? " rm-lu-line--d" : "")">
+                                    <div class="rm-lu-line-tag" title="@grp.Key">@(isPair ? "D" : "L")@grp.Key.Substring(grp.Key.Length - 1)</div>
+                                    <div class="rm-lu-line-rows">
+                                        @foreach (var r in grp)
+                                        {
+                                            <partial name="_LineupRow" model="new RotoMonster.Pages.LineupRowView { Row = r, IsMLB = Model.Sport.IsMLB, LeagueId = leagueId }" />
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            @foreach (var r in lt.Rows.Where(r => string.IsNullOrEmpty(r.Group)))
                             {
                                 <partial name="_LineupRow" model="new RotoMonster.Pages.LineupRowView { Row = r, IsMLB = Model.Sport.IsMLB, LeagueId = leagueId }" />
                             }
@@ -117,15 +164,28 @@
 (function () {
     var root = document.querySelector('.rm-lu');
     if (!root) return;
+    var luMode = 'all';
+    var find = document.getElementById('luFind');
+    function luApply() {
+        var q = find ? find.value : '';
+        var shown = 0;
+        root.querySelectorAll('.rm-lu-card').forEach(function (c) {
+            var show = (luMode === 'all' || (luMode === 'upcoming' && c.dataset.state === 'upcoming') || (luMode === 'mine' && c.dataset.own === '1'))
+                && (!q || (c.dataset.teams || '').indexOf(' ' + q + ' ') >= 0);
+            c.hidden = !show;
+            if (show) shown++;
+        });
+        if (find) find.classList.toggle('is-set', !!q);
+        var none = document.getElementById('luNoMatch');
+        if (none) none.hidden = shown > 0;
+    }
+    if (find) find.addEventListener('change', luApply);
     root.addEventListener('click', function (e) {
         var f = e.target.closest('[data-lu-filter]');
         if (f) {
-            var mode = f.getAttribute('data-lu-filter');
+            luMode = f.getAttribute('data-lu-filter');
             root.querySelectorAll('[data-lu-filter]').forEach(function (b) { b.setAttribute('aria-pressed', b === f ? 'true' : 'false'); });
-            root.querySelectorAll('.rm-lu-card').forEach(function (c) {
-                var show = mode === 'all' || (mode === 'upcoming' && c.dataset.state === 'upcoming') || (mode === 'mine' && c.dataset.own === '1');
-                c.hidden = !show;
-            });
+            luApply();
             return;
         }
         var p = e.target.closest('[data-lu-pick]');
