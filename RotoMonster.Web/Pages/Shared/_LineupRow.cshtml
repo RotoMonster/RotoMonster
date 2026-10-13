@@ -1,0 +1,38 @@
+@model RotoMonster.Pages.LineupRowView
+@{
+    var r = Model.Row;
+    bool slotIsPos = !Model.IsMLB || r.IsFeatured || Model.IsBench;
+}
+@if (r.Player != null)
+{
+    <div class="rm-lu-row@(r.IsFeatured ? " rm-lu-row--feat" : "")">
+        <span class="rm-lu-slot">
+            @if (slotIsPos && r.Position != null)
+            {
+                <partial name="_ColoredPosition" model="r.Position" />
+            }
+            else
+            {
+                @r.Slot
+            }
+        </span>
+        <span class="rm-lu-name">
+            <a asp-page="/Players" asp-route-playerId="@r.Player.Id" asp-route-l="@Model.LeagueId">@r.Player.ForwardName</a>
+            @if (!string.IsNullOrEmpty(r.Hand))
+            {
+                <span class="rm-lu-hand">@r.Hand</span>
+            }
+            @if (r.IsOwned)
+            {
+                <span class="rm-lu-own@(r.IsActive ? "" : " rm-lu-own--bench")" title="@(r.IsActive ? "On your team, active" : "On your team, benched")">Own</span>
+            }
+            <partial name="_PlayerStatus" model="r.Status" />
+        </span>
+        <span class="rm-lu-right">
+            @if (Model.IsMLB && !r.IsFeatured && !Model.IsBench && r.Position != null)
+            {
+                <partial name="_ColoredPosition" model="r.Position" />
+            }
+        </span>
+    </div>
+}

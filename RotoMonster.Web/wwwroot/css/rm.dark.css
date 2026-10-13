@@ -290,3 +290,11 @@ td.tdleft {
     border: 1px solid var(--pp-team, var(--brand-primary));
 }
 /* end rm-pp-team-dark */
+
+/* rm-lineups-start */
+.rm-lu { --lu-name: color-mix(in srgb, var(--lu-sport) 50%, #ffffff); }
+.rm-lu-status--live { color: #4ade80; }
+.rm-lu-foot--proj { color: #fbbf24; }
+.rm-lu-card { transition: border-color .15s ease, box-shadow .15s ease; }
+.rm-lu-card:hover { border-color: var(--lu-sport); box-shadow: 0 2px 12px rgba(0, 0, 0, .45); }
+/* rm-lineups-end */

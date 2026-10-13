@@ -1,0 +1,147 @@
+@page
+@model RotoMonster.Pages.LineupsModel
+@{
+    int leagueId = Model.SelectedUserLeagueId;
+    bool anyBench = Model.Games.Any(g => g.Teams.Any(t => t.Bench.Count > 0));
+}
+
+<div class="container-fluid px-4 rm-lu rm-lu--@Model.SportKey">
+
+    <form method="post" class="rm-lu-toolbar">
+        <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
+        <h1 class="rm-lu-title">@Model.Sport.Title Lineups</h1>
+        <div class="rm-lu-datenav">
+            <button type="submit" name="backbutton" value="1" class="btn btn-sm btn-secondary" aria-label="Previous day">&lsaquo;</button>
+            <input type="date" asp-for="@Model.SelectedDate" asp-format="{0:yyyy-MM-dd}" class="form-control form-control-sm rm-lu-datebox" onchange="this.form.requestSubmit()" />
+            <button type="submit" name="nextbutton" value="1" class="btn btn-sm btn-secondary" aria-label="Next day">&rsaquo;</button>
+        </div>
+        <span class="rm-lu-count">@Model.SelectedDate.ToString("dddd, MMM d") &middot; @Model.Games.Count games</span>
+        <div class="rm-lu-seg" role="group" aria-label="Filter games">
+            <button type="button" data-lu-filter="all" aria-pressed="true">All games</button>
+            <button type="button" data-lu-filter="upcoming" aria-pressed="false">Not started</button>
+            @if (Model.IsLoggedIn)
+            {
+                <button type="button" data-lu-filter="mine" aria-pressed="false">My players</button>
+            }
+        </div>
+        @if (anyBench)
+        {
+            <label class="rm-lu-switch"><input type="checkbox" id="luBenchAll" /> Show benches</label>
+        }
+    </form>
+
+    <div class="rm-lu-legend">
+        <span><i class="rm-lu-sw rm-lu-sw--ok"></i>Confirmed</span>
+        <span><i class="rm-lu-sw rm-lu-sw--proj"></i>Projected</span>
+        @if (Model.IsLoggedIn)
+        {
+            <span><span class="rm-lu-own">Own</span>active <span class="rm-lu-own rm-lu-own--bench">Own</span>benched</span>
+        }
+    </div>
+
+    @if (Model.Games.Count == 0)
+    {
+        <div class="rm-lu-empty">No games on this date.</div>
+    }
+
+    <div class="rm-lu-grid">
+        @for (int gi = 0; gi < Model.Games.Count; gi++)
+        {
+            var lg = Model.Games[gi];
+            <article class="rm-lu-card" data-state="@lg.State" data-own="@(lg.HasOwned ? "1" : "0")">
+                <div class="rm-lu-chead">
+                    <span class="rm-lu-status rm-lu-status--@lg.State">@lg.StatusText</span>
+                    <span class="rm-lu-matchup">@lg.Game.GameText</span>
+                    <span class="rm-lu-spacer"></span>
+                    @if (lg.Game.HasStarted)
+                    {
+                        <a asp-page="/Scores" asp-route-g="@lg.Game.Id" asp-route-l="@leagueId">Box score</a>
+                    }
+                </div>
+
+                <div class="rm-lu-pick" role="group" aria-label="Team">
+                    @for (int ti = 0; ti < lg.Teams.Count; ti++)
+                    {
+                        <button type="button" data-lu-pick="@ti" aria-pressed="@(ti == 0 ? "true" : "false")" style="--tc:@lg.Teams[ti].Color">@lg.Teams[ti].Team.Code</button>
+                    }
+                </div>
+
+                <div class="rm-lu-teams">
+                    @for (int ti = 0; ti < lg.Teams.Count; ti++)
+                    {
+                        var lt = lg.Teams[ti];
+                        <section class="rm-lu-team@(ti == 0 ? "" : " rm-lu-team--alt")" data-lu-team="@ti" style="--tc:@lt.Color">
+                            <div class="rm-lu-thead">
+                                <span class="rm-lu-tcode">@lt.Team.Code</span>
+                                <span class="rm-lu-implied">@lt.Implied</span>
+                            </div>
+                            @if (!string.IsNullOrEmpty(lt.Line))
+                            {
+                                <div class="rm-lu-odds">@lt.Line</div>
+                            }
+                            <div class="rm-lu-ctx"><span class="rm-lu-ctx-slot">@lt.SlotHead</span><span class="rm-lu-ctx-main">@lt.Context</span><span>@lt.RightHead</span></div>
+
+                            @foreach (var r in lt.Rows)
+                            {
+                                <partial name="_LineupRow" model="new RotoMonster.Pages.LineupRowView { Row = r, IsMLB = Model.Sport.IsMLB, LeagueId = leagueId }" />
+                            }
+                            @if (lt.Rows.Count == 0)
+                            {
+                                <div class="rm-lu-none">Not posted yet</div>
+                            }
+
+                            @if (lt.Bench.Count > 0)
+                            {
+                                <details class="rm-lu-bench">
+                                    <summary>@lt.BenchTitle (@lt.Bench.Count)</summary>
+                                    @foreach (var r in lt.Bench)
+                                    {
+                                        <partial name="_LineupRow" model="new RotoMonster.Pages.LineupRowView { Row = r, IsMLB = Model.Sport.IsMLB, LeagueId = leagueId, IsBench = true }" />
+                                    }
+                                </details>
+                            }
+
+                            <div class="rm-lu-foot rm-lu-foot--@lt.FooterKind">@lt.Footer</div>
+                        </section>
+                    }
+                </div>
+            </article>
+        }
+    </div>
+
+    <div class="rm-lu-tz">@RotoMonster.Core.Game.DisplayZoneName &middot; <a asp-page="/DisplaySettings" asp-fragment="timezone">Change timezone</a></div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    var root = document.querySelector('.rm-lu');
+    if (!root) return;
+    root.addEventListener('click', function (e) {
+        var f = e.target.closest('[data-lu-filter]');
+        if (f) {
+            var mode = f.getAttribute('data-lu-filter');
+            root.querySelectorAll('[data-lu-filter]').forEach(function (b) { b.setAttribute('aria-pressed', b === f ? 'true' : 'false'); });
+            root.querySelectorAll('.rm-lu-card').forEach(function (c) {
+                var show = mode === 'all' || (mode === 'upcoming' && c.dataset.state === 'upcoming') || (mode === 'mine' && c.dataset.own === '1');
+                c.hidden = !show;
+            });
+            return;
+        }
+        var p = e.target.closest('[data-lu-pick]');
+        if (p) {
+            var card = p.closest('.rm-lu-card');
+            var idx = p.getAttribute('data-lu-pick');
+            card.querySelectorAll('[data-lu-pick]').forEach(function (b) { b.setAttribute('aria-pressed', b === p ? 'true' : 'false'); });
+            card.querySelectorAll('[data-lu-team]').forEach(function (t) { t.classList.toggle('rm-lu-team--alt', t.getAttribute('data-lu-team') !== idx); });
+        }
+    });
+    var all = document.getElementById('luBenchAll');
+    if (all) {
+        all.addEventListener('change', function () {
+            root.querySelectorAll('.rm-lu-bench').forEach(function (d) { d.open = all.checked; });
+        });
+    }
+})();
+</script>
+}
