@@ -423,7 +423,7 @@ td.tdleft {
 /* end rm-dc-brand */
 
 /* rm-dc-box */
-.rm-dc-grid--mb2 .rm-dc-mb { padding: 2px; border: 1.5px solid color-mix(in srgb, var(--color-text-tertiary) 70%, transparent); border-radius: 7px; background: color-mix(in srgb, var(--color-text-tertiary) 8%, transparent); }
-.rm-dc-grid--mb2 .rm-dc-h-mb { width: 157px; }
-.rm-dc-grid--mb2 .rm-dc-row { padding-top: 1px; padding-bottom: 1px; }
+.rm-dc .rm-dc-mb { padding: 2px; border: 1.5px solid color-mix(in srgb, var(--color-text-tertiary) 70%, transparent); border-radius: 7px; background: color-mix(in srgb, var(--color-text-tertiary) 8%, transparent); }
+.rm-dc .rm-dc-h-mb { width: 157px; }
+.rm-dc .rm-dc-row { padding-top: 1px; padding-bottom: 1px; }
 /* end rm-dc-box */
