@@ -1,0 +1,22 @@
+@model RotoMonster.Core.OwnershipPlayer
+@{
+    var ownColors = new RotoMonster.Core.Libs.ColorLib();
+}
+@if (Model != null)
+{
+    var tipKey = Model.PlayerId + "-" + Guid.NewGuid().ToString("N").Substring(0, 6);
+    var ownTip = string.Format("Own%: rostered in {0:0}% of tracked leagues", Model.OwnershipPercent)
+        + (Model.PercentOwnershipChange != 0 ? string.Format(" ({0:+0;-0} in the last 24 hours)", Model.PercentOwnershipChange) : "");
+    var actTip = string.Format("Act%: in an active lineup spot in {0:0}% of tracked leagues", Model.ActivePercent)
+        + (Model.PercentActiveChange != 0 ? string.Format(" ({0:+0;-0} in the last 24 hours)", Model.PercentActiveChange) : "");
+    <span class="rm-own-pair">
+        <span class="bm-tooltip-wrap">
+            <span class="rm-badge rm-badge--inline rm-own-pct bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="bm-tip-own-@tipKey" style="background-color:#@ownColors.OwnershipGetPercentColor(Model.OwnershipPercent)">@string.Format("{0:0}", Model.OwnershipPercent)</span>
+            <div class="bm-tooltip-content" id="bm-tip-own-@tipKey" role="tooltip">@ownTip</div>
+        </span>
+        <span class="bm-tooltip-wrap">
+            <span class="rm-badge rm-badge--inline rm-own-pct bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="bm-tip-act-@tipKey" style="background-color:#@ownColors.ActiveGetPercentColor(Model.ActivePercent)">@string.Format("{0:0}", Model.ActivePercent)</span>
+            <div class="bm-tooltip-content" id="bm-tip-act-@tipKey" role="tooltip">@actTip</div>
+        </span>
+    </span>
+}

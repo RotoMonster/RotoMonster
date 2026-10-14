@@ -5,7 +5,7 @@
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
 }
 
-<div class="container-fluid px-4">
+<div class="container-fluid px-4 rm-dc-page rm-lu--@((ViewData["sport"]?.ToString() ?? "").ToLowerInvariant())">
 
 @Html.Raw(new PageGuide("depth-guide")
     .WithTitle("Depth Charts")

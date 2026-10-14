@@ -43,6 +43,7 @@ namespace RotoMonster.Pages
         public MonsterBar TotalMonsterBar { get; set; } = null;
         public List<Position> AllPositions { get; set; }
         public bool ShowPositionPercents { get; set; } = false;
+        public string SportKey => (db.Sport?.Title ?? "").ToLowerInvariant();
 
         public async Task OnGetAsync(int? t, int? hid, int? l, bool? z, bool? gmb, bool? tmb)
         {

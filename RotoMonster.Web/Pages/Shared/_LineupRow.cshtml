@@ -29,6 +29,7 @@
             <partial name="_PlayerStatus" model="r.Status" />
         </span>
         <span class="rm-lu-right">
+            <partial name="_PlayerOwnership" model="r.Ownership" />
             @if (Model.IsMLB && !r.IsFeatured && !Model.IsBench && r.Position != null)
             {
                 <partial name="_ColoredPosition" model="r.Position" />

@@ -26,6 +26,7 @@ namespace RotoMonster.Pages
         public bool IsActive { get; set; }
         public bool IsFeatured { get; set; }
         public string Group { get; set; } = "";
+        public OwnershipPlayer Ownership { get; set; }
     }
 
     public class LineupRowView
@@ -123,6 +124,25 @@ namespace RotoMonster.Pages
 
             var statusByPlayer = statuses.GroupBy(s => s.PlayerId).ToDictionary(gr => gr.Key, gr => gr.OrderByDescending(s => s.DateAdded).First());
 
+            var ownershipByPlayer = new Dictionary<int, OwnershipPlayer>();
+            try
+            {
+                var ownLeague = (SelectedUserLeagues ?? new List<UserLeague>()).FirstOrDefault(u => u.Id == SelectedUserLeagueId);
+                foreach (var playerType in db.GetPlayerTypes())
+                {
+                    var code = ownLeague != null
+                        ? await db.GetUserLeagueCategoryCodeAsync(ownLeague, playerType)
+                        : db.GetDefaultCategoriesString(playerType).Code;
+                    if (string.IsNullOrEmpty(code)) continue;
+                    foreach (var op in db.GetOwnershipPlayersWithChange(code, DateTime.UtcNow, 24))
+                        ownershipByPlayer.TryAdd(op.PlayerId, op);
+                }
+            }
+            catch (Exception)
+            {
+                ownershipByPlayer.Clear();
+            }
+
             foreach (var game in games)
             {
                 var lg = new LineupGame { Game = game };
@@ -139,6 +159,7 @@ namespace RotoMonster.Pages
                     var lt = new LineupTeam { Team = team };
                     lt.Color = "var(--team-" + SportKey + "-" + (team.Code ?? "").ToLowerInvariant() + ", var(--lu-sport))";
                     FillOdds(lt, game, team);
+                    if (ownershipByPlayer.Count > 0) lt.RightHead = "Own \u00b7 Act";
 
                     var teamStates = gameStates.Where(s => s.TeamId == team.Id).ToList();
                     var starters = teamStates.Where(s => s.PlayerGameStateTypeId == ProbableTypeId || s.PlayerGameStateTypeId == ConfirmedTypeId).ToList();
@@ -161,7 +182,8 @@ namespace RotoMonster.Pages
                             Status = statusByPlayer.TryGetValue(playerId, out var ps) ? ps : null,
                             IsOwned = owned.ContainsKey(playerId),
                             IsActive = owned.TryGetValue(playerId, out var act) && act,
-                            IsFeatured = featured
+                            IsFeatured = featured,
+                            Ownership = ownershipByPlayer.TryGetValue(playerId, out var own) ? own : null
                         };
                         if (Sport.IsMLB && player != null)
                             r.Hand = (r.Position != null && IsCode(r.Position, "SP")) ? (player.Throws ?? "") : (player.Bats ?? "");
@@ -171,7 +193,7 @@ namespace RotoMonster.Pages
                     if (Sport.IsMLB)
                     {
                         lt.SlotHead = "#";
-                        lt.RightHead = "POS";
+                        lt.RightHead = ownershipByPlayer.Count > 0 ? "Own \u00b7 Act \u00b7 Pos" : "POS";
                         var oppSp = sps.FirstOrDefault(s => s.TeamId != team.Id);
                         if (oppSp != null && oppSp.Player != null)
                             lt.Context = "vs " + ((oppSp.Player.Throws ?? "").StartsWith("L", StringComparison.OrdinalIgnoreCase) ? "LHP " : "RHP ") + oppSp.Player.ForwardName;

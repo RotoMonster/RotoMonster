@@ -413,3 +413,11 @@ td.tdleft {
 .rm-lu-dn-text, .rm-lu-cal-foot button { color: color-mix(in srgb, var(--lu-sport) 60%, #ffffff); }
 .rm-lu-cal { box-shadow: 0 16px 40px rgba(0, 0, 0, .5); }
 /* end rm-lu-cal */
+
+/* rm-own-tweaks */
+.bm-tooltip-wrap > .badge { color: #fff !important; }
+/* end rm-own-tweaks */
+
+/* rm-dc-brand */
+.rm-dc-page, .rm-dc-page .bm-custom-select { --brand-accent: color-mix(in srgb, var(--lu-sport) 70%, #ffffff); }
+/* end rm-dc-brand */

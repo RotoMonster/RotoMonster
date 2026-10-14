@@ -55,6 +55,7 @@
     <div class="rm-lu-legend">
         <span><i class="rm-lu-sw rm-lu-sw--ok"></i>Confirmed</span>
         <span><i class="rm-lu-sw rm-lu-sw--proj"></i>Projected</span>
+        <span class="bm-tooltip-wrap"><span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="bm-tip-own-legend"><span class="rm-own-pair"><span class="rm-badge rm-badge--inline rm-own-pct" style="background-color:#a6ffff">Own</span><span class="rm-badge rm-badge--inline rm-own-pct" style="background-color:#ffe680">Act</span></span>% owned / active in leagues</span><div class="bm-tooltip-content" id="bm-tip-own-legend" role="tooltip">Own% is how many tracked leagues have the player on a roster. Act% is how many have him in an active lineup spot. Hover any badge for the exact number and its 24-hour change.</div></span>
         @if (Model.IsLoggedIn)
         {
             <span><span class="rm-lu-own">Own</span>active <span class="rm-lu-own rm-lu-own--bench">Own</span>benched</span>
