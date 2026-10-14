@@ -3932,3 +3932,9 @@ a.rm-live-busy svg {
 .rm-dc-page.rm-lu--nfl { --brand-primary-rgb: 168, 116, 63; --brand-accent-rgb: 168, 116, 63; }
 .rm-dc-page .bm-custom-select { --brand-primary: var(--lu-sport); --brand-accent: var(--lu-sport); }
 /* end rm-dc-brand */
+
+/* rm-dc-box */
+.rm-dc-grid--mb2 .rm-dc-mb { padding: 2px; border: 1.5px solid color-mix(in srgb, var(--color-text-tertiary) 70%, transparent); border-radius: 7px; background: color-mix(in srgb, var(--color-text-tertiary) 8%, transparent); }
+.rm-dc-grid--mb2 .rm-dc-h-mb { width: 157px; }
+.rm-dc-grid--mb2 .rm-dc-row { padding-top: 1px; padding-bottom: 1px; }
+/* end rm-dc-box */
