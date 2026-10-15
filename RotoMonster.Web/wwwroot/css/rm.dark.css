@@ -397,9 +397,6 @@ td.tdleft {
 .rm-lu--nhl { --pos-d: #ff8a7a; }
 /* end rm-lu-toggle-dcolor */
 
-/* rm-season-blue */
-:root { --season-progress-fill: #3b8fe8; --season-progress-pending-border: #3b8fe8; }
-/* end rm-season-blue */
 
 /* rm-lu-datenav */
 .rm-lu-datebox { color-scheme: dark; }
@@ -427,3 +424,7 @@ td.tdleft {
 .rm-dc .rm-dc-h-mb { width: 157px; }
 .rm-dc .rm-dc-row { padding-top: 1px; padding-bottom: 1px; }
 /* end rm-dc-box */
+
+/* rm-lu-all */
+.rm-lu .rm-lu-thead { background: color-mix(in srgb, var(--tc) 32%, transparent); }
+/* end rm-lu-all */

@@ -73,6 +73,9 @@ namespace RotoMonster.Pages
         public Sport Sport { get; set; }
         public string SportKey { get; set; } = "";
         public List<LineupGame> Games { get; set; } = new List<LineupGame>();
+        public bool IsWeek { get; set; }
+        public DateTime RangeStart { get; set; }
+        public DateTime RangeEnd { get; set; }
 
         public LineupsModel(IConfiguration config, IRMData db, IRMSharedData sharedDb, UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor, ILogger<PageModel> logger)
             : base(config, db, sharedDb, userManager, contextAccessor, logger)
@@ -82,9 +85,9 @@ namespace RotoMonster.Pages
         public IActionResult OnPost(string backbutton, string nextbutton)
         {
             if (!string.IsNullOrEmpty(backbutton))
-                SelectedDate = SelectedDate.AddDays(-1);
+                SelectedDate = SelectedDate.AddDays(db.Sport.IsNFL ? -7 : -1);
             else if (!string.IsNullOrEmpty(nextbutton))
-                SelectedDate = SelectedDate.AddDays(1);
+                SelectedDate = SelectedDate.AddDays(db.Sport.IsNFL ? 7 : 1);
 
             return RedirectToPage("./Lineups", new { l = SelectedUserLeagueId, date = SelectedDate.ToString("yyyy-MM-dd") });
         }
@@ -107,8 +110,16 @@ namespace RotoMonster.Pages
             var season = db.GetDefaultSeason();
             SelectedDate = date.Ticks == 0 ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Game.DisplayZone).Date : date.Date;
 
-            var games = db.GetGames(season, SelectedDate, SelectedDate);
-            var states = await db.GetPlayerGameStatesAsync(SelectedDate, SelectedDate);
+            RangeStart = SelectedDate;
+            RangeEnd = SelectedDate;
+            if (Sport.IsNFL)
+            {
+                IsWeek = true;
+                RangeStart = SelectedDate.AddDays(-(((int)SelectedDate.DayOfWeek - (int)DayOfWeek.Tuesday + 7) % 7));
+                RangeEnd = RangeStart.AddDays(6);
+            }
+            var games = db.GetGames(season, RangeStart, RangeEnd);
+            var states = await db.GetPlayerGameStatesAsync(RangeStart, RangeEnd);
             var seasonPlayers = db.GetAllSeasonPlayers(season);
             var statuses = await db.GetActivePlayerStatusesAsync();
             var positions = db.GetPositions().ToDictionary(p => p.Id);
@@ -134,7 +145,10 @@ namespace RotoMonster.Pages
                         ? await db.GetUserLeagueCategoryCodeAsync(ownLeague, playerType)
                         : db.GetDefaultCategoriesString(playerType).Code;
                     if (string.IsNullOrEmpty(code)) continue;
-                    foreach (var op in db.GetOwnershipPlayersWithChange(code, DateTime.UtcNow, 24))
+                    var ownRows = db.GetOwnershipPlayersWithChange(code, DateTime.UtcNow, 24);
+                    if (ownRows.Count == 0)
+                        ownRows = db.GetOwnershipPlayersWithChange(db.GetDefaultCategoriesString(playerType).Code, DateTime.UtcNow, 24);
+                    foreach (var op in ownRows)
                         ownershipByPlayer.TryAdd(op.PlayerId, op);
                 }
             }
@@ -143,13 +157,28 @@ namespace RotoMonster.Pages
                 ownershipByPlayer.Clear();
             }
 
+            var depthPlayers = new List<DepthPlayer>();
+            if (Sport.IsNFL)
+            {
+                try
+                {
+                    foreach (var playerType in db.GetPlayerTypes())
+                        depthPlayers.AddRange(db.GetDepthPlayers(playerType, db.GetDefaultCategoriesString(playerType).Code, DateTime.UtcNow, false)
+                            .Where(dp => dp.Team != null && dp.Position != null && dp.SeasonPlayer != null));
+                }
+                catch (Exception)
+                {
+                    depthPlayers.Clear();
+                }
+            }
+
             foreach (var game in games)
             {
                 var lg = new LineupGame { Game = game };
                 lg.State = game.IsFinished ? "final" : (game.HasStarted ? "live" : "upcoming");
                 lg.StatusText = game.IsFinished ? "Final"
                     : game.HasStarted ? (game.PercentComplete > 0 ? "Live · " + game.PercentComplete + "%" : "Live")
-                    : game.EasternTime.ToString("h:mm tt", CultureInfo.InvariantCulture);
+                    : game.EasternTime.ToString(IsWeek ? "ddd h:mm tt" : "h:mm tt", CultureInfo.InvariantCulture);
 
                 var gameStates = states.Where(s => s.GameId == game.Id).ToList();
                 var sps = gameStates.Where(s => s.PlayerGameStateTypeId != BenchTypeId && IsCode(Pos(s, positions), "SP")).ToList();
@@ -238,6 +267,63 @@ namespace RotoMonster.Pages
                         else if (skaters.Count > 0) { lt.Footer = "Projected lines"; lt.FooterKind = "proj"; }
                         else { lt.Footer = "Lines not posted"; lt.FooterKind = "none"; }
                     }
+                    else if (Sport.IsNFL)
+                    {
+                        lt.SlotHead = "POS";
+                        lt.Context = "Depth chart starters";
+                        var picked = new HashSet<int>();
+                        foreach (var slot in NflSlots)
+                        {
+                            if (starters.Count > 0)
+                            {
+                                foreach (var fs in starters.Where(x => IsCode(Pos(x, positions), slot.Key)).OrderBy(x => x.Details))
+                                {
+                                    if (!picked.Add(fs.PlayerId)) continue;
+                                    var feedRow = row(fs.PlayerId, Pos(fs, positions), "", false);
+                                    feedRow.Group = slot.Key;
+                                    lt.Rows.Add(feedRow);
+                                }
+                                continue;
+                            }
+                            var slotPlayers = depthPlayers
+                                .Where(dp => dp.Team.Id == team.Id && IsCode(dp.Position, slot.Key) && !picked.Contains(dp.SeasonPlayer.PlayerId))
+                                .OrderBy(dp => dp.Depth)
+                                .Where(dp => !(statusByPlayer.TryGetValue(dp.SeasonPlayer.PlayerId, out var nflStatus) && nflStatus.PlayerStatusType != null && nflStatus.IsOut))
+                                .Take(slot.Value)
+                                .ToList();
+                            foreach (var dp in slotPlayers)
+                            {
+                                picked.Add(dp.SeasonPlayer.PlayerId);
+                                var nflRow = row(dp.SeasonPlayer.PlayerId, dp.Position, "", false);
+                                nflRow.Group = slot.Key;
+                                lt.Rows.Add(nflRow);
+                            }
+                            var need = slot.Value - slotPlayers.Count;
+                            if (need > 0)
+                            {
+                                var fill = seasonPlayers
+                                    .Where(sp => sp.TeamId == team.Id && sp.Player != null && IsCode(sp.Player.DefaultPosition, slot.Key) && !picked.Contains(sp.PlayerId))
+                                    .Where(sp => !(statusByPlayer.TryGetValue(sp.PlayerId, out var fillStatus) && fillStatus.PlayerStatusType != null && fillStatus.IsOut))
+                                    .OrderByDescending(sp => ownershipByPlayer.TryGetValue(sp.PlayerId, out var fillOwn) ? fillOwn.OwnershipPercent : 0)
+                                    .ThenByDescending(sp => sp.Salary ?? 0)
+                                    .ThenBy(sp => sp.Player.LastName)
+                                    .Take(need)
+                                    .ToList();
+                                foreach (var sp in fill)
+                                {
+                                    picked.Add(sp.PlayerId);
+                                    var fillRow = row(sp.PlayerId, sp.Player.DefaultPosition, "", false);
+                                    fillRow.Group = slot.Key;
+                                    lt.Rows.Add(fillRow);
+                                }
+                            }
+                        }
+                        lt.Bench = Roster(seasonPlayers, team, picked, row);
+                        lt.BenchTitle = "Rest of roster";
+                        if (starters.Count > 0) { lt.Context = "Starters"; SetLineupFooter(lt, starters); }
+                        else if (lt.Rows.Count > 0) { lt.Footer = "Projected from depth chart"; lt.FooterKind = "proj"; }
+                        else { lt.Footer = "Depth chart not available"; lt.FooterKind = "none"; }
+                    }
                     else
                     {
                         lt.SlotHead = "POS";
@@ -260,6 +346,18 @@ namespace RotoMonster.Pages
                 Games.Add(lg);
             }
         }
+
+        private static readonly List<KeyValuePair<string, int>> NflSlots = new List<KeyValuePair<string, int>>
+        {
+            new KeyValuePair<string, int>("QB", 1),
+            new KeyValuePair<string, int>("RB", 2),
+            new KeyValuePair<string, int>("WR", 3),
+            new KeyValuePair<string, int>("TE", 1),
+            new KeyValuePair<string, int>("PK", 1),
+            new KeyValuePair<string, int>("K", 1),
+            new KeyValuePair<string, int>("DEF", 1),
+            new KeyValuePair<string, int>("DST", 1)
+        };
 
         private static List<LineupRow> Roster(List<SeasonPlayer> seasonPlayers, Team team, HashSet<int> exclude, Func<int, Position, string, bool, LineupRow> row)
         {

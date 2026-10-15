@@ -104,6 +104,11 @@ namespace RotoMonster.Pages
                 string leagueCategoriesCode = userLeague != null ? await db.GetUserLeagueCategoryCodeAsync(userLeague, playerType) : defCode;
 
                 List<OwnershipPlayer> ownershipPlayers = db.GetOwnershipPlayersWithChange(leagueCategoriesCode, DateTime.UtcNow, 24);
+                if (ownershipPlayers.Count == 0 && leagueCategoriesCode != defCode)
+                {
+                    leagueCategoriesCode = defCode;
+                    ownershipPlayers = db.GetOwnershipPlayersWithChange(leagueCategoriesCode, DateTime.UtcNow, 24);
+                }
 
                 if (ShowGameMonsterBar) 
                     MonsterBar = db.GetMonsterBar(playerType, season, catSetttings, scoringSystem, db.GetPerGamePerValue(playerType.Id), leagueSize, userLeague.ActiveSize(playerType));

@@ -30,7 +30,7 @@
         {
             <a class="rm-lu-today" asp-page="./Lineups" asp-route-date='@luToday.ToString("yyyy-MM-dd")' asp-route-l="@Model.SelectedUserLeagueId">Today</a>
         }
-        <span class="rm-lu-count">@Model.SelectedDate.ToString("dddd, MMM d") &middot; @Model.Games.Count games</span>
+        <span class="rm-lu-count">@(Model.IsWeek ? "Week of " + Model.RangeStart.ToString("MMM d") + " \u2013 " + Model.RangeEnd.ToString("MMM d") : Model.SelectedDate.ToString("dddd, MMM d")) &middot; @Model.Games.Count games</span>
         <div class="rm-lu-seg" role="group" aria-label="Filter games">
             <button type="button" data-lu-filter="all" aria-pressed="true">All games</button>
             <button type="button" data-lu-filter="upcoming" aria-pressed="false">Not started</button>
@@ -64,7 +64,7 @@
 
     @if (Model.Games.Count == 0)
     {
-        <div class="rm-lu-empty">No games on this date.</div>
+        <div class="rm-lu-empty">@(Model.IsWeek ? "No games this week." : "No games on this date.")</div>
     }
 
     <div class="rm-lu-empty" id="luNoMatch" hidden>No games match.</div>
@@ -118,9 +118,10 @@
                             @{ var lineGroups = lt.Rows.Where(r => !string.IsNullOrEmpty(r.Group)).GroupBy(r => r.Group).ToList(); }
                             @foreach (var grp in lineGroups)
                             {
-                                var isPair = grp.Key.StartsWith("D");
+                                var isPair = Model.Sport.IsNHL && grp.Key.StartsWith("D");
+                                var lineTag = Model.Sport.IsNHL ? (isPair ? "D" : "L") + grp.Key.Substring(grp.Key.Length - 1) : grp.Key;
                                 <div class="rm-lu-line@(isPair ? " rm-lu-line--d" : "")">
-                                    <div class="rm-lu-line-tag" title="@grp.Key">@(isPair ? "D" : "L")@grp.Key.Substring(grp.Key.Length - 1)</div>
+                                    <div class="rm-lu-line-tag" title="@grp.Key">@lineTag</div>
                                     <div class="rm-lu-line-rows">
                                         @foreach (var r in grp)
                                         {
