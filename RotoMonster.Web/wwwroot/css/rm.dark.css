@@ -428,3 +428,7 @@ td.tdleft {
 /* rm-lu-all */
 .rm-lu .rm-lu-thead { background: color-mix(in srgb, var(--tc) 32%, transparent); }
 /* end rm-lu-all */
+
+/* rm-sbc */
+.rm-sbc-badge { color: #0f172a; }
+/* end rm-sbc */

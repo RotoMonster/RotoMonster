@@ -6,11 +6,19 @@
 
 @if (Model != null)
 {
-    string txt = Model.PlayerStatusType.Title;
-    if (Model.Comment.Length > 0)
-        txt += " - " + Model.Comment;
-    if (Model.Subject != null && Model.Subject.Length > 0)
-        txt += " (" + Model.Subject + ")";
+    Func<string, string, bool> samePart = (a, b) => string.Equals(a, b, StringComparison.OrdinalIgnoreCase)
+        || (!a.Contains(' ') && !b.Contains(' ') && a.Length >= 6 && b.Length >= 6 && string.Compare(a, 0, b, 0, 6, StringComparison.OrdinalIgnoreCase) == 0);
+    var tipParts = new List<string> { (Model.PlayerStatusType.Title ?? "").Trim() };
+    foreach (var piece in (Model.Comment ?? "").Split(" - "))
+    {
+        var part = piece.Trim();
+        if (part.Length > 0 && !tipParts.Any(x => samePart(x, part)))
+            tipParts.Add(part);
+    }
+    string txt = string.Join(" - ", tipParts);
+    var tipSubject = (Model.Subject ?? "").Trim();
+    if (tipSubject.Length > 0 && !tipParts.Any(x => samePart(x, tipSubject)))
+        txt += " (" + tipSubject + ")";
 
     if (Model.EstimatedReturnDate != null)
         txt += " - est. return " + Model.EstimatedReturnDate.GetValueOrDefault().Month.ToString() + "/" + Model.EstimatedReturnDate.GetValueOrDefault().Day.ToString();

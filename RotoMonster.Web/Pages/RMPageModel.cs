@@ -121,7 +121,7 @@ namespace RotoMonster.Pages
                 var seasonDays = (defaultSeason.EndDate.Date - defaultSeason.StartDate.Date).TotalDays;
                 var seasonElapsed = (seasonToday - defaultSeason.StartDate.Date).TotalDays;
                 ViewData["SeasonPercent"] = seasonDays > 0
-                    ? System.Math.Min(100d, seasonElapsed / seasonDays * 100d)
+                    ? System.Math.Round(System.Math.Min(100d, seasonElapsed / seasonDays * 100d), 0)
                     : 100d;
             }
         }

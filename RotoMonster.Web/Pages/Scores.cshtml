@@ -1,7 +1,39 @@
-﻿@page
+@page
 @model RotoMonster.Pages.ScoresModel
 @{
-    RotoMonster.Core.Libs.FileLib fileLib = new Core.Libs.FileLib();
+    string sportKey = (Model.Sport != null ? Model.Sport.Title : "").Trim().ToLower();
+    string periodPrefix = sportKey == "nhl" ? "P" : sportKey == "mlb" ? "Inn " : "Q";
+    var selectedGame = Model.BoxScoreModel != null ? Model.BoxScoreModel.Game : null;
+
+    string StateText(RotoMonster.Core.Game game)
+    {
+        if (game.IsPostponed == true) return "PPD";
+        if (game.IsFinished) return "Final";
+        if (game.HasStarted) return game.Period > 0 ? periodPrefix + game.Period + (string.IsNullOrEmpty(game.GameClock) ? "" : " " + game.GameClock) : "Live";
+        return game.EasternTime.ToString("h:mm tt");
+    }
+
+    string StateCss(RotoMonster.Core.Game game)
+    {
+        if (game.IsPostponed == true) return "rm-sc-state--ppd";
+        if (game.IsFinished) return "rm-sc-state--final";
+        if (game.HasStarted) return "rm-sc-state--live";
+        return "rm-sc-state--pre";
+    }
+
+    string TeamColor(RotoMonster.Core.Team team)
+    {
+        if (team == null) return "var(--brand-primary)";
+        return "var(--team-" + sportKey + "-" + (team.Code ?? "").Trim().ToLower() + ", var(--brand-primary))";
+    }
+
+    string ResultCss(RotoMonster.Core.Game game, RotoMonster.Core.Team team)
+    {
+        if (!game.IsFinished) return "";
+        int mine = game.GetTeamScore(team);
+        int theirs = game.GetOpponentTeamScore(team);
+        return mine > theirs ? "rm-sc-team--won" : mine < theirs ? "rm-sc-team--lost" : "";
+    }
 }
 
 <div class="container-fluid px-4">
@@ -10,84 +42,137 @@
 
         <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
 
-        <div class="rm-scores-layout">
+        <div class="rm-sc">
 
-            <div class="rm-scores-side">
+            <aside class="rm-sc-side">
+                <div class="rm-sc-card">
 
-                <div class="rm-scores-panel">
-                    <div class="rm-scores-date">
-                        @Model.SelectedDate.DayOfWeek.ToString()
-                        <partial name="_SmallDate" model="Model.SelectedDate" />
-                        <span class="rm-scores-count">(@Model.ScheduleGames.Count)</span>
-                    </div>
-
-                    <div class="rm-scores-controls">
-                        <input type="submit" name="backbutton" value="Back" class="btn btn-sm btn-primary" />
-                        <input type="submit" name="nextbutton" value="Next" class="btn btn-sm btn-primary" />
-                        <input type="date" asp-for="@Model.SelectedDate" class="form-control form-control-sm rm-scores-datebox" onchange="this.form.requestSubmit()" />
-                        <button class="btn btn-sm btn-success">Refresh</button>
-                    </div>
-
-                    <label class="form-check-label rm-scores-toggle">
-                        <input asp-for="ShowTopToo">
-                        @Html.DisplayNameFor(model => model.ShowTopToo)
-                    </label>
-                </div>
-
-                <div class="rm-scores-panel rm-scores-games">
-                    @foreach (var game in Model.ScheduleGames)
-                    {
-                        <div class="rm-scores-game clearfix small">
-                            <partial name="_TeamGame" model="new RotoMonster.Models.Shared.TeamGameModel() {Sport=Model.Sport,Game=game,Team=game.AwayTeam}" />
-                            @if (game.PercentComplete > 0)
-                            {
-                                <input type="submit" name="viewgame" asp-route-newgameid="@game.Id" value="box score" class="linkbutton rm-scores-view" />
-                            }
+                    <div class="rm-sc-nav">
+                        <button type="submit" name="backbutton" value="Back" class="rm-sc-step" title="Previous day" aria-label="Previous day">&lsaquo;</button>
+                        <div class="rm-sc-day">
+                            <div class="rm-sc-dayname">@Model.SelectedDate.ToString("dddd")</div>
+                            <div class="rm-sc-daysub">@Model.SelectedDate.ToString("MMM d") &middot; @Model.ScheduleGames.Count @(Model.ScheduleGames.Count == 1 ? "game" : "games")</div>
                         </div>
-                    }
-                    <div class="rm-scores-tz">@RotoMonster.Core.Game.DisplayZoneName &middot; <a asp-page="/DisplaySettings" asp-fragment="timezone">Change timezone</a></div>
-                </div>
+                        <button type="submit" name="nextbutton" value="Next" class="rm-sc-step" title="Next day" aria-label="Next day">&rsaquo;</button>
+                    </div>
 
-            </div>
-
-            <div class="rm-scores-main">
-
-                @if (Model.BoxScoreModel != null && Model.BoxScoreModel.Game != null)
-                {
-                    <input type="hidden" id="gameid" name="prevgameid" value="@Model.BoxScoreModel.Game.Id" />
-
-                    <div class="rm-scores-header">
-                        <span class="rm-scores-state">
-                            @(Model.BoxScoreModel.Game.IsFinished ? "Final" : Model.BoxScoreModel.Game.HasStarted ? "Live" : "Upcoming")
-                        </span>
-                        @foreach (var t in Model.BoxScoreModel.Game.GetTeams())
+                    @{ var scToday = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, RotoMonster.Core.Game.DisplayZone).Date; }
+                    <div class="rm-sc-tools">
+                        <div class="rm-lu-datenav rm-sc-datenav">
+                            <div class="rm-lu-dn-date" id="luDateBtn" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" aria-label="Pick a date">
+                                <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+                                <span class="rm-lu-dn-text">@Model.SelectedDate.ToString("ddd, MMM d")</span>
+                                <input type="date" asp-for="@Model.SelectedDate" asp-format="{0:yyyy-MM-dd}" class="rm-lu-datebox" hidden />
+                            </div>
+                        </div>
+                        @if (Model.SelectedDate.Date != scToday)
                         {
-                            <span class="rm-scores-pill" style="@Model.BoxScoreModel.Game.GetTeamStyle(t)">
-                                <span class="rm-scores-pill-code">@t.Code</span>
-                                <span class="rm-scores-pill-score">@Model.BoxScoreModel.Game.GetTeamScore(t)</span>
-                            </span>
+                            <a class="rm-lu-today" asp-page="./Scores" asp-route-date='@scToday.ToString("yyyy-MM-dd")' asp-route-l="@Model.SelectedUserLeagueId">Today</a>
+                        }
+                        <button class="rm-sc-refresh" title="Refresh">Refresh</button>
+                        <div class="rm-lu-cal" id="luCal" data-today='@scToday.ToString("yyyy-MM-dd")' role="dialog" aria-label="Choose a date" hidden></div>
+                    </div>
+                    <script src="~/js/rm-lineups-cal.js" asp-append-version="true" defer></script>
+
+                    <label class="rm-sc-toggle">
+                        <input asp-for="ShowTopToo" class="form-check-input" />
+                        <span title="Also list top players on these teams who didn't play, like injured or scratched players">Include top players who sat out</span>
+                    </label>
+
+                    <div class="rm-sc-list">
+                        @if (Model.ScheduleGames.Count == 0)
+                        {
+                            <div class="rm-sc-none">No games on this date.</div>
+                        }
+                        @foreach (var game in Model.ScheduleGames)
+                        {
+                            bool started = game.IsFinished || game.HasStarted;
+                            bool canView = game.PercentComplete > 0 || game.IsFinished;
+                            bool isSelected = selectedGame != null && selectedGame.Id == game.Id;
+                            string rowCss = "rm-sc-game" + (isSelected ? " rm-sc-game--on" : "") + (canView ? "" : " rm-sc-game--off");
+
+                            var rowTeams = game.GetTeams();
+                            if (canView)
+                            {
+                                <button type="submit" name="viewgame" value="box score" asp-route-newgameid="@game.Id" class="@rowCss" title="Box score">
+                                    <span class="rm-sc-state @StateCss(game)">@StateText(game)</span>
+                                    @foreach (var t in rowTeams)
+                                    {
+                                        <span class="rm-sc-team @ResultCss(game, t)">
+                                            <span class="rm-sc-code">@(t.Id == game.HomeTeam.Id ? "@" : "")@t.Code</span>
+                                            <span class="rm-sc-score" style="@game.GetTeamStyle(t)">@game.GetTeamScore(t)</span>
+                                        </span>
+                                    }
+                                </button>
+                            }
+                            else
+                            {
+                                <div class="@rowCss">
+                                    <span class="rm-sc-state @StateCss(game)">@StateText(game)</span>
+                                    @foreach (var t in rowTeams)
+                                    {
+                                        double proj = game.ProjectedPoints(Model.Sport, t);
+                                        <span class="rm-sc-team">
+                                            <span class="rm-sc-code">@(t.Id == game.HomeTeam.Id ? "@" : "")@t.Code</span>
+                                            @if (proj > 0)
+                                            {
+                                                <span class="rm-sc-proj" title="Projected">@proj.ToString("0.0")</span>
+                                            }
+                                        </span>
+                                    }
+                                </div>
+                            }
                         }
                     </div>
 
-                    @foreach (var team in Model.BoxScoreModel.Game.GetTeams())
-                    {
-                        <div class="rm-scores-team">
-                            <div class="rm-scores-team-head">
-                                <span class="rm-scores-team-code" style="@Model.BoxScoreModel.Game.GetTeamStyle(team)">@team.Code</span>
-                                <span class="rm-scores-team-score">@Model.BoxScoreModel.Game.GetTeamScore(team)</span>
+                    <div class="rm-scores-tz">@RotoMonster.Core.Game.DisplayZoneName &middot; <a asp-page="/DisplaySettings" asp-fragment="timezone">Change timezone</a></div>
+                </div>
+            </aside>
+
+            <div class="rm-sc-main">
+
+                @if (selectedGame != null)
+                {
+                    <input type="hidden" id="gameid" name="prevgameid" value="@selectedGame.Id" />
+
+                    <div class="rm-sc-card rm-sc-head">
+                        <span class="rm-sc-state rm-sc-head-state @StateCss(selectedGame)">@StateText(selectedGame)</span>
+                        @foreach (var t in selectedGame.GetTeams())
+                        {
+                            <div class="rm-sc-head-team @ResultCss(selectedGame, t)" style="--tc: @TeamColor(t);">
+                                <div class="rm-sc-head-id">
+                                    <span class="rm-sc-head-code">@(t.Id == selectedGame.HomeTeam.Id ? "@" : "")@t.Code</span>
+                                    <span class="rm-sc-head-name">@t.Name</span>
+                                </div>
+                                <span class="rm-sc-score rm-sc-head-score" style="@selectedGame.GetTeamStyle(t)">@selectedGame.GetTeamScore(t)</span>
                             </div>
+                        }
+                    </div>
+
+                    @foreach (var team in selectedGame.GetTeams())
+                    {
+                        <section class="rm-sc-card rm-sc-box" style="--tc: @TeamColor(team);">
+                            <header class="rm-sc-box-head">
+                                <span class="rm-sc-head-code">@team.Code</span>
+                                <span class="rm-sc-head-name">@team.Name</span>
+                                <span class="rm-sc-score" style="@selectedGame.GetTeamStyle(team)">@selectedGame.GetTeamScore(team)</span>
+                            </header>
 
                             @foreach (var playerType in Model.BoxScoreModel.PlayerTypes)
                             {
                                 var playerTableModel = Model.BoxScoreModel.TeamPlayerTableModels[team][playerType];
                                 if (playerTableModel.DisplayPlayers.Count > 0)
                                 {
+                                    if (Model.BoxScoreModel.PlayerTypes.Count > 1)
+                                    {
+                                        <div class="rm-sc-box-type">@(string.IsNullOrEmpty(playerType.PluralTitle) ? playerType.Title : playerType.PluralTitle)</div>
+                                    }
                                     <div class="rm-scores-table">
                                         <partial name="_PlayerTable" model="playerTableModel" />
                                     </div>
                                 }
                             }
-                        </div>
+                        </section>
                     }
 
                     if (Model.BoxScoreModel.Articles != null && Model.BoxScoreModel.Articles.Count > 0)
@@ -100,7 +185,7 @@
                 }
                 else
                 {
-                    <div class="rm-scores-empty">Pick a game to see its box score.</div>
+                    <div class="rm-sc-empty">Pick a game to see its box score.</div>
                 }
 
             </div>

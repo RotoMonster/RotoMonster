@@ -129,7 +129,10 @@ namespace RotoMonster.Pages
             foreach (var playerType in db.GetPlayerTypes())
             {
                 monsterBars[playerType.Id] = db.GetMonsterBar(playerType, season, userLeague.GetCategorySettings(playerType), userLeague.ScoringSystem, db.GetPerGamePerValue(playerType.Id), db.GetUserLeagueLeagueSize(userLeague, playerType), userLeague.ActiveSize(playerType));
-                ownershipPlayerLists[playerType.Id] = db.GetOwnershipPlayersWithChange(await db.GetUserLeagueCategoryCodeAsync(userLeague, playerType), DateTime.UtcNow, 24);
+                var ownFallback = db.GetOwnershipPlayersWithChange(await db.GetUserLeagueCategoryCodeAsync(userLeague, playerType), DateTime.UtcNow, 24);
+                if (ownFallback.Count == 0)
+                    ownFallback = db.GetOwnershipPlayersWithChange(db.GetDefaultCategoriesString(playerType).Code, DateTime.UtcNow, 24);
+                ownershipPlayerLists[playerType.Id] = ownFallback;
             }
 
             if (gameId > 0)
@@ -180,7 +183,7 @@ namespace RotoMonster.Pages
                         playerTableModel.ShowCategoryValues = false;
                         playerTableModel.ShowGames = false;
                         playerTableModel.ShowTeam = false;
-                        playerTableModel.ShowOwnership = false;
+                        playerTableModel.ShowOwnership = true;
                         playerTableModel.ShowDepth = false;
 
                         boxScoreModel.TeamPlayerTableModels[team][playerType] = playerTableModel;

@@ -17,18 +17,21 @@
         }
     }
 
-    <div class="mb-2 ms-1">
-        <a class="btn btn-primary" asp-page="./UserLeagues/Import">Add Leagues</a>
-    </div>
+    @if (Model.UserLeagueViews.Count > 0)
+    {
+        <div class="mb-2 ms-1">
+            <a class="btn btn-primary" asp-page="./UserLeagues/Import">Add Leagues</a>
+        </div>
+    }
 
-    <div class="row">
-        <div class="col-auto p-2">
+    <div class="row rm-front-row">
+        <div class="col-auto p-2 rm-front-side">
 
             @if (Model.RecentArticles.Count > 0)
             {
                 <div class="card mb-3 border-success bg">
                     <div class="card-header text-nowrap">
-                        <h5 class="p-0 m-0"><a href="#RecentArcticles" data-bs-toggle="collapse">Recent Articles (@Model.RecentArticles.Count)</a></h5>
+                        <div class="rm-sb-header"><a class="rm-sb-title" href="#RecentArcticles" data-bs-toggle="collapse">Recent Articles</a><span class="rm-sb-count">@Model.RecentArticles.Count articles</span></div>
                         <div id="RecentArcticles" class="collapse">
                             <div class="card-body p-2">
                                 @foreach (var a in Model.RecentArticles)
@@ -56,11 +59,11 @@
             {
                 <div class="card mb-3 border-success bg">
                     <div class="card-header text-nowrap">
-                        <h5 class="p-0 m-0"><a href="#ScoringLog" data-bs-toggle="collapse">Scoring Log</a></h5>
+                        <div class="rm-sb-header"><a class="rm-sb-title" href="#ScoringLog" data-bs-toggle="collapse">Scoring Log</a></div>
                     </div>
                     <div id="ScoringLog" class="collapse">
                         <div class="card-body p-2">
-                            <table class="table table-sm small table-bordered w-auto">
+                            <table class="table table-sm small rm-front-list">
                                 @foreach (var dp in Model.GameScoringAlertDisplayPlayers)
                                 {
                                     <tr>
@@ -157,11 +160,11 @@
             {
                 <div class="card mb-3 border-info bg">
                     <div class="card-header text-nowrap">
-                        <h5 class="p-0 m-0"><a href="#WaiverTrends" data-bs-toggle="collapse">@Model.Sport.Title Waiver Trends</a></h5>
+                        <div class="rm-sb-header"><a class="rm-sb-title" href="#WaiverTrends" data-bs-toggle="collapse">@Model.Sport.Title Waiver Trends</a></div>
                     </div>
                     <div id="WaiverTrends" class="collapse.show">
                         <div class="card-body p-2">
-                            <table class="table table-sm small table-bordered w-auto">
+                            <table class="table table-sm small rm-front-list">
                                 @foreach (var dp in Model.TrendingDisplayPlayers)
                                 {
                                     <tr>
@@ -237,13 +240,13 @@
 
             @if (Model.InjuryDisplayPlayers != null && Model.InjuryDisplayPlayers.Count > 0)
             {
-                <div class="card mb-3 border-danger bg">
+                <div class="card mb-3 border-danger bg rm-inj">
                     <div class="card-header text-nowrap">
-                        <h5 class="p-0 m-0"><a href="#RecentInjuries" data-bs-toggle="collapse">@Model.Sport.Title Recent Injuries (@Model.InjuryDisplayPlayers.Count)</a></h5>
+                        <div class="rm-sb-header"><a class="rm-sb-title" href="#RecentInjuries" data-bs-toggle="collapse">@Model.Sport.Title Recent Injuries</a><span class="rm-sb-count">@Model.InjuryDisplayPlayers.Count players</span></div>
                     </div>
                     <div id="RecentInjuries" class="collapse.show">
                         <div class="card-body p-2">
-                            <table class="table table-sm small table-bordered w-auto">
+                            <table class="table table-sm small rm-front-list">
                                 @foreach (var dp in Model.InjuryDisplayPlayers)
                                 {
                                     <tr>
@@ -285,6 +288,15 @@
         </div>
 
         <div class="col p-2 rm-league-grid" id="rmLeagueGrid">
+            @if (Model.UserLeagueViews.Count == 0)
+            {
+                <div class="rm-front-empty">
+                    <div class="rm-front-empty-icon">+</div>
+                    <h2 class="rm-front-empty-title">Add your first league</h2>
+                    <p class="rm-front-empty-text">Import your fantasy leagues to see your rosters, today's games and MonsterBot recommendations here.</p>
+                    <a class="btn btn-primary" asp-page="./UserLeagues/Import">Add Leagues</a>
+                </div>
+            }
             @foreach (var ulv in Model.UserLeagueViews)
             {
                 <div class="card mb-3 bg" id="league-card-@ulv.UserLeague.Id" style="border-color:#@ViewData["LogoColor"];">
@@ -548,9 +560,11 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            var sbDate = '';
             function updateContent() {
+                $('#FrontGameScoresContainer .rm-sb-list').addClass('is-loading');
                 $.ajax({
-                    url: '@Url.Page("/Index", "FrontGameScores")',
+                    url: '@Url.Page("/Index", "FrontGameScores")' + (sbDate ? '&date=' + sbDate : ''),
                     type: 'GET',
                     success: function (data) {
                         $('#FrontGameScoresContainer').html(data);
@@ -561,6 +575,11 @@
                     }
                 });
             }
+
+            $('#FrontGameScoresContainer').on('click', '[data-sb-date]', function () {
+                sbDate = $(this).attr('data-sb-date');
+                updateContent();
+            });
 
             // Initial load
             updateContent();

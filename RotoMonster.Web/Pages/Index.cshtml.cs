@@ -393,7 +393,7 @@ namespace RotoMonster.Pages
             return RedirectToPage("./Index");
         }
 
-        public void FillFrontGameScoreValues()
+        public void FillFrontGameScoreValues(DateTime? day = null)
         {
             season = db.GetDefaultSeason();
             seasonPlayers = db.GetAllSeasonPlayers(season);
@@ -407,6 +407,12 @@ namespace RotoMonster.Pages
             ScheduleStartDate = liveUpcomingStartDate;
             ScheduleEndDate = liveUpcomingEndDate;
             ScheduleGames = db.GetGames(season, liveUpcomingStartDate, liveUpcomingEndDate);
+            if (day.HasValue)
+            {
+                ScheduleStartDate = day.Value.Date;
+                ScheduleEndDate = day.Value.Date;
+                ScheduleGames = db.GetGames(season, day.Value.Date, day.Value.Date);
+            }
             CurrentGames = db.GetGames(season, liveStartDate, liveEndDate);
 
             OwnedGameUserLeagueTeamPlayers = new List<GameUserLeagueTeamPlayer>();
@@ -427,15 +433,19 @@ namespace RotoMonster.Pages
             ActiveGameUserLeagueTeamPlayers = (from tp in OwnedGameUserLeagueTeamPlayers where tp.UserLeagueTeamPlayer.IsActive select tp).ToList();
         }
 
-        public IActionResult OnGetFrontGameScores()
+        public IActionResult OnGetFrontGameScores(string date)
         {
-            FillFrontGameScoreValues();
+            DateTime? pickedDay = null;
+            if (DateTime.TryParseExact(date ?? "", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var parsedDay))
+                pickedDay = parsedDay;
+            FillFrontGameScoreValues(pickedDay);
 
             var frontGameScoresModel = new FrontGameScoresModel();
             frontGameScoresModel.Sport = db.Sport;
             frontGameScoresModel.ScheduleStartDate = ScheduleStartDate;
             frontGameScoresModel.ScheduleEndDate = ScheduleEndDate;
             frontGameScoresModel.ScheduleGames = ScheduleGames;
+            frontGameScoresModel.PickedDay = pickedDay.HasValue;
             frontGameScoresModel.OwnedGameUserLeagueTeamPlayers = OwnedGameUserLeagueTeamPlayers;
             frontGameScoresModel.ActiveGameUserLeagueTeamPlayers = ActiveGameUserLeagueTeamPlayers;
 

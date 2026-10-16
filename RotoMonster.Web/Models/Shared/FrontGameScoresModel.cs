@@ -13,6 +13,7 @@ namespace RotoMonster.Models.Shared
         public DateTime ScheduleStartDate { get; set; }
         public DateTime ScheduleEndDate { get; set; }
         public List<Game> ScheduleGames { get; set; }
+        public bool PickedDay { get; set; }
         public List<GameUserLeagueTeamPlayer> ActiveGameUserLeagueTeamPlayers { get; set; }
         public List<GameUserLeagueTeamPlayer> OwnedGameUserLeagueTeamPlayers { get; set; }
     }

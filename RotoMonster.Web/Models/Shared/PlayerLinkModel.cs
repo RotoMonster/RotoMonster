@@ -11,5 +11,6 @@ namespace RotoMonster.Models.Shared
         public DisplayPlayer DisplayPlayer { get; set; } = null;
         public UserLeague SelectedUserLeague { get; set; }
         public PlayerGameState PlayerGameState { get; set; } = null;
+        public bool FullTeamName { get; set; }
     }
 }

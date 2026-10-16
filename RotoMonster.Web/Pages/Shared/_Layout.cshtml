@@ -19,10 +19,10 @@
     @{
         // Declared here rather than reusing the `sport` variable below, which is
         // defined after </head>. Only MLB, NBA and NFL override files exist.
-        string sportCss = ViewData["sport"].ToString().ToLower();
+        string sportCss = ViewData["sport"].ToString().Trim().ToLower();
     }
     <link rel="stylesheet" href="~/css/bm.@(rmTheme).css" asp-append-version="true" />
-    @if (sportCss == "mlb" || sportCss == "nba" || sportCss == "nfl")
+    @if (sportCss == "mlb" || sportCss == "nba" || sportCss == "nfl" || sportCss == "nhl")
     {
         <link rel="stylesheet" href="~/css/bm.@(sportCss).@(rmTheme).css" asp-append-version="true" />
     }

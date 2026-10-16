@@ -349,24 +349,25 @@ namespace RotoMonster.Core
 
             if (HasStarted)
             {
-                double diff = Math.Abs((double)HomeScore - (double)AwayScore);
+                double avg = sport.IsNHL ? 3.1 : sport.IsMLB ? 4.4 : sport.IsNFL ? 22 : sport.IsNBA ? 114 : ((double)sport.HighPoints + (double)sport.LowPoints) / 2;
+                double spread = sport.IsNHL ? 2.5 : sport.IsMLB ? 3.5 : sport.IsNFL ? 12 : sport.IsNBA ? 15 : Math.Max(1, ((double)sport.HighPoints - (double)sport.LowPoints) / 2);
+                double done = IsFinished ? 1 : Math.Max(0.1, Math.Min(1, PercentComplete / 100d));
 
-                if (diff != 0)
-                {
-                    int range = Convert.ToInt16(Math.Round(((double)sport.HighPoints - (double)sport.LowPoints), 0));
-                    string greenColor = colorLib.GetGreenRangeColorStyle(diff, 0, range, true);
-                    string redColor = colorLib.GetRedRangeColorStyle(diff, 0, range, true);
-                    string homeColor = (HomeScore > AwayScore) ? greenColor : redColor;
-                    string awayColor = (AwayScore > HomeScore) ? greenColor : redColor;
+                string winStyle = (IsFinished) ? "border: solid 1px green;" : "";
+                string lossStyle = (IsFinished) ? "margin: 1px 0 1px 0;" : "";
 
-                    string winStyle = (IsFinished) ? "border: solid 1px green;" : "";
-                    string lossStyle = (IsFinished) ? "margin: 1px 0 1px 0;" : "";
-
-                    HomeStyle = "background-color:#" + homeColor + ";" + ((HomeScore > AwayScore) ? winStyle : lossStyle);
-                    AwayStyle = "background-color:#" + awayColor + ";" + ((AwayScore > HomeScore) ? winStyle : lossStyle);
-                }
+                HomeStyle = "background-color:#" + ScoreColor(HomeScore, avg * done, spread * done, colorLib) + ";" + ((HomeScore > AwayScore) ? winStyle : lossStyle);
+                AwayStyle = "background-color:#" + ScoreColor(AwayScore, avg * done, spread * done, colorLib) + ";" + ((AwayScore > HomeScore) ? winStyle : lossStyle);
             }
 
+        }
+
+        private static string ScoreColor(int score, double expected, double spread, ColorLib colorLib)
+        {
+            double diff = score - expected;
+            return diff >= 0
+                ? colorLib.GetGreenRangeColorStyle(diff, 0, spread, true)
+                : colorLib.GetRedRangeColorStyle(-diff, 0, spread, true);
         }
 
         public void MoneyLineToWinsAndPoints()
