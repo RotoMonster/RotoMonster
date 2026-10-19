@@ -1,0 +1,29 @@
+@page
+@model RotoMonster.Pages.ScheduleGridModel
+
+<div class="container-fluid px-4 rm-sgp">
+
+    <div class="rm-sgp-head">
+        <span class="rm-sgp-sub">Games per fantasy week, colored by how easy the opponents are</span>
+    </div>
+
+    @if (Model.UsesQualityGames)
+    {
+        <div class="rm-sgp-legend" id="rmSgpLegend">
+            <span class="rm-sgp-ex">4<sup>2</sup></span>
+            <span><b>4 games</b> that week, and <b>2</b> of them are <b>Quality Games</b>: games on nights with @Model.QualityLimit or fewer games, so they're easier to fit into your lineup.</span>
+            <span class="rm-sgp-sep"></span>
+            <span><span class="rm-sgp-sw rm-sgp-sw--easy"></span>Easier opponents</span>
+            <span><span class="rm-sgp-sw rm-sgp-sw--hard"></span>Tougher</span>
+            <button type="button" class="rm-sgp-dismiss" onclick="document.getElementById('rmSgpLegend').hidden=true;try{localStorage.setItem('rmSgpLegendHidden','1')}catch(e){}">Dismiss</button>
+        </div>
+        <script>try{if(localStorage.getItem('rmSgpLegendHidden')==='1'){document.getElementById('rmSgpLegend').hidden=true}}catch(e){}</script>
+    }
+
+    <form method="post" id="rmScheduleGridForm">
+        <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
+        <input type="hidden" name="@(RotoMonster.Pages.ScheduleGridModel.GridId)-expanded" value="@Model.ExpandedCsv" />
+        @Html.Raw(Model.GridHtml)
+    </form>
+
+</div>
