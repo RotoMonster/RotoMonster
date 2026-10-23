@@ -4407,3 +4407,7 @@ button.rm-sc-game:hover { background: rgba(var(--brand-primary-rgb), 0.07); }
 /* rm-sgp-avgease */
 .rm-sgp .schedule-grid-summary-row .schedule-grid-cell-colored { color: var(--color-text-primary) !important; }
 /* end rm-sgp-avgease */
+
+.pgs-badge--icon {
+    padding: 2px 4px;
+}

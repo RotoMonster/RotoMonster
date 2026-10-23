@@ -4,26 +4,39 @@
     var stateType = Model.PlayerGameState.PlayerGameStateType;
     IconType stateIcon;
     var hasIcon = Enum.TryParse(stateType.Icon, out stateIcon);
+    var details = (Model.PlayerGameState.Details ?? "").Trim();
+    var iconOnly = details.Contains(' ');
 
+    if (iconOnly && !hasIcon)
+    {
+        stateIcon = stateType.IsStarter ? IconType.Play
+            : stateType.IsProbableStarter ? IconType.PlayQuestion
+            : stateType.IsBench ? IconType.Pause
+            : IconType.Question;
+        hasIcon = true;
+    }
+
+    var tipText = iconOnly ? stateType.Title + " - " + details : stateType.Title;
     var tipId = Context.NextTooltipId();
 
     <span class="bm-tooltip-wrap">
-    <span class="me-1 badge pgs-badge bm-tooltip-trigger bm-tooltip-trigger--hover"
+    <span class="me-1 badge pgs-badge@(iconOnly ? " pgs-badge--icon" : "") bm-tooltip-trigger bm-tooltip-trigger--hover"
           data-bm-tooltip="@tipId"
+          aria-label="@tipText"
           style="color:white;background-color:#@stateType.TextColor">
         @if (hasIcon)
         {
             @Html.Raw(new Icon(new IconInput { Type = stateIcon, Size = 14, Color = "#fff" }).Render())
         }
-        @if (Model.PlayerGameState.Details != null && Model.PlayerGameState.Details.Length > 0)
+        @if (!iconOnly && details.Length > 0)
         {
-            <span class="pgs-detail">@Model.PlayerGameState.Details</span>
+            <span class="pgs-detail">@details</span>
         }
         @if (stateType.ShowLockAfterStart & Model.PlayerGameState.Game.HasStarted)
         {
             @Html.Raw(new Icon(new IconInput { Type = IconType.Lock, Size = 14, Color = "#fff" }).Render())
         }
     </span>
-    <div class="bm-tooltip-content" id="@tipId" role="tooltip">@stateType.Title</div>
+    <div class="bm-tooltip-content" id="@tipId" role="tooltip">@tipText</div>
     </span>
 }
