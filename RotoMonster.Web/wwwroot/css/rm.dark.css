@@ -690,3 +690,5 @@ td.tdleft {
 /* rm-sgp-avgease */
 .rm-sgp .schedule-grid-summary-row .schedule-grid-cell-colored { color: var(--color-text-primary) !important; }
 /* end rm-sgp-avgease */
+
+.rm-sport-nhl { --pos-lw: #5ec4c4; --pos-c: #e3c065; --pos-rw: #b39cf0; --pos-d: #ff8a7a; --pos-g: #f0a0c8; }

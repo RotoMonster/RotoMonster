@@ -4411,3 +4411,8 @@ button.rm-sc-game:hover { background: rgba(var(--brand-primary-rgb), 0.07); }
 .pgs-badge--icon {
     padding: 2px 4px;
 }
+
+.rm-sport-nhl { --pos-lw: #0f8f8f; --pos-c: #b8860b; --pos-rw: #7c5cd6; --pos-d: #d14b3a; --pos-g: #c2417f; }
+.pos-border-lw { border-color: var(--pos-lw); }
+.pos-border-rw { border-color: var(--pos-rw); }
+.pos-border-d { border-color: var(--pos-d); }
