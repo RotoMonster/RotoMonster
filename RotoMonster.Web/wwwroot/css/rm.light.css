@@ -1909,11 +1909,11 @@ table.table > :not(caption) > * > * {
 /* rm-own-badge */
 .own-badge {
     --own-badge-starting-bg: #00b33c;
-    --own-badge-bench-bg: #00b33c;
-    --own-badge-ir-bg: #00b33c;
-    --own-badge-other-starting-bg: #c5cdd3;
-    --own-badge-other-bench-bg: #c5cdd3;
-    --own-badge-other-ir-bg: #c5cdd3;
+    --own-badge-bench-bg: #89dca5;
+    --own-badge-ir-bg: #89dca5;
+    --own-badge-other-starting-bg: #acb3b9;
+    --own-badge-other-bench-bg: #e2e6e9;
+    --own-badge-other-ir-bg: #e2e6e9;
     --own-badge-waiver-bg: #6b7f92;
     --own-badge-starting-fg: #ffffff;
     --own-badge-bench-fg: #ffffff;

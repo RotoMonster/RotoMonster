@@ -246,12 +246,12 @@ td.tdleft {
 /* Own badges. The light-mode greens and gold sit too bright against the dark
    page, and white icons glare - deepen the fills and tint the icons instead. */
 .own-badge {
-    --own-badge-starting-bg: #009933;
-    --own-badge-bench-bg: #009933;
-    --own-badge-ir-bg: #009933;
-    --own-badge-other-starting-bg: #c5cdd3;
-    --own-badge-other-bench-bg: #c5cdd3;
-    --own-badge-other-ir-bg: #c5cdd3;
+    --own-badge-starting-bg: #00b33c;
+    --own-badge-bench-bg: #89dca5;
+    --own-badge-ir-bg: #89dca5;
+    --own-badge-other-starting-bg: #acb3b9;
+    --own-badge-other-bench-bg: #e2e6e9;
+    --own-badge-other-ir-bg: #e2e6e9;
     --own-badge-waiver-bg: #6b7f92;
     --own-badge-starting-fg: #000000;
     --own-badge-bench-fg: #000000;
