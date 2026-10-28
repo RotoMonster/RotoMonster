@@ -3832,9 +3832,58 @@ namespace RotoMonster.Data
 
         public List<int> GetUserLeagueIdsWithNoWaivers(Season season)
         {
-            var ids = (from ul in GetUserLeagues() where ul.SeasonId == season.Id && ul.FantasyProviderId == 4 && !ul.IsAuction && ul.IsProLeague select ul.Id).ToList();
+            return WaiverCandidateLeagues(season)
+                .Where(ul => ul.WaiverTime == 0)
+                .Select(ul => ul.Id)
+                .ToList();
+        }
 
-            return ids;
+        public List<int> GetUserLeagueIdsNeedingWaiverTime(Season season)
+        {
+            return WaiverCandidateLeagues(season)
+                .Where(ul => ul.WaiverTime == null)
+                .Select(ul => new { ul.Id, ul.ProviderLeagueId })
+                .ToList()
+                .GroupBy(ul => ul.ProviderLeagueId)
+                .Select(g => g.Min(ul => ul.Id))
+                .OrderBy(id => id)
+                .ToList();
+        }
+
+        public void SetUserLeagueWaiverTime(Season season, string providerLeagueId, int waiverTime)
+        {
+            var leagues = (from ul in db.UserLeagues
+                           where ul.SeasonId == season.Id && ul.FantasyProviderId == 1 && ul.ProviderLeagueId == providerLeagueId
+                           select ul).ToList();
+
+            foreach (var ul in leagues)
+                ul.WaiverTime = waiverTime;
+
+            db.SaveChanges();
+        }
+
+        private IQueryable<UserLeague> WaiverCandidateLeagues(Season season)
+        {
+            var defaultLeague = (from ul in db.UserLeagues.AsNoTracking() where ul.IsDefault select ul).FirstOrDefault();
+            if (defaultLeague == null)
+                return Enumerable.Empty<UserLeague>().AsQueryable();
+
+            int teams = defaultLeague.NumberOfTeams;
+            int players = defaultLeague.PlayersPerTeam;
+            int defaultId = defaultLeague.Id;
+            var defaultStringIds = (from pt in db.UserLeaguePlayerTypes.AsNoTracking()
+                                    where pt.UserLeagueId == defaultId
+                                    select pt.CategoriesStringId).Distinct().ToList();
+
+            return from ul in db.UserLeagues.AsNoTracking()
+                   where ul.SeasonId == season.Id
+                      && ul.FantasyProviderId == 1
+                      && !ul.ContinuousWaivers
+                      && ul.NumberOfTeams == teams
+                      && ul.PlayersPerTeam == players
+                      && ul.ProviderLeagueId != null && ul.ProviderLeagueId != ""
+                      && db.UserLeaguePlayerTypes.Any(pt => pt.UserLeagueId == ul.Id && defaultStringIds.Contains(pt.CategoriesStringId))
+                   select ul;
         }
 
         public List<int> GetAuctionUserLeagueIds(Season season)

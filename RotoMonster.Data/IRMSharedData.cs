@@ -12,6 +12,7 @@ namespace RotoMonster.Data
     {
         List<ApplicationUser> GetUsers();
         UserAuth GetUserAuth(string userId);
+        int? GetYahooWaiverTime(UserAuth userAuth, Season season, string yahooLeagueId);
         List<UserAuth> UserAuths { get; }
         UserAuth AddYahooUserAuth(string userId, string accessToken, string refreshToken);
         UserAuth AddESPNUserAuth(string userId, string swid, string s2);

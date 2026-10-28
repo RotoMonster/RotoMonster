@@ -2703,6 +2703,9 @@ namespace RotoMonster.NFL.Migrations.Migrations
                     b.Property<string>("WaiverRule")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("WaiverTime")
+                        .HasColumnType("int");
+
                     b.Property<string>("WaiverType")
                         .HasColumnType("nvarchar(max)");
 

@@ -126,6 +126,7 @@ namespace RotoMonster.Data
                 DraftDate = s.DraftDate,
                 WaiverType = s.WaiverType ?? "",
                 WaiverRule = s.WaiverRule ?? "",
+                WaiverTime = _provider.Id == 1 ? s.WaiverPeriodDays : (int?)null,
                 ContinuousWaivers = s.ContinuousWaivers,
                 EntryFee = s.EntryFee,
                 GameLimit = s.GameLimit,

@@ -21,6 +21,8 @@ namespace RotoMonster.Api
         public const int DefensePlayerTypeId = 6;
         public const int KickerCategoriesStringId = 1433;
         public const int DefenseCategoriesStringId = 1861;
+        public const string WaiversCode = "waivers";
+        public const int WaiversCategoriesStringId = 1;
 
         private static int _running;
         private static RunSummary _lastRun;
@@ -41,6 +43,7 @@ namespace RotoMonster.Api
             public string CategoriesCode { get; set; }
             public int LeagueCount { get; set; } = 100;
             public int PauseSeconds { get; set; } = 3;
+            public int WaiverChecks { get; set; } = 50;
         }
 
         public class LeagueResult
@@ -68,6 +71,9 @@ namespace RotoMonster.Api
             public int OffensePlayers { get; set; }
             public int KickerPlayers { get; set; }
             public int DefensePlayers { get; set; }
+            public int WaiverTimesChecked { get; set; }
+            public int WaiverTimesUnknown { get; set; }
+            public int NoWaiverLeagues { get; set; }
             public double DurationSeconds { get; set; }
             public List<LeagueResult> Failures { get; set; } = new List<LeagueResult>();
         }
@@ -88,12 +94,13 @@ namespace RotoMonster.Api
                 var code = request.CategoriesCode;
                 var wanted = Math.Max(1, request.LeagueCount);
                 var pause = TimeSpan.FromSeconds(Math.Max(0, request.PauseSeconds));
+                var waiverChecks = Math.Max(0, request.WaiverChecks);
 
                 _ = Task.Run(async () =>
                 {
                     try
                     {
-                        _lastRun = await RunAsync(code, wanted, pause).ConfigureAwait(false);
+                        _lastRun = await RunAsync(code, wanted, pause, waiverChecks).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -154,38 +161,101 @@ namespace RotoMonster.Api
                     offensePlayers = last.OffensePlayers,
                     kickerPlayers = last.KickerPlayers,
                     defensePlayers = last.DefensePlayers,
+                    waiverTimesChecked = last.WaiverTimesChecked,
+                    waiverTimesUnknown = last.WaiverTimesUnknown,
+                    noWaiverLeagues = last.NoWaiverLeagues,
                     durationSeconds = last.DurationSeconds,
                     failures = last.Failures
                 }
             };
         }
 
-        private async Task<RunSummary> RunAsync(string code, int wanted, TimeSpan pause)
+        private async Task<RunSummary> RunAsync(string code, int wanted, TimeSpan pause, int waiverChecks)
         {
             var summary = new RunSummary { StartedAt = DateTime.UtcNow, CategoriesCode = code };
 
             List<UserLeague> candidates;
             Season season;
             Dictionary<int, int> typeMap = null;
+            var isWaivers = string.Equals(code, WaiversCode, StringComparison.OrdinalIgnoreCase) || string.Equals(code, "nowaiver", StringComparison.OrdinalIgnoreCase);
 
-            using (var scope = _scopeFactory.CreateScope())
+            if (isWaivers)
             {
-                var db = scope.ServiceProvider.GetRequiredService<IRMData>();
-                season = db.GetDefaultSeason();
+                List<int> unknownIds;
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<IRMData>();
+                    season = db.GetDefaultSeason();
+                    var waiversString = db.GetCategoriesString(WaiversCategoriesStringId);
+                    code = waiversString != null && !string.IsNullOrEmpty(waiversString.Code) ? waiversString.Code : WaiversCode;
+                    summary.CategoriesCode = code;
+                    unknownIds = db.GetUserLeagueIdsNeedingWaiverTime(season);
+                }
 
-                var resolved = await ResolveCodeAsync(db, code).ConfigureAwait(false);
-                code = resolved.Code;
-                typeMap = resolved.TypeMap;
-                summary.CategoriesCode = code;
+                foreach (var id in unknownIds.Take(waiverChecks))
+                {
+                    try
+                    {
+                        using (var scope = _scopeFactory.CreateScope())
+                        {
+                            var db = scope.ServiceProvider.GetRequiredService<IRMData>();
+                            var sharedDb = scope.ServiceProvider.GetRequiredService<IRMSharedData>();
 
-                var ids = db.GetUserLeagueIdsWithCategoriesCode(code, season);
-                candidates = ids
-                    .Select(id => db.GetUserLeague(id))
-                    .Where(ul => ul != null && ul.FantasyProviderId == 1 && ul.IsProLeague && !string.IsNullOrEmpty(ul.ProviderLeagueId))
-                    .GroupBy(ul => ul.ProviderLeagueId)
-                    .Select(g => g.First())
-                    .OrderBy(ul => ul.ProviderLeagueId, StringComparer.Ordinal)
-                    .ToList();
+                            var userLeague = db.GetUserLeague(id);
+                            if (userLeague == null) continue;
+
+                            var userAuth = sharedDb.GetUserAuth(userLeague.UserId);
+                            var days = userAuth == null ? null : sharedDb.GetYahooWaiverTime(userAuth, season, userLeague.ProviderLeagueId);
+                            db.SetUserLeagueWaiverTime(season, userLeague.ProviderLeagueId, days ?? -1);
+                            summary.WaiverTimesChecked++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Waiver time check failed for user league {Id}", id);
+                    }
+
+                    if (pause > TimeSpan.Zero)
+                        await Task.Delay(pause).ConfigureAwait(false);
+                }
+
+                summary.WaiverTimesUnknown = Math.Max(0, unknownIds.Count - summary.WaiverTimesChecked);
+
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<IRMData>();
+                    candidates = db.GetUserLeagueIdsWithNoWaivers(season)
+                        .Select(id => db.GetUserLeague(id))
+                        .Where(ul => ul != null)
+                        .GroupBy(ul => ul.ProviderLeagueId)
+                        .Select(g => g.First())
+                        .OrderBy(ul => ul.ProviderLeagueId, StringComparer.Ordinal)
+                        .ToList();
+                }
+
+                summary.NoWaiverLeagues = candidates.Count;
+            }
+            else
+            {
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<IRMData>();
+                    season = db.GetDefaultSeason();
+
+                    var resolved = await ResolveCodeAsync(db, code).ConfigureAwait(false);
+                    code = resolved.Code;
+                    typeMap = resolved.TypeMap;
+                    summary.CategoriesCode = code;
+
+                    var ids = db.GetUserLeagueIdsWithCategoriesCode(code, season);
+                    candidates = ids
+                        .Select(id => db.GetUserLeague(id))
+                        .Where(ul => ul != null && ul.FantasyProviderId == 1 && ul.IsProLeague && !string.IsNullOrEmpty(ul.ProviderLeagueId))
+                        .GroupBy(ul => ul.ProviderLeagueId)
+                        .Select(g => g.First())
+                        .OrderBy(ul => ul.ProviderLeagueId, StringComparer.Ordinal)
+                        .ToList();
+                }
             }
 
             summary.SeasonId = season.Id;

@@ -230,6 +230,19 @@ namespace RotoMonster.Data
         }
 
         // Yahoo Calls
+        public int? GetYahooWaiverTime(UserAuth userAuth, Season season, string yahooLeagueId)
+        {
+            string url = "https://fantasysports.yahooapis.com/fantasy/v2/league/" + season.YahooId + ".l." + yahooLeagueId + "/settings";
+            string data = GetYahooAPIXML(userAuth, url);
+            if (string.IsNullOrEmpty(data))
+                return null;
+
+            XmlDocument xml = new XmlDocument();
+            xml.LoadXml(data);
+            XmlNode node = xml["fantasy_content"]?["league"]?["settings"]?["waiver_time"];
+            return node != null && int.TryParse(node.InnerText, out var days) ? days : (int?)null;
+        }
+
         public string GetYahooAPIXML(
             UserAuth userAuth,
             string url)
@@ -473,6 +486,7 @@ namespace RotoMonster.Data
                     league.ContinuousWaivers = (sNode["waiver_rule"] != null && sNode["waiver_rule"].InnerText == "continuous");
                     league.WaiverType = (sNode["waiver_type"] != null ? sNode["waiver_type"].InnerText : "");
                     league.WaiverRule = (sNode["waiver_rule"] != null ? sNode["waiver_rule"].InnerText : "");
+                    league.WaiverTime = (sNode["waiver_time"] != null && int.TryParse(sNode["waiver_time"].InnerText, out var yahooWaiverTime)) ? yahooWaiverTime : (int?)null;
                     if (leagueNode["weekly_deadline"].InnerText == "1")
                     {
                         league.LineupFrequency = "W";

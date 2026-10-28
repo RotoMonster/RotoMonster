@@ -142,6 +142,8 @@ namespace RotoMonster.Data
         UserLeague GetNewCustomUserLeague();
         List<int> GetUserLeagueIdsWithCategoriesCode(string categoriesCode, Season season);
         List<int> GetUserLeagueIdsWithNoWaivers(Season season);
+        List<int> GetUserLeagueIdsNeedingWaiverTime(Season season);
+        void SetUserLeagueWaiverTime(Season season, string providerLeagueId, int waiverTime);
         List<int> GetAuctionUserLeagueIds(Season season);
 
         List<UserLeagueTeam> GetUserLeagueTeams(UserLeague userLeague);

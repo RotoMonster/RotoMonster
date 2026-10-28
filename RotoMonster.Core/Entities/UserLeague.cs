@@ -119,6 +119,7 @@ namespace RotoMonster.Core
 
         public string WaiverType { get; set; } = "";
         public string WaiverRule { get; set; } = "";
+        public int? WaiverTime { get; set; }
 
         public bool IsDefault { get; set; }    // the default settings league
 
