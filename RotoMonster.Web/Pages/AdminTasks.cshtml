@@ -1,0 +1,64 @@
+@page
+@model RotoMonster.Pages.AdminTasksModel
+@{
+    ViewData["Title"] = "Admin Tasks";
+}
+
+<div class="container-fluid px-4 rm-admin-tasks">
+    @Html.AntiForgeryToken()
+    <div id="admin-tasks" data-list-url="@Url.Page("/AdminTasks", "List")" data-post-url="@Url.Page("/AdminTasks")">
+        <partial name="_AdminTasksList" model="Model" />
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    var box = document.getElementById('admin-tasks');
+    var token = document.querySelector('.rm-admin-tasks input[name="__RequestVerificationToken"]').value;
+    var viewAll = false;
+    var busy = false;
+
+    function show(html) { box.innerHTML = html; }
+
+    async function refresh() {
+        if (busy) return;
+        try {
+            var r = await fetch(box.dataset.listUrl + '&viewAll=' + viewAll, { credentials: 'same-origin' });
+            if (r.ok) show(await r.text());
+        } catch (e) { }
+    }
+
+    async function post(handler, data) {
+        busy = true;
+        try {
+            var body = new URLSearchParams(Object.assign({ viewAll: viewAll }, data || {}));
+            var r = await fetch(box.dataset.postUrl + '?handler=' + handler, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'RequestVerificationToken': token },
+                body: body
+            });
+            if (r.ok) show(await r.text());
+        } finally {
+            busy = false;
+        }
+    }
+
+    box.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-handler]');
+        if (!b) return;
+        e.preventDefault();
+        b.disabled = true;
+        post(b.dataset.handler, b.dataset.id ? { id: b.dataset.id } : null);
+    });
+
+    box.addEventListener('change', function (e) {
+        if (e.target.matches('[data-viewall]')) { viewAll = e.target.checked; refresh(); }
+        if (e.target.matches('[data-auto]')) { post('Auto', { auto: e.target.checked }); }
+    });
+
+    setInterval(function () { if (!document.hidden) refresh(); }, 10000);
+})();
+</script>
+}

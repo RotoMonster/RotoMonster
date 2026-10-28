@@ -1,0 +1,98 @@
+@model RotoMonster.Pages.AdminTasksModel
+@using RotoMonster.Pages
+@{
+    var duty = Model.Duty;
+}
+
+<div class="rm-at-duty">
+    <div class="rm-at-baton">
+        @if (duty.OnDuty != null)
+        {
+            <span class="rm-at-now"><span class="rm-at-dot"></span><strong>@AdminTasksModel.ShortName(duty.OnDuty)</strong> on duty</span>
+        }
+        else
+        {
+            <span class="rm-at-now rm-at-nobody">Nobody on duty</span>
+        }
+        @foreach (var r in duty.Ready)
+        {
+            <span class="rm-at-ready">@AdminTasksModel.ShortName(r) ready</span>
+        }
+    </div>
+    <div class="rm-at-duty-buttons">
+        <button type="button" class="btn btn-sm rm-at-b" data-handler="Ready" disabled="@(duty.IAmOnDuty || duty.IAmReady)">Ready</button>
+        <button type="button" class="btn btn-sm rm-at-b" data-handler="OnDuty" disabled="@duty.IAmOnDuty">On Duty</button>
+        <button type="button" class="btn btn-sm rm-at-b" data-handler="OffDuty" disabled="@(!duty.IAmOnDuty && !duty.IAmReady)">Off Duty</button>
+        <div class="form-check form-switch mb-0 ms-2">
+            <input class="form-check-input" type="checkbox" id="at-auto" data-auto checked="@duty.MyAuto">
+            <label class="form-check-label" for="at-auto">Auto</label>
+        </div>
+    </div>
+</div>
+
+<div class="rm-at-panel">
+    <div class="rm-at-head">
+        <h2>Tasks</h2>
+        <span class="rm-at-updated">Updated @DateTime.Now.ToString("h:mm:ss tt")</span>
+        <span class="flex-grow-1"></span>
+        <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" id="at-viewall" data-viewall checked="@Model.ViewAll">
+            <label class="form-check-label" for="at-viewall">View All</label>
+        </div>
+        <button type="button" class="btn btn-sm rm-at-b" data-handler="DoneAll">Done All</button>
+        @if (Model.IsAdmin)
+        {
+            <button type="button" class="btn btn-sm rm-at-b" data-handler="DoneAllAdmin">Done All Admin</button>
+        }
+    </div>
+
+    @if (Model.Tasks.Count == 0)
+    {
+        <div class="rm-at-empty">Nothing to do. New tasks show up here on their own.</div>
+    }
+    else
+    {
+        <table class="table table-sm mb-0 rm-at-table">
+            <tbody>
+                @foreach (var t in Model.Tasks)
+                {
+                    var cls = (t.IsAdminOnly ? "rm-at-admin" : "rm-at-everyone") + (t.DoneAt != null ? " rm-at-done" : "");
+                    <tr class="@cls">
+                        <td class="rm-at-rail"></td>
+                        <td class="rm-at-btn">
+                            @if (t.DoneAt == null)
+                            {
+                                <button type="button" class="btn btn-sm rm-at-b" data-handler="Done" data-id="@t.Id">Done</button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-sm rm-at-b" data-handler="Undo" data-id="@t.Id">Undo</button>
+                            }
+                        </td>
+                        <td class="rm-at-ago">@AdminTasksModel.Ago(t.CreatedAt)</td>
+                        <td class="rm-at-source">@t.Source</td>
+                        <td>
+                            <span class="rm-at-text">@t.Text</span>
+                            @if (!string.IsNullOrEmpty(t.Url))
+                            {
+                                <a class="ms-2" href="@t.Url" target="_blank" rel="noopener">@(string.IsNullOrEmpty(t.UrlText) ? "Open" : t.UrlText)</a>
+                            }
+                            @if (!string.IsNullOrEmpty(t.ActionType) && t.DoneAt == null)
+                            {
+                                <button type="button" class="btn btn-sm btn-primary ms-2" data-handler="Run" data-id="@t.Id">@(string.IsNullOrEmpty(t.ActionLabel) ? "Run" : t.ActionLabel)</button>
+                            }
+                            @if (!string.IsNullOrEmpty(t.ActionResult))
+                            {
+                                <div class="rm-at-result">@t.ActionResult</div>
+                            }
+                            @if (t.DoneAt != null)
+                            {
+                                <div class="rm-at-result">Done by @AdminTasksModel.ShortName(t.DoneBy) @AdminTasksModel.Ago(t.DoneAt.Value) ago</div>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

@@ -95,6 +95,7 @@ namespace RotoMonster
             services.AddSingleton(Configuration.GetSection("ZohoDesk").Get<RotoMonsterExternalAPIs.Client.Services.Zoho.ZohoDeskOptions>() ?? new RotoMonsterExternalAPIs.Client.Services.Zoho.ZohoDeskOptions());
             services.AddSingleton(sp => new RotoMonsterExternalAPIs.Client.Services.Zoho.ZohoDeskClient(sp.GetRequiredService<RotoMonsterExternalAPIs.Client.Services.Zoho.ZohoDeskOptions>()));
             services.AddScoped<SupportService>();
+            services.AddScoped<AdminTaskService>();
             services.AddMemoryCache();
             services.AddRazorPages();
             services.AddControllers();

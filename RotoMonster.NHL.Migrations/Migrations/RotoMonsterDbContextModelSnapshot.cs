@@ -74,6 +74,108 @@ namespace RotoMonster.NHL.Migrations.Migrations
                     b.ToTable("ActiveRosterSpotPositions", (string)null);
                 });
 
+            modelBuilder.Entity("RotoMonster.Core.AdminDuty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Auto")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOnDuty")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ReadyAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
+                    b.ToTable("AdminDuties", (string)null);
+                });
+
+            modelBuilder.Entity("RotoMonster.Core.AdminTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ActionLabel")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<DateTime?>("ActionRanAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ActionResult")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ActionType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DedupeKey")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("DoneAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DoneBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("IsAdminOnly")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Source")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UrlText")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DedupeKey");
+
+                    b.HasIndex("DoneAt");
+
+                    b.ToTable("AdminTasks", (string)null);
+                });
+
             modelBuilder.Entity("RotoMonster.Core.Article", b =>
                 {
                     b.Property<int>("Id")

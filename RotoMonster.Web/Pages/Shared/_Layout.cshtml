@@ -138,6 +138,13 @@
                             </a>
                         </li>
 
+                        @if (User.IsInRole("Admin") || User.IsInRole("Worker"))
+                        {
+                            <li class="nav-item ms-3">
+                                <a class="nav-link" asp-area="" asp-page="/AdminTasks">Tasks</a>
+                            </li>
+                        }
+
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item ms-3">

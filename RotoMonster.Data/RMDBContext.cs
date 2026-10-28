@@ -56,6 +56,8 @@ namespace RotoMonster.Data
         public DbSet<UserLeaguePlayerType> UserLeaguePlayerTypes { get; set; }
         public DbSet<UserLeagueImportError> UserLeagueImportErrors { get; set; }
         public DbSet<UserLeagueWaiverPlayer> UserLeagueWaiverPlayers { get; set; }
+        public DbSet<AdminTask> AdminTasks { get; set; }
+        public DbSet<AdminDuty> AdminDuties { get; set; }
 
         public DbSet<DisplayCategory> DisplayCategories { get; set; }
         public DbSet<PositionSource> PositionSources { get; set; }
@@ -163,6 +165,23 @@ namespace RotoMonster.Data
 
             modelBuilder.Entity<UserLeagueWaiverPlayer>().HasKey(s => new { s.UserLeagueId, s.PlayerId });
             modelBuilder.Entity<UserLeagueWaiverPlayer>().ToTable("UserLeagueWaiverPlayers");
+
+            modelBuilder.Entity<AdminTask>().ToTable("AdminTasks");
+            modelBuilder.Entity<AdminTask>().Property(t => t.Text).HasMaxLength(1000).IsRequired();
+            modelBuilder.Entity<AdminTask>().Property(t => t.Url).HasMaxLength(500);
+            modelBuilder.Entity<AdminTask>().Property(t => t.UrlText).HasMaxLength(50);
+            modelBuilder.Entity<AdminTask>().Property(t => t.Source).HasMaxLength(50);
+            modelBuilder.Entity<AdminTask>().Property(t => t.DedupeKey).HasMaxLength(200);
+            modelBuilder.Entity<AdminTask>().Property(t => t.DoneBy).HasMaxLength(256);
+            modelBuilder.Entity<AdminTask>().Property(t => t.ActionType).HasMaxLength(50);
+            modelBuilder.Entity<AdminTask>().Property(t => t.ActionLabel).HasMaxLength(30);
+            modelBuilder.Entity<AdminTask>().Property(t => t.ActionResult).HasMaxLength(500);
+            modelBuilder.Entity<AdminTask>().HasIndex(t => t.DoneAt);
+            modelBuilder.Entity<AdminTask>().HasIndex(t => t.DedupeKey);
+
+            modelBuilder.Entity<AdminDuty>().ToTable("AdminDuties");
+            modelBuilder.Entity<AdminDuty>().Property(d => d.UserName).HasMaxLength(256).IsRequired();
+            modelBuilder.Entity<AdminDuty>().HasIndex(d => d.UserName).IsUnique();
 
             modelBuilder.Entity<PositionSourcePosition>().HasKey(s => new { s.PositionSourceId, s.PositionId });
             modelBuilder.Entity<PositionSourcePosition>().ToTable("PositionSourcePositions");
