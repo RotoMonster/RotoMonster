@@ -225,6 +225,7 @@ namespace RotoMonster.Data
         PlayerInjury AddPlayerInjury(PlayerInjury playerInjury);
         int AddPlayerInjuries(List<PlayerInjury> playerInjuries);
         List<PlayerInjury> UpdatePlayerInjuries(List<PlayerInjury> playerInjuries);
+        List<PlayerInjury> UpdatePlayerInjuries(List<PlayerInjury> playerInjuries, string source);
         List<PlayerInjury> GetPlayerInjuries();
 
         PlayerStatusType GetPlayerStatusTypeByName(string name);

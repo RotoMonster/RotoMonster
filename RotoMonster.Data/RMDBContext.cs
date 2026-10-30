@@ -165,6 +165,7 @@ namespace RotoMonster.Data
 
             modelBuilder.Entity<UserLeagueWaiverPlayer>().HasKey(s => new { s.UserLeagueId, s.PlayerId });
             modelBuilder.Entity<UserLeagueWaiverPlayer>().ToTable("UserLeagueWaiverPlayers");
+            modelBuilder.Entity<PlayerInjury>().Property(i => i.Source).HasMaxLength(50);
 
             modelBuilder.Entity<AdminTask>().ToTable("AdminTasks");
             modelBuilder.Entity<AdminTask>().Property(t => t.Text).HasMaxLength(1000).IsRequired();

@@ -18,6 +18,7 @@ namespace RotoMonster.Core
         public DateTime? StartDate { get; set; }
         public DateTime? UpdateDate { get; set; }
         public DateTime? EstimatedReturnDate { get; set; }
+        public string Source { get; set; }
 
         public TimeSpan TimeSince
         {

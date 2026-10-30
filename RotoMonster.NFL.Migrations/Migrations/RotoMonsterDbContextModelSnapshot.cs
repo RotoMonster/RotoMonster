@@ -2038,6 +2038,10 @@ namespace RotoMonster.NFL.Migrations.Migrations
                     b.Property<string>("ProviderInjuryId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Source")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 

@@ -4369,13 +4369,20 @@ namespace RotoMonster.Data
 
         public List<PlayerInjury> UpdatePlayerInjuries(List<PlayerInjury> playerInjuries)
         {
+            return UpdatePlayerInjuries(playerInjuries, null);
+        }
+
+        public List<PlayerInjury> UpdatePlayerInjuries(List<PlayerInjury> playerInjuries, string source)
+        {
             var newInjuries = new List<PlayerInjury>();
 
             try
             {
                 var now = DateTime.UtcNow;
 
-                var oldInjuries = GetPlayerInjuries();
+                var oldInjuries = (from i in GetPlayerInjuries() where i.Source == source select i).ToList();
+                foreach (var inj in playerInjuries)
+                    inj.Source = source;
 
                 var newPlayerStatuses = new List<PlayerStatus>();
 
