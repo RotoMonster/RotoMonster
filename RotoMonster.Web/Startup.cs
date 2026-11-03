@@ -99,6 +99,7 @@ namespace RotoMonster
             services.AddScoped<IAdminTaskAction, PostInjuryAction>();
             services.AddScoped<IAdminTaskAction, PostLineupAction>();
             services.AddMemoryCache();
+            services.AddSingleton<RotoMonster.Services.TwitterFeedService>();
             services.AddRazorPages();
             services.AddControllers();
             services.AddHttpContextAccessor();

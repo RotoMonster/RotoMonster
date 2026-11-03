@@ -1,0 +1,26 @@
+@model RotoMonster.Pages.TwitterViewState
+
+<div id="tv-columns" class="rm-tv-columns rm-tv-cols-@Model.Columns.Count" data-newest="@Model.NewestAdded">
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="rm-tv-note rm-tv-note-ok">@Model.Message</div>
+    }
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="rm-tv-note rm-tv-note-err">@Model.Error</div>
+    }
+    @foreach (var col in Model.Columns)
+    {
+        <section class="rm-tv-col" data-col="@col.Key">
+            <h2 class="rm-tv-col-title">@col.Title <span class="rm-tv-count">(@col.Cards.Count)</span></h2>
+            @if (col.Cards.Count == 0)
+            {
+                <div class="rm-tv-empty">No tweets.</div>
+            }
+            @foreach (var card in col.Cards)
+            {
+                @Html.Raw(new TweetCard(card).Render())
+            }
+        </section>
+    }
+</div>

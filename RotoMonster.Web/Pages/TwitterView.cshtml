@@ -1,0 +1,102 @@
+@page
+@model RotoMonster.Pages.TwitterViewModel
+@{
+    ViewData["Title"] = "Twitter";
+}
+
+<form method="post" id="tv-form" class="container-fluid px-4 rm-twitter-view">
+    <input type="hidden" name="clearedAt" id="tv-clearedAt" value="@Model.State.ClearedAt" />
+    <input type="hidden" name="paused" id="tv-paused" value="@(Model.State.Paused ? "true" : "false")" />
+    <input type="hidden" name="showAll" id="tv-showAll" value="@(Model.State.ShowAll ? "true" : "false")" />
+
+    <div class="rm-tv-toolbar">
+        <span class="rm-tv-status" id="tv-status"></span>
+        <button type="button" class="btn btn-sm rm-at-b" id="tv-reset">Reset</button>
+        <div class="rm-tv-group">
+            <button type="button" class="btn btn-sm rm-at-b" id="tv-clear">Clear</button>
+            <button type="button" class="btn btn-sm rm-at-b@(Model.State.Paused ? " rm-tv-on" : "")" id="tv-pause">@(Model.State.Paused ? "Resume" : "Pause")</button>
+        </div>
+        <button type="button" class="btn btn-sm rm-at-b@(Model.State.ShowAll ? " rm-tv-on" : "")" id="tv-all" aria-pressed="@(Model.State.ShowAll ? "true" : "false")">All Tweets</button>
+    </div>
+
+    <div id="tv-box" data-columns-url="@Url.Page("/TwitterView", "Columns")" data-refresh="@Model.RefreshSeconds">
+        <partial name="_TwitterViewColumns" model="Model.State" />
+    </div>
+</form>
+
+@section Scripts {
+<script>
+(function () {
+    var box = document.getElementById('tv-box');
+    var clearedAt = document.getElementById('tv-clearedAt');
+    var paused = document.getElementById('tv-paused');
+    var showAll = document.getElementById('tv-showAll');
+    var pauseBtn = document.getElementById('tv-pause');
+    var allBtn = document.getElementById('tv-all');
+    var status = document.getElementById('tv-status');
+    var seconds = Math.max(15, parseInt(box.dataset.refresh, 10) || 60);
+    var busy = false;
+
+    function stamp() {
+        var d = new Date();
+        status.textContent = (paused.value === 'true' ? 'Paused' : 'Updated ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }));
+    }
+
+    function editing() {
+        if (box.querySelector('.tweet-card--posting')) return true;
+        var a = document.activeElement;
+        return a && box.contains(a) && /INPUT|TEXTAREA|SELECT/.test(a.tagName);
+    }
+
+    async function refresh(force) {
+        if (busy) return;
+        if (!force && (paused.value === 'true' || editing())) return;
+        busy = true;
+        try {
+            var url = box.dataset.columnsUrl + '&clearedAt=' + encodeURIComponent(clearedAt.value) + '&showAll=' + showAll.value;
+            var r = await fetch(url, { credentials: 'same-origin' });
+            if (r.ok) {
+                box.innerHTML = await r.text();
+                stamp();
+            }
+        } catch (e) {
+        } finally {
+            busy = false;
+        }
+    }
+
+    document.getElementById('tv-clear').addEventListener('click', function () {
+        var cols = document.getElementById('tv-columns');
+        clearedAt.value = cols ? cols.dataset.newest || '' : '';
+        refresh(true);
+    });
+
+    document.getElementById('tv-reset').addEventListener('click', function () {
+        clearedAt.value = '';
+        refresh(true);
+    });
+
+    pauseBtn.addEventListener('click', function () {
+        var p = paused.value !== 'true';
+        paused.value = p ? 'true' : 'false';
+        pauseBtn.textContent = p ? 'Resume' : 'Pause';
+        pauseBtn.classList.toggle('rm-tv-on', p);
+        if (!p) refresh(true); else stamp();
+    });
+
+    allBtn.addEventListener('click', function () {
+        var on = showAll.value !== 'true';
+        showAll.value = on ? 'true' : 'false';
+        allBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        allBtn.classList.toggle('rm-tv-on', on);
+        refresh(true);
+    });
+
+    var target = document.getElementById('tweet-card-selected');
+    if (target) target.scrollIntoView({ block: 'center' });
+
+    stamp();
+    setInterval(function () { refresh(false); }, seconds * 1000);
+})();
+</script>
+}
