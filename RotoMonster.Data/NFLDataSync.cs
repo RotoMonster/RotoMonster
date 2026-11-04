@@ -493,6 +493,14 @@ VALUES ({seasonId}, {year}, {title}, {title}, {startDate.Date}, {endDate.Date}, 
                 if (sp.TeamId != teamId.Value) sp.TeamId = teamId.Value;
             }
 
+            foreach (var def in await GetDefensePlayerIdsAsync())
+            {
+                if (byPlayer.ContainsKey(def.Value)) continue;
+                var dsp = new SeasonPlayer { SeasonId = seasonId, PlayerId = def.Value, TeamId = def.Key, PlayerTypeId = DefensePlayerTypeId };
+                _db.Set<SeasonPlayer>().Add(dsp);
+                byPlayer[def.Value] = dsp;
+            }
+
             await _db.SaveChangesAsync();
         }
 
@@ -721,6 +729,11 @@ VALUES ({seasonId}, {year}, {title}, {title}, {startDate.Date}, {endDate.Date}, 
             d.Points21to27 = Flag(allowed >= 21 && allowed <= 27);
             d.Points28to34 = Flag(allowed >= 28 && allowed <= 34);
             d.Points35 = Flag(allowed >= 35);
+            d.Points2to10 = Flag(allowed >= 2 && allowed <= 10);
+            d.Points11to20 = Flag(allowed >= 11 && allowed <= 20);
+            d.Points14to17 = Flag(allowed >= 14 && allowed <= 17);
+            d.Points35to45 = Flag(allowed >= 35 && allowed <= 45);
+            d.Points46 = Flag(allowed >= 46);
         }
 
         private class PoolPlayer
