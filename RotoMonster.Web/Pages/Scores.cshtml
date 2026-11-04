@@ -27,6 +27,12 @@
         return "var(--team-" + sportKey + "-" + (team.Code ?? "").Trim().ToLower() + ", var(--brand-primary))";
     }
 
+    string TeamName(RotoMonster.Core.Team team)
+    {
+        if (team == null) return "";
+        return string.IsNullOrWhiteSpace(team.Name) ? team.Code : team.Name;
+    }
+
     string ResultCss(RotoMonster.Core.Game game, RotoMonster.Core.Team team)
     {
         if (!game.IsFinished) return "";
@@ -86,42 +92,62 @@
                         }
                         @foreach (var game in Model.ScheduleGames)
                         {
-                            bool started = game.IsFinished || game.HasStarted;
+                            bool postponed = game.IsPostponed == true;
+                            bool finished = game.IsFinished;
+                            bool live = !finished && !postponed && game.HasStarted;
+                            bool showScores = finished || live;
                             bool canView = game.PercentComplete > 0 || game.IsFinished;
                             bool isSelected = selectedGame != null && selectedGame.Id == game.Id;
-                            string rowCss = "rm-sc-game" + (isSelected ? " rm-sc-game--on" : "") + (canView ? "" : " rm-sc-game--off");
+                            bool anyProj = !showScores && (game.ProjectedPoints(Model.Sport, game.AwayTeam) > 0 || game.ProjectedPoints(Model.Sport, game.HomeTeam) > 0);
+                            string stateCss = postponed ? "rm-sbc-game--ppd" : finished ? "rm-sbc-game--final" : live ? "rm-sbc-game--live" : "rm-sbc-game--pre";
+                            string rowCss = "rm-sc-game rm-sbc-game " + stateCss + (isSelected ? " rm-sc-game--on" : "") + (canView ? "" : " rm-sc-game--off");
+                            int[] mine = Model.MyGameCounts.TryGetValue(game.Id, out var mc) ? mc : null;
 
-                            var rowTeams = game.GetTeams();
-                            if (canView)
-                            {
-                                <button type="submit" name="viewgame" value="box score" asp-route-newgameid="@game.Id" class="@rowCss" title="Box score">
-                                    <span class="rm-sc-state @StateCss(game)">@StateText(game)</span>
-                                    @foreach (var t in rowTeams)
+                            <button type="submit" name="viewgame" value="box score" asp-route-newgameid="@game.Id" class="@rowCss" title="@(canView ? "Box score" : "")" disabled="@(!canView)">
+                                <span class="rm-sbc-teams">
+                                    @foreach (var t in game.GetTeams())
                                     {
-                                        <span class="rm-sc-team @ResultCss(game, t)">
-                                            <span class="rm-sc-code">@(t.Id == game.HomeTeam.Id ? "@" : "")@t.Code</span>
-                                            <span class="rm-sc-score" style="@game.GetTeamStyle(t)">@game.GetTeamScore(t)</span>
-                                        </span>
-                                    }
-                                </button>
-                            }
-                            else
-                            {
-                                <div class="@rowCss">
-                                    <span class="rm-sc-state @StateCss(game)">@StateText(game)</span>
-                                    @foreach (var t in rowTeams)
-                                    {
+                                        if (t == null) { continue; }
                                         double proj = game.ProjectedPoints(Model.Sport, t);
-                                        <span class="rm-sc-team">
-                                            <span class="rm-sc-code">@(t.Id == game.HomeTeam.Id ? "@" : "")@t.Code</span>
-                                            @if (proj > 0)
+                                        string result = finished ? ResultCss(game, t).Replace("rm-sc-", "rm-sbc-") : "";
+                                        <span class="rm-sbc-team @result" style="--tc: @TeamColor(t);">
+                                            <span class="rm-sbc-badge">@t.Code</span>
+                                            <span class="rm-sbc-name" title="@TeamName(t)">@TeamName(t)</span>
+                                            @if (showScores)
                                             {
-                                                <span class="rm-sc-proj" title="Projected">@proj.ToString("0.0")</span>
+                                                <span class="rm-sbc-score" style="@game.GetTeamStyle(t)">@game.GetTeamScore(t)</span>
+                                            }
+                                            else if (proj > 0)
+                                            {
+                                                <span class="rm-sbc-proj" title="Projected">@proj.ToString("0.0")</span>
                                             }
                                         </span>
                                     }
-                                </div>
-                            }
+                                </span>
+                                <span class="rm-sbc-side">
+                                    @if (postponed)
+                                    {
+                                        <span class="rm-sbc-state rm-sbc-state--ppd">Postponed</span>
+                                    }
+                                    else if (live)
+                                    {
+                                        <span class="rm-sbc-state rm-sbc-state--live">@StateText(game)</span>
+                                        <span class="rm-sbc-bar"><span style="width:@Math.Max(4, Math.Min(100, game.PercentComplete))%"></span></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="rm-sbc-state">@(finished ? "Final" : game.EasternTime.ToString("ddd h:mm tt"))</span>
+                                        @if (anyProj)
+                                        {
+                                            <span class="rm-sbc-sub">projected</span>
+                                        }
+                                    }
+                                    @if (mine != null && mine[1] > 0)
+                                    {
+                                        <span class="rm-sc-mine" title="@mine[1] of your players are in this game (@mine[0] active)">@mine[1] yours</span>
+                                    }
+                                </span>
+                            </button>
                         }
                     </div>
 

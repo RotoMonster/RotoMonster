@@ -1,0 +1,196 @@
+@page
+@model RotoMonster.Pages.InjuriesModel
+@{
+    RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
+    bool anyReturn = true;
+}
+
+<div class="container-fluid px-4 rm-injp">
+
+    <div class="rm-injp-sub">Every player with a current status &middot; <span id="injpCount">@Model.Rows.Count</span> players</div>
+
+    <div class="rm-injp-wrap">
+
+    <div class="modern-filter-container rm-injp-panel">
+        <div class="rm-filter-section modern-filter-row" data-title="Find">
+            <input type="search" id="injpSearch" class="rm-injp-search" placeholder="Search players" autocomplete="off" aria-label="Search players" />
+            <select id="injpTeam" class="form-control rm-modern-select" aria-label="Team">
+                <option value="">All teams</option>
+                @foreach (var team in Model.Rows.Select(r => r.DisplayPlayer.SeasonPlayer.Team).Where(tm => tm != null && !string.IsNullOrWhiteSpace(tm.Code)).GroupBy(tm => tm.Code.Trim()).Select(g => g.First()).OrderBy(tm => string.IsNullOrWhiteSpace(tm.Name) ? tm.Code : tm.Name))
+                {
+                    <option value="@team.Code.Trim().ToLowerInvariant()">@(string.IsNullOrWhiteSpace(team.Name) ? team.Code : team.Name)</option>
+                }
+            </select>
+        </div>
+        <div class="rm-filter-section modern-filter-row" data-title="Status">
+            <div class="rm-injp-chips" data-filter="group">
+                <button type="button" class="rm-injp-chip rm-injp-chip--on" data-value="">All</button>
+                <button type="button" class="rm-injp-chip" data-value="out" style="--cc:#e8590c">Out / IR</button>
+                <button type="button" class="rm-injp-chip" data-value="doubtful" style="--cc:#f59e0b">Doubtful</button>
+                <button type="button" class="rm-injp-chip" data-value="questionable" style="--cc:#0ea5e9">Questionable</button>
+            </div>
+        </div>
+        <div class="rm-filter-section modern-filter-row" data-title="Positions">
+            <div class="rm-injp-chips" data-filter="pos">
+                <button type="button" class="rm-injp-chip rm-injp-chip--on" data-value="">All pos</button>
+                @foreach (var pos in Model.Rows.SelectMany(r => r.DisplayPlayer.Positions).Where(p => p != null && !string.IsNullOrWhiteSpace(p.Abbreviation)).GroupBy(p => p.Abbreviation.Trim()).Select(g => g.First()).OrderBy(p => p.Id))
+                {
+                    string posCode = pos.Abbreviation.Trim();
+                    <button type="button" class="rm-injp-chip" data-value="@posCode.ToLowerInvariant()" style="--cc: var(--pos-@(posCode.ToLowerInvariant()))">@posCode</button>
+                }
+            </div>
+        </div>
+        @if (Model.HasMine)
+        {
+            <div class="rm-filter-section modern-filter-row" data-title="Display">
+                <label class="rm-injp-toggle" for="injpMine">
+                    <input type="checkbox" id="injpMine" />
+                    <span class="rm-injp-sw"></span>
+                    <span>Only my players</span>
+                </label>
+            </div>
+        }
+    </div>
+
+    <div class="rm-sc-card rm-injp-card rm-injp-v2">
+        <table class="rm-injp-table" id="injpTable">
+            <thead>
+                <tr>
+                    <th class="rm-injp-sort rm-injp-fit" data-sort="name" aria-sort="none">Player</th>
+                    <th class="rm-injp-fit">Status</th>
+                    <th class="rm-injp-hide-sm rm-injp-grow">Injury</th>
+                    @if (anyReturn)
+                    {
+                        <th class="rm-injp-sort rm-injp-fit" data-sort="ret" aria-sort="none">Return</th>
+                    }
+                    <th class="rm-injp-sort rm-injp-fit" data-sort="age" aria-sort="none">Updated</th>
+                    <th class="rm-injp-sort rm-injp-fit tdr" data-sort="own" aria-sort="descending">Own%</th>
+                    <th class="rm-injp-sort rm-injp-fit tdr" data-sort="start" aria-sort="none">Start%</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Rows)
+                {
+                    <tr data-name="@row.Name.ToLowerInvariant()" data-team="@((row.TeamCode ?? "").ToLowerInvariant())" data-group="@row.Group" data-pos=" @row.PositionCodes "
+                        data-age="@row.MinutesAgo.ToString("0")" data-own="@(row.Own.HasValue ? row.Own.Value.ToString("0.0") : "-1")" data-start="@(row.Start.HasValue ? row.Start.Value.ToString("0.0") : "-1")" data-mine="@row.Mine" data-ret="@(row.PlayerStatus.EstimatedReturnDate.HasValue ? row.PlayerStatus.EstimatedReturnDate.Value.ToString("yyyyMMdd") : "99999999")" data-retdays="@(row.PlayerStatus.EstimatedReturnDate.HasValue ? (row.PlayerStatus.EstimatedReturnDate.Value.Date - DateTime.Today).Days.ToString() : "")">
+                        <td>
+                            <div class="rm-injp-player">
+                                <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=row.DisplayPlayer}" />
+                                @if (row.Mine > 0)
+                                {
+                                    var mineTip = ViewContext.HttpContext.NextTooltipId();
+                                    <span class="bm-tooltip-wrap"><span class="rm-inj-mine @(row.Mine == 2 ? "rm-inj-mine--on" : "") bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@mineTip">@(row.Mine == 2 ? "Starting" : "Bench")</span><div class="bm-tooltip-content" id="@mineTip" role="tooltip">@(row.Mine == 2 ? "He's on your roster and in your starting lineup" : "He's on your roster, on your bench")</div></span>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            @{
+                                var stType = row.PlayerStatus.PlayerStatusType;
+                                var stTip = ViewContext.HttpContext.NextTooltipId();
+                                string stTitle = string.IsNullOrWhiteSpace(stType.Title) ? (stType.TextFormat ?? "").Replace("{t}", "").Trim() : stType.Title.Trim();
+                                string stText = string.IsNullOrWhiteSpace(row.PlayerStatus.Comment) ? stTitle : row.PlayerStatus.Comment.Trim();
+                                if (row.PlayerStatus.EstimatedReturnDate != null)
+                                    stText += " - est. return " + row.PlayerStatus.EstimatedReturnDate.Value.ToString("M/d");
+                            }
+                            <span class="bm-tooltip-wrap"><span class="badge rm-injp-status bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@stTip" style="@colorLib.GetPlayerStatusTypeStyle(stType)">@stTitle</span><div class="bm-tooltip-content" id="@stTip" role="tooltip">@stText</div></span>
+                        </td>
+                        <td class="rm-injp-injury rm-injp-hide-sm">@row.Injury</td>
+                        @if (anyReturn)
+                        {
+                            var ret = row.PlayerStatus.EstimatedReturnDate;
+                            <td class="rm-injp-ret @(ret.HasValue ? "" : "rm-injp-ret--none")">@(ret.HasValue ? ret.Value.ToString("MMM d") : "\u2014")</td>
+                        }
+                        <td class="rm-injp-age @(row.MinutesAgo < 720 ? "rm-injp-age--new" : "")"><partial name="_Timespan" model="row.PlayerStatus.TimeSince" /> ago</td>
+                        <td class="tdr">
+                            @if (row.Own.HasValue)
+                            {
+                                var ownTip = ViewContext.HttpContext.NextTooltipId();
+                                <span class="bm-tooltip-wrap"><span class="rm-badge rm-inj-pct bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@ownTip" style="background-color:#@colorLib.OwnershipGetPercentColor(row.Own.Value)">@row.Own.Value.ToString("0")</span><div class="bm-tooltip-content" id="@ownTip" role="tooltip">Rostered in @row.Own.Value.ToString("0")% of leagues</div></span>
+                            }
+                        </td>
+                        <td class="tdr">
+                            @if (row.Start.HasValue)
+                            {
+                                var actTip = ViewContext.HttpContext.NextTooltipId();
+                                <span class="bm-tooltip-wrap"><span class="rm-badge rm-inj-pct bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@actTip" style="background-color:#@colorLib.ActiveGetPercentColor(row.Start.Value)">@row.Start.Value.ToString("0")</span><div class="bm-tooltip-content" id="@actTip" role="tooltip">Started in @row.Start.Value.ToString("0")% of leagues</div></span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="rm-injp-none" id="injpNone" hidden>No players match these filters.</div>
+    </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    var table = document.getElementById('injpTable');
+    if (!table) return;
+    var tbody = table.tBodies[0];
+    var rows = Array.prototype.slice.call(tbody.rows);
+    var search = document.getElementById('injpSearch');
+    var team = document.getElementById('injpTeam');
+    var mine = document.getElementById('injpMine');
+    var count = document.getElementById('injpCount');
+    var none = document.getElementById('injpNone');
+    var filters = { group: '', pos: '' };
+    var sortKey = 'own', sortDir = -1;
+
+    function apply() {
+        var q = (search.value || '').trim().toLowerCase();
+        var shown = 0;
+        rows.forEach(function (r) {
+            var ok = (!q || r.dataset.name.indexOf(q) >= 0 || r.dataset.team === q)
+                && (!team.value || r.dataset.team === team.value)
+                && (!filters.group || r.dataset.group === filters.group)
+                && (!filters.pos || r.dataset.pos.indexOf(' ' + filters.pos + ' ') >= 0)
+                && (!mine || !mine.checked || r.dataset.mine !== '0');
+            r.hidden = !ok;
+            if (ok) shown++;
+        });
+        count.textContent = shown;
+        none.hidden = shown > 0;
+    }
+
+    function sort() {
+        rows.sort(function (a, b) {
+            if (sortKey === 'name') return sortDir * a.dataset.name.localeCompare(b.dataset.name);
+            return sortDir * (parseFloat(a.dataset[sortKey]) - parseFloat(b.dataset[sortKey]));
+        });
+        rows.forEach(function (r) { tbody.appendChild(r); });
+        table.querySelectorAll('th[data-sort]').forEach(function (th) {
+            th.setAttribute('aria-sort', th.dataset.sort === sortKey ? (sortDir > 0 ? 'ascending' : 'descending') : 'none');
+        });
+    }
+
+    table.querySelectorAll('th[data-sort]').forEach(function (th) {
+        th.addEventListener('click', function () {
+            var key = th.dataset.sort;
+            if (key === sortKey) sortDir = -sortDir;
+            else { sortKey = key; sortDir = (key === 'name' || key === 'age' || key === 'ret') ? 1 : -1; }
+            sort();
+        });
+    });
+
+    document.querySelectorAll('.rm-injp-chips').forEach(function (group) {
+        group.addEventListener('click', function (e) {
+            var btn = e.target.closest('.rm-injp-chip');
+            if (!btn) return;
+            group.querySelectorAll('.rm-injp-chip').forEach(function (b) { b.classList.toggle('rm-injp-chip--on', b === btn); });
+            filters[group.dataset.filter] = btn.dataset.value;
+            apply();
+        });
+    });
+
+    search.addEventListener('input', apply);
+    team.addEventListener('change', apply);
+    if (mine) mine.addEventListener('change', apply);
+    apply();
+})();
+</script>
+}

@@ -201,7 +201,7 @@
 
         @if (Model.PlayerTableModel.ShowAnalysisDates)
         {
-            <div id="AnalysisDates" class="rm-filter-section modern-filter-row" data-title="Projections">
+            <div id="AnalysisDates" class="rm-filter-section modern-filter-row d-none" data-title="Projections">
                 <div class="col-">
                     <input type="date" asp-for="@Model.AnalysisStartDate" />
                     <input type="date" asp-for="@Model.AnalysisEndDate" />

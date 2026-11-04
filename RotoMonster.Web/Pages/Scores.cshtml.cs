@@ -25,6 +25,7 @@ namespace RotoMonster.Pages
         public List<Game> ScheduleGames { get; set; }
         public Sport Sport { get; set; }
         public BoxScoreModel BoxScoreModel { get; set; } = new BoxScoreModel();
+        public Dictionary<int, int[]> MyGameCounts { get; set; } = new Dictionary<int, int[]>();
 
         public ScoresModel(IConfiguration config, IRMData db, IRMSharedData sharedDb, UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor, ILogger<PageModel> logger)
             : base(config, db, sharedDb, userManager, contextAccessor, logger)
@@ -110,6 +111,33 @@ namespace RotoMonster.Pages
             var playerStatuses = await db.GetActivePlayerStatusesAsync();
 
             ScheduleGames = db.GetGames(season, SelectedDate, SelectedDate);
+
+            if (UserId != null && ScheduleGames.Count > 0)
+            {
+                var allSeasonPlayers = db.GetAllSeasonPlayers(season);
+                var myGames = new Dictionary<int, int>();
+                var myActive = new HashSet<int>();
+                foreach (var ul in await db.GetTrackedUserLeaguesAsync(UserId))
+                {
+                    foreach (var tp in ul.GetGameUserLeagueTeamPlayers(ScheduleGames, allSeasonPlayers))
+                    {
+                        if (tp.UserLeagueTeamPlayer == null || tp.UserLeagueTeamPlayer.Player == null)
+                            continue;
+                        int pid = tp.UserLeagueTeamPlayer.PlayerId;
+                        myGames[pid] = tp.Game.Id;
+                        if (tp.UserLeagueTeamPlayer.IsActive)
+                            myActive.Add(pid);
+                    }
+                }
+                foreach (var kv in myGames)
+                {
+                    if (!MyGameCounts.TryGetValue(kv.Value, out var counts))
+                        MyGameCounts[kv.Value] = counts = new int[2];
+                    counts[1]++;
+                    if (myActive.Contains(kv.Key))
+                        counts[0]++;
+                }
+            }
 
             ValueAverages outValueAverages;
             var valuePlayersHash = new Dictionary<int, List<ValuePlayer>>();

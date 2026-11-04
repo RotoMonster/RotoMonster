@@ -238,49 +238,65 @@
                 </div>
             }
 
+        </div>
+
+        <div class="col-auto p-2 rm-front-side rm-front-side--inj">
             @if (Model.InjuryDisplayPlayers != null && Model.InjuryDisplayPlayers.Count > 0)
             {
                 <div class="card mb-3 border-danger bg rm-inj">
                     <div class="card-header text-nowrap">
-                        <div class="rm-sb-header"><a class="rm-sb-title" href="#RecentInjuries" data-bs-toggle="collapse">@Model.Sport.Title Recent Injuries</a><span class="rm-sb-count">@Model.InjuryDisplayPlayers.Count players</span></div>
+                        <div class="rm-sb-header"><a class="rm-sb-title" href="#RecentInjuries" data-bs-toggle="collapse">@Model.Sport.Title Recent Injuries</a><span class="rm-sb-count">@Model.InjuryDisplayPlayers.Count recent &middot; <a class="rm-inj-all" asp-page="/Injuries">All injuries &rsaquo;</a></span></div>
                     </div>
                     <div id="RecentInjuries" class="collapse.show">
                         <div class="card-body p-2">
                             <table class="table table-sm small rm-front-list">
-                                @foreach (var dp in Model.InjuryDisplayPlayers)
+                                <tr class="rm-inj-head">
+                                    <td class="rm-inj-head-player">Player</td>
+                                    <td class="tdr" title="% of leagues where he's rostered">Own%</td>
+                                    <td class="tdr" title="% of leagues where he's started">Start%</td>
+                                </tr>
+                                @{
+                                    var injOwnedIds = new HashSet<int>(Model.OwnedGameUserLeagueTeamPlayers.Select(gp => gp.UserLeagueTeamPlayer.PlayerId));
+                                    var injSorted = Model.InjuryDisplayPlayers
+                                        .OrderByDescending(x => injOwnedIds.Contains(x.SeasonPlayer.PlayerId))
+                                        .ThenByDescending(x => x.OwnershipPlayer != null ? x.OwnershipPlayer.OwnershipPercent : 0)
+                                        .ToList();
+                                    int injIndex = 0;
+                                }
+                                @foreach (var dp in injSorted)
                                 {
-                                    <tr>
+                                    <tr class="@(injIndex++ >= 10 ? "rm-inj-more" : "")">
                                         <td class="ps-1 pe-1">
                                             <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=dp}" />
+                                        @{
+                                            bool injOwned = Model.OwnedGameUserLeagueTeamPlayers.Any(gp => gp.UserLeagueTeamPlayer.PlayerId == dp.SeasonPlayer.PlayerId);
+                                            bool injActive = Model.ActiveGameUserLeagueTeamPlayers.Any(gp => gp.UserLeagueTeamPlayer.PlayerId == dp.SeasonPlayer.PlayerId);
+                                        }
+                                        @if (injOwned)
+                                        {
+                                            var mineTip = ViewContext.HttpContext.NextTooltipId();
+                                            <span class="bm-tooltip-wrap rm-inj-mine-wrap"><span class="rm-inj-mine @(injActive ? "rm-inj-mine--on" : "") bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@mineTip">@(injActive ? "Starting" : "Bench")</span><div class="bm-tooltip-content" id="@mineTip" role="tooltip">@(injActive ? "He's on your roster and in your starting lineup" : "He's on your roster, on your bench")</div></span>
+                                        }
                                         </td>
 
                                         @if (dp.OwnershipPlayer != null)
                                         {
-                                            <td class="tdr text-nowrap rm-badge-cell"><span class="rm-badge" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">
-                                                @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)
-                                            </span></td>
-                                            <td class="tdr text-nowrap rm-badge-cell"><span class="rm-badge" style="background-color:#@colorLib.ActiveGetPercentColor(dp.OwnershipPlayer.ActivePercent)">
-                                                @String.Format("{0:##0}", dp.OwnershipPlayer.ActivePercent)
-                                            </span></td>
+                                            var ownTip = ViewContext.HttpContext.NextTooltipId();
+                                            var actTip = ViewContext.HttpContext.NextTooltipId();
+                                            <td class="tdr text-nowrap rm-badge-cell"><span class="bm-tooltip-wrap"><span class="rm-badge rm-inj-pct bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@ownTip" style="background-color:#@colorLib.OwnershipGetPercentColor(dp.OwnershipPlayer.OwnershipPercent)">@String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)</span><div class="bm-tooltip-content" id="@ownTip" role="tooltip">Rostered in @String.Format("{0:##0}", dp.OwnershipPlayer.OwnershipPercent)% of leagues</div></span></td>
+                                            <td class="tdr text-nowrap rm-badge-cell"><span class="bm-tooltip-wrap"><span class="rm-badge rm-inj-pct bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@actTip" style="background-color:#@colorLib.ActiveGetPercentColor(dp.OwnershipPlayer.ActivePercent)">@String.Format("{0:##0}", dp.OwnershipPlayer.ActivePercent)</span><div class="bm-tooltip-content" id="@actTip" role="tooltip">Started in @String.Format("{0:##0}", dp.OwnershipPlayer.ActivePercent)% of leagues</div></span></td>
                                         }
                                         else
                                         {
                                             <td colspan="2" />
                                         }
-                                        <td class="tdc">
-                                            @{
-                                                var gamePlayers = (from gp in Model.OwnedGameUserLeagueTeamPlayers where gp.UserLeagueTeamPlayer.PlayerId == dp.SeasonPlayer.PlayerId select gp).ToList();
-                                            }
-                                            <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Models.Shared.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=gamePlayers,UseOwnColor=true}" />
-
-                                            @{
-                                                var activePlayers = (from gp in Model.ActiveGameUserLeagueTeamPlayers where gp.UserLeagueTeamPlayer.PlayerId == dp.SeasonPlayer.PlayerId select gp).ToList();
-                                            }
-                                            <partial name="_GameUserLeagueTeamPlayers" model="new RotoMonster.Models.Shared.GameUserLeagueTeamPlayersModel() {GameUserLeagueTeamPlayers=activePlayers,UseOwnColor=false}" />
-                                        </td>
                                     </tr>
                                 }
                             </table>
+                            @if (Model.InjuryDisplayPlayers.Count > 10)
+                            {
+                                <button type="button" class="rm-inj-toggle" data-all="Show all @Model.InjuryDisplayPlayers.Count" onclick="var c=this.closest('.rm-inj');var on=c.classList.toggle('rm-inj--all');this.textContent=on?'Show top 10':this.dataset.all;">Show all @Model.InjuryDisplayPlayers.Count</button>
+                            }
                         </div>
                     </div>
                 </div>

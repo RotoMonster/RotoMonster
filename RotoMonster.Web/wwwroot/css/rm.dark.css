@@ -694,3 +694,48 @@ td.tdleft {
 .rm-sport-nhl { --pos-lw: #5ec4c4; --pos-c: #e3c065; --pos-rw: #b39cf0; --pos-d: #ff8a7a; --pos-g: #f0a0c8; }
 
 .rm-admin-tasks { --at-everyone-bg: #3a3115; --at-admin-bg: #123843; --at-duty-bg: #123a2d; --at-everyone: #e0b02a; --at-admin: #38c6d9; }
+
+:root {
+    --team-nfl-ari: #E0607A;
+    --team-nfl-atl: #E8646F;
+    --team-nfl-bal: #9B86E0;
+    --team-nfl-buf: #5E8EEA;
+    --team-nfl-car: #4FB3E8;
+    --team-nfl-chi: #F0874A;
+    --team-nfl-cin: #FB8A55;
+    --team-nfl-cle: #C08E62;
+    --team-nfl-dal: #7FA2E8;
+    --team-nfl-den: #F7A04E;
+    --team-nfl-det: #4FA8E0;
+    --team-nfl-gb: #6FBF73;
+    --team-nfl-hou: #D9636F;
+    --team-nfl-ind: #5D93E0;
+    --team-nfl-jax: #3FB6C0;
+    --team-nfl-jac: #3FB6C0;
+    --team-nfl-kc: #F05A6E;
+    --team-nfl-lac: #5FC2F0;
+    --team-nfl-lar: #FFCE4A;
+    --team-nfl-la: #FFCE4A;
+    --team-nfl-lv: #B8BEC2;
+    --team-nfl-oak: #B8BEC2;
+    --team-nfl-mia: #3FC4CC;
+    --team-nfl-min: #A585E0;
+    --team-nfl-ne: #E05A72;
+    --team-nfl-no: #D3BC8D;
+    --team-nfl-nyg: #7090F0;
+    --team-nfl-nyj: #4FB585;
+    --team-nfl-phi: #4FB0A8;
+    --team-nfl-pit: #FFC233;
+    --team-nfl-sea: #8BD15A;
+    --team-nfl-sf: #E8706A;
+    --team-nfl-tb: #F06464;
+    --team-nfl-ten: #5FA8F0;
+    --team-nfl-was: #D66B6B;
+    --team-nfl-wsh: #D66B6B;
+}
+
+.rm-inj-mine--on { background: rgba(74, 222, 128, 0.16); color: #4ade80; }
+
+.rm-injp-age--new { color: #4ade80; }
+
+.rm-injp-v2 .display-player-name { color: #7cb0ee; }
