@@ -60,6 +60,10 @@ namespace RotoMonster.Data
             var mappedPlayers = new HashSet<int>(own.Values);
             var sportRadar = useSharedIds ? await MapAsync(SportRadarProvider) : new Dictionary<string, int>();
             var yahoo = useSharedIds ? await MapAsync(YahooProvider) : new Dictionary<string, int>();
+            var nameIndex = useSharedIds ? await BuildNameIndexAsync() : null;
+            _feedLastCounts = players
+                .GroupBy(x => LastKey(x.Name) + "|" + (x.Team ?? "").Trim().ToUpperInvariant())
+                .ToDictionary(g => g.Key, g => g.Count());
 
             var resolved = new Dictionary<string, int>();
 
@@ -76,6 +80,9 @@ namespace RotoMonster.Data
 
                 var found = (!string.IsNullOrEmpty(p.SportRadarId) && sportRadar.TryGetValue(p.SportRadarId, out playerId))
                             || (!string.IsNullOrEmpty(p.StatsIncId) && yahoo.TryGetValue(p.StatsIncId, out playerId));
+
+                if (!found && nameIndex != null)
+                    found = TryNameMatch(p, nameIndex, mappedPlayers, out playerId);
 
                 if (!found)
                 {
@@ -99,6 +106,105 @@ namespace RotoMonster.Data
 
             if (result.Created > 0) await _db.SaveChangesAsync();
             return resolved;
+        }
+
+        private static readonly HashSet<string> NameSuffixes = new HashSet<string> { "jr", "sr", "ii", "iii", "iv", "v" };
+
+        private Dictionary<string, List<int>> _lastIndex;
+        private Dictionary<string, int> _feedLastCounts;
+
+        private static string LastKey(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return "";
+            var s = name.ToLowerInvariant().Replace(".", " ").Replace("'", "").Replace("-", " ").Replace(",", " ");
+            var parts = s.Split(' ', StringSplitOptions.RemoveEmptyEntries).Where(x => !NameSuffixes.Contains(x)).ToList();
+            return parts.Count == 0 ? "" : parts[parts.Count - 1];
+        }
+
+        private static string NameKey(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return "";
+            var s = name.ToLowerInvariant().Replace(".", " ").Replace("'", "").Replace("-", " ").Replace(",", " ");
+            return string.Concat(s.Split(' ', StringSplitOptions.RemoveEmptyEntries).Where(x => !NameSuffixes.Contains(x)));
+        }
+
+        private async Task<Dictionary<string, List<(int Id, string Team)>>> BuildNameIndexAsync()
+        {
+            var players = await _db.Set<Player>().AsNoTracking()
+                .Where(x => x.LastName != "DEF")
+                .Select(x => new { x.Id, x.FirstName, x.LastName })
+                .ToListAsync();
+
+            var teamCodes = (await _db.Set<Team>().AsNoTracking().Select(t => new { t.Id, t.Code }).ToListAsync())
+                .GroupBy(t => t.Id)
+                .ToDictionary(g => g.Key, g => (g.First().Code ?? "").Trim().ToUpperInvariant());
+
+            var latestTeam = (await _db.Set<SeasonPlayer>().AsNoTracking().Select(sp => new { sp.PlayerId, sp.SeasonId, sp.TeamId }).ToListAsync())
+                .GroupBy(sp => sp.PlayerId)
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.SeasonId).First().TeamId);
+
+            var index = new Dictionary<string, List<(int Id, string Team)>>();
+            _lastIndex = new Dictionary<string, List<int>>();
+            foreach (var x in players)
+            {
+                var key = NameKey((x.FirstName ?? "") + " " + (x.LastName ?? ""));
+                if (key.Length == 0) continue;
+
+                string team = "";
+                if (latestTeam.TryGetValue(x.Id, out var teamId) && teamCodes.TryGetValue(teamId, out var code))
+                    team = code;
+
+                if (!index.TryGetValue(key, out var list))
+                    index[key] = list = new List<(int Id, string Team)>();
+                list.Add((x.Id, team));
+
+                var lastKey = LastKey(x.LastName);
+                if (team.Length > 0 && lastKey.Length > 0)
+                {
+                    if (!_lastIndex.TryGetValue(lastKey + "|" + team, out var ids))
+                        _lastIndex[lastKey + "|" + team] = ids = new List<int>();
+                    ids.Add(x.Id);
+                }
+            }
+            return index;
+        }
+
+        private bool TryNameMatch(ProviderPlayerPosition p, Dictionary<string, List<(int Id, string Team)>> index, HashSet<int> alreadyMapped, out int playerId)
+        {
+            playerId = 0;
+            if (p.Positions.Any(x => string.Equals(x, "DEF", StringComparison.OrdinalIgnoreCase))) return false;
+
+            var key = NameKey(p.Name);
+            if (key.Length == 0) return false;
+            if (!index.TryGetValue(key, out var list)) return TryLastNameMatch(p, alreadyMapped, out playerId);
+
+            var candidates = list.Where(c => !alreadyMapped.Contains(c.Id)).ToList();
+            if (candidates.Count == 0) return false;
+
+            var team = (p.Team ?? "").Trim().ToUpperInvariant();
+            var onTeam = team.Length == 0 ? new List<(int Id, string Team)>() : candidates.Where(c => c.Team == team).ToList();
+
+            if (onTeam.Count == 1) { playerId = onTeam[0].Id; return true; }
+            if (onTeam.Count == 0 && candidates.Count == 1) { playerId = candidates[0].Id; return true; }
+            return false;
+        }
+
+        private bool TryLastNameMatch(ProviderPlayerPosition p, HashSet<int> alreadyMapped, out int playerId)
+        {
+            playerId = 0;
+            var team = (p.Team ?? "").Trim().ToUpperInvariant();
+            var lastKey = LastKey(p.Name);
+            if (team.Length == 0 || lastKey.Length == 0 || _lastIndex == null) return false;
+
+            var key = lastKey + "|" + team;
+            if (_feedLastCounts == null || !_feedLastCounts.TryGetValue(key, out var feedCount) || feedCount != 1) return false;
+            if (!_lastIndex.TryGetValue(key, out var ids)) return false;
+
+            var free = ids.Where(i => !alreadyMapped.Contains(i)).ToList();
+            if (free.Count != 1) return false;
+
+            playerId = free[0];
+            return true;
         }
 
         private async Task<Dictionary<string, int>> MapAsync(int providerId)

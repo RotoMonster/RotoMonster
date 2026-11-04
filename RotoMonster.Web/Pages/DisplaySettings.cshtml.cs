@@ -105,7 +105,7 @@ namespace RotoMonster.Pages
 
             AddMessage("Your settings have been saved.");
 
-            return Page();
+            return RedirectToPage();
         }
 
     }

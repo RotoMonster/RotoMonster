@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -75,13 +76,29 @@ namespace RotoMonster
             {
                 options.CheckConsentNeeded = context => false;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
-                options.ConsentCookie.Name= "RotoMonster" + sport.ToUpper();
+                options.ConsentCookie.Name = "RotoMonsterConsent" + sport.ToUpper();
             });
 
             services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.Name = "RotoMonster" + sport.ToUpper();
+                options.ExpireTimeSpan = TimeSpan.FromDays(30);
+                options.SlidingExpiration = true;
             });
+
+            var keysPath = Configuration["DataProtection:KeysPath"];
+            if (string.IsNullOrWhiteSpace(keysPath))
+            {
+                var baseDir = OperatingSystem.IsWindows()
+                    ? Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
+                    : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                keysPath = System.IO.Path.Combine(baseDir, "RotoMonster", "keys");
+            }
+            keysPath = System.IO.Path.Combine(keysPath, sport);
+            System.IO.Directory.CreateDirectory(keysPath);
+            services.AddDataProtection()
+                .SetApplicationName("RotoMonster" + sport)
+                .PersistKeysToFileSystem(new System.IO.DirectoryInfo(keysPath));
 
             services.Configure<CookieTempDataProviderOptions>(options => options.Cookie.Name = "RotoMonsterTempData" + sport.ToUpper());
 
