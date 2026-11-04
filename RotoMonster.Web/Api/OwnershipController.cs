@@ -25,7 +25,7 @@ namespace RotoMonster.Api
         public const int WaiversCategoriesStringId = 1;
 
         private static int _running;
-        private static RunSummary _lastRun;
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, RunSummary> _lastRuns = new System.Collections.Concurrent.ConcurrentDictionary<string, RunSummary>(StringComparer.OrdinalIgnoreCase);
 
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IConfiguration _config;
@@ -84,6 +84,7 @@ namespace RotoMonster.Api
             if (!IsAuthorized()) return Unauthorized();
 
             request = request ?? new FillOwnershipRequest();
+            var key = request.CategoriesCode ?? "";
 
             var alreadyRunning = Interlocked.Exchange(ref _running, 1) == 1;
             var started = false;
@@ -100,12 +101,12 @@ namespace RotoMonster.Api
                 {
                     try
                     {
-                        _lastRun = await RunAsync(code, wanted, pause, waiverChecks).ConfigureAwait(false);
+                        _lastRuns[key] = await RunAsync(code, wanted, pause, waiverChecks).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Ownership run failed");
-                        _lastRun = new RunSummary
+                        _lastRuns[key] = new RunSummary
                         {
                             StartedAt = DateTime.UtcNow,
                             FinishedAt = DateTime.UtcNow,
@@ -120,14 +121,14 @@ namespace RotoMonster.Api
                 });
             }
 
-            return Ok(Status(started));
+            return Ok(Status(started, key));
         }
 
         [HttpGet("status")]
-        public IActionResult GetStatus()
+        public IActionResult GetStatus(string code = "")
         {
             if (!IsAuthorized()) return Unauthorized();
-            return Ok(Status(false));
+            return Ok(Status(false, code ?? ""));
         }
 
         private bool IsAuthorized()
@@ -137,9 +138,10 @@ namespace RotoMonster.Api
             return !string.IsNullOrEmpty(apiKey) && Request.Headers["X-API-Key"] == apiKey;
         }
 
-        private object Status(bool startedNow)
+        private object Status(bool startedNow, string code)
         {
-            var last = _lastRun;
+            RunSummary last;
+            _lastRuns.TryGetValue(code ?? "", out last);
 
             return new
             {
