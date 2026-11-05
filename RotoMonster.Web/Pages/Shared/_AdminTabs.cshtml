@@ -1,0 +1,9 @@
+@{
+    var adminPath = (Context.Request.Path.Value ?? "").TrimEnd('/').ToLowerInvariant();
+    string TabCss(bool on) => on ? "rm-admin-tab rm-admin-tab--on" : "rm-admin-tab";
+}
+<nav class="rm-admin-tabs" aria-label="Admin">
+    <a class="@TabCss(adminPath == "/admintasks")" asp-area="" asp-page="/AdminTasks">Tasks</a>
+    <a class="@TabCss(adminPath == "/twitterview")" asp-area="" asp-page="/TwitterView">Twitter</a>
+    <a class="@TabCss(adminPath == "/admin")" asp-area="" asp-page="/Admin">Site</a>
+</nav>

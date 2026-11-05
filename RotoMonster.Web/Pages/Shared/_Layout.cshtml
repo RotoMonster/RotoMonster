@@ -101,7 +101,17 @@
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     @foreach (Helper helper in (List<Helper>)ViewData["Helpers"])
                                     {
-                                        <a href="@Html.Raw(helper.GetPlayerTypeUrl(helper.Url,null))" class="dropdown-item text-dark">@Html.Raw(helper.GetDisplayText(helper.Title,null))</a>
+                                        string helperUrl = helper.GetPlayerTypeUrl(helper.Url, null) ?? "";
+                                        string helperSport = "/" + (ViewData["sport"] ?? "").ToString().Trim().ToLower();
+                                        if (!Context.Request.PathBase.HasValue && Context.Request.Host.Host == "localhost" && helperUrl.StartsWith(helperSport + "/", StringComparison.OrdinalIgnoreCase))
+                                            helperUrl = Url.Content("~" + helperUrl.Substring(helperSport.Length));
+                                        <a href="@Html.Raw(helperUrl)" class="dropdown-item text-dark rm-helper-item">
+                                            <span class="rm-helper-item-title">@Html.Raw(helper.GetDisplayText(helper.Title,null))</span>
+                                            @if (!string.IsNullOrWhiteSpace(helper.Description))
+                                            {
+                                                <span class="rm-helper-item-desc">@Html.Raw(helper.GetDisplayText(helper.Description,null))</span>
+                                            }
+                                        </a>
                                     }
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item text-dark" asp-area="" asp-page="/Help">Help Page</a>
@@ -139,13 +149,10 @@
                             </a>
                         </li>
 
-                        @if (User.IsInRole("Admin") || User.IsInRole("Worker"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item ms-3">
-                                <a class="nav-link" asp-area="" asp-page="/AdminTasks">Tasks</a>
-                            </li>
-                            <li class="nav-item ms-3">
-                                <a class="nav-link" asp-area="" asp-page="/TwitterView">Twitter</a>
+                                <a class="nav-link" asp-area="" asp-page="/AdminTasks">Admin</a>
                             </li>
                         }
 
@@ -314,13 +321,19 @@
     @if (ViewData["Helper"] != null)
     {
         Helper helper = (Helper)ViewData["Helper"];
-        <div class="alert alert-info container">
-            <h3>Helper: @Html.Raw(helper.Title)</h3>
-            <div>Description: @Html.Raw(helper.Description)</div>
-            @if (helper.OnPageDetails != null && helper.OnPageDetails.Length > 0)
+        <div class="container rm-helper" id="rmHelper">
+            <button type="button" class="rm-helper-close" aria-label="Dismiss" onclick="document.getElementById('rmHelper').remove()">&times;</button>
+            <div class="rm-helper-label">Helper</div>
+            <div class="rm-helper-title">@Html.Raw(helper.Title)</div>
+            @if (!string.IsNullOrWhiteSpace(helper.OnPageDetails))
             {
-                <div class="mt-1">Page Info: @Html.Raw(helper.OnPageDetails)</div>
+                <div class="rm-helper-details">@Html.Raw(helper.OnPageDetails)</div>
             }
+            else if (!string.IsNullOrWhiteSpace(helper.Description))
+            {
+                <div class="rm-helper-details">@Html.Raw(helper.Description)</div>
+            }
+            <a class="rm-helper-more" href="@Url.Page("/Help", new { from = helper.Id })#shortcuts">More shortcuts and help &rsaquo;</a>
         </div>
     }
 

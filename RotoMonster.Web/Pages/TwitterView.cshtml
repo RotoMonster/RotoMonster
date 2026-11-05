@@ -5,6 +5,7 @@
 }
 
 <form method="post" id="tv-form" class="container-fluid px-4 rm-twitter-view">
+    <partial name="_AdminTabs" />
     <input type="hidden" name="clearedAt" id="tv-clearedAt" value="@Model.State.ClearedAt" />
     <input type="hidden" name="paused" id="tv-paused" value="@(Model.State.Paused ? "true" : "false")" />
     <input type="hidden" name="showAll" id="tv-showAll" value="@(Model.State.ShowAll ? "true" : "false")" />

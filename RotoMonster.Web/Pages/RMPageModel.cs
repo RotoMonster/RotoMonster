@@ -124,6 +124,42 @@ namespace RotoMonster.Pages
                     ? System.Math.Round(System.Math.Min(100d, seasonElapsed / seasonDays * 100d), 0)
                     : 100d;
             }
+
+            AutoRefreshRosters();
+        }
+
+        private void AutoRefreshRosters()
+        {
+            if (UserId == null)
+                return;
+
+            int hours = config.GetValue<int?>("AutoRefreshRostersHours") ?? 4;
+            if (hours <= 0)
+                return;
+
+            try
+            {
+                var season = db.GetDefaultSeason();
+                if (season == null || season.IsFinished)
+                    return;
+
+                var userLeague = db.SelectUserLeague(UserId, null);
+                if (userLeague == null || !userLeague.TrackLeague || userLeague.SeasonId != season.Id || string.IsNullOrEmpty(userLeague.ProviderLeagueId))
+                    return;
+
+                if (!userLeague.TimeToRefresh(hours * 60))
+                    return;
+
+                db.UpdateUserLeagueUpdatedDate(userLeague.Id, DateTime.UtcNow, false);
+
+                RefreshRosters(userLeague, false);
+                if (LastRefreshSucceeded)
+                    AddMessage(userLeague.DisplayTitle + " rosters were refreshed automatically (last update was over " + hours + " hours ago).");
+            }
+            catch (Exception ex)
+            {
+                logger?.LogWarning(ex, "Automatic roster refresh failed");
+            }
         }
 
         public IRMData NewDb

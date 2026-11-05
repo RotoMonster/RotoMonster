@@ -1,18 +1,18 @@
 @page
-@using RotoMonster.Models.Shared
 @model RotoMonster.Pages.HelpModel
 @{
+    ViewData["Title"] = "Help";
 }
 
-<div class="container">
-
-@*    <h2>Monster Bar</h2>
-    <p>There are two types of Monster Bars, one showing a per-game value and one showing a total value.  By default, the per-game one is shown in most places.</p>
-
-*@
-    <h2>Helpers</h2>
-    @foreach (var helper in Model.Helpers)
-    {
-        <partial name="_Helper" model="@new HelperModel(){Helper=helper,PlayerType=null}" />
-    }
+<div class="container-fluid px-4 rm-help">
+    @Html.Raw(Model.HelpHtml)
 </div>
+
+@section Scripts {
+<script>
+document.querySelectorAll('.rm-help [data-toggle="collapse"]').forEach(function (btn) {
+    btn.setAttribute('data-bs-toggle', 'collapse');
+    btn.setAttribute('data-bs-target', btn.getAttribute('data-target'));
+});
+</script>
+}

@@ -37,7 +37,7 @@ namespace RotoMonster.Pages
         public List<TwitterColumn> Columns { get; set; } = new List<TwitterColumn>();
     }
 
-    [Authorize(Roles = "Admin,Worker")]
+    [Authorize(Roles = "Admin")]
     public class TwitterViewModel : PageModel
     {
         private class RmPlayer

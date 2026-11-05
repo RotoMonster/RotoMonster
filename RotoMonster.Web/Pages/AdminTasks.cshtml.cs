@@ -13,7 +13,7 @@ using RotoMonster.Data;
 
 namespace RotoMonster.Pages
 {
-    [Authorize(Roles = "Admin,Worker")]
+    [Authorize(Roles = "Admin")]
     public class AdminTasksModel : PageModel
     {
         private readonly AdminTaskService _tasks;

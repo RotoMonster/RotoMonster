@@ -5,6 +5,7 @@
 }
 
 <div class="container-fluid px-4 rm-admin-tasks">
+    <partial name="_AdminTabs" />
     @Html.AntiForgeryToken()
     <div id="admin-tasks" data-list-url="@Url.Page("/AdminTasks", "List")" data-post-url="@Url.Page("/AdminTasks")">
         <partial name="_AdminTasksList" model="Model" />
