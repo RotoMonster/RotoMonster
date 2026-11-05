@@ -46,22 +46,10 @@ namespace RotoMonster.Pages
             var season = db.GetDefaultSeason();
 
             var leagues = UserId != null ? await db.GetTrackedUserLeaguesAsync(UserId) : new List<UserLeague>();
-            var mine = new Dictionary<int, int>();
-            foreach (var ul in leagues)
-            {
-                var team = ul.MyUserLeagueTeam;
-                if (team == null || team.UserLeagueTeamPlayers == null)
-                    continue;
-                foreach (var tp in team.UserLeagueTeamPlayers)
-                {
-                    int v = tp.IsActive ? 2 : 1;
-                    if (!mine.TryGetValue(tp.PlayerId, out var cur) || v > cur)
-                        mine[tp.PlayerId] = v;
-                }
-            }
-            HasMine = mine.Count > 0;
+            var selectedLeague = UserId != null ? await db.SelectUserLeagueAsync(UserId, null) : null;
+            HasMine = selectedLeague != null;
 
-            var userLeague = leagues.FirstOrDefault();
+            var userLeague = selectedLeague ?? leagues.FirstOrDefault();
             var positions = userLeague != null
                 ? db.GetUserLeagueSeasonPlayerPositions(userLeague, season)
                 : db.GetPlayerSeasonPositions(db.GetDefaultFantasyProvider(), season);
@@ -90,7 +78,6 @@ namespace RotoMonster.Pages
                     : "other";
 
                 ownership.TryGetValue(ps.PlayerId, out var op);
-                mine.TryGetValue(ps.PlayerId, out var m);
 
                 Rows.Add(new InjuryRow
                 {
@@ -104,8 +91,15 @@ namespace RotoMonster.Pages
                     MinutesAgo = ps.TimeSince.TotalMinutes,
                     Own = op != null ? op.OwnershipPercent : (double?)null,
                     Start = op != null ? op.ActivePercent : (double?)null,
-                    Mine = m
+                    Mine = 0
                 });
+            }
+
+            if (selectedLeague != null && Rows.Count > 0)
+            {
+                await db.FillDisplayPlayerUserLeagueTeamsAsync(selectedLeague, Rows.Select(r => r.DisplayPlayer).ToList());
+                foreach (var r in Rows)
+                    r.Mine = r.DisplayPlayer.IsMyPlayer ? (r.DisplayPlayer.IsActive ? 2 : 1) : 0;
             }
 
             Rows = Rows.OrderByDescending(r => r.Own ?? -1).ThenBy(r => r.MinutesAgo).ToList();

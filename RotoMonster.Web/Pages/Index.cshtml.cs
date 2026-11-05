@@ -177,6 +177,10 @@ namespace RotoMonster.Pages
                             InjuryDisplayPlayers.Add(displayPlayer);
                     }
                 }
+
+                var injLeague = selectedUserLeague ?? userLeague;
+                if (UserId != null && injLeague != null && InjuryDisplayPlayers.Count > 0)
+                    await db.FillDisplayPlayerUserLeagueTeamsAsync(injLeague, InjuryDisplayPlayers);
             }
 
             var gameScoringAlerts = await db.GetGameScoringAlertsAsync(season, liveStartDate, liveEndDate);

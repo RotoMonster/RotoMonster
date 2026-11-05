@@ -17,14 +17,11 @@
             }
         </span>
         <span class="rm-lu-name">
+            <span class="rm-lu-ownbadge own-cell text-white">@if (r.OwnDisplay != null) { <partial name="_DisplayPlayerOwn" model="r.OwnDisplay" /> }</span>
             <a asp-page="/Players" asp-route-playerId="@r.Player.Id" asp-route-l="@Model.LeagueId">@r.Player.ForwardName</a>
             @if (!string.IsNullOrEmpty(r.Hand))
             {
                 <span class="rm-lu-hand">@r.Hand</span>
-            }
-            @if (r.IsOwned)
-            {
-                <span class="rm-lu-own@(r.IsActive ? "" : " rm-lu-own--bench")" title="@(r.IsActive ? "On your team, active" : "On your team, benched")">Own</span>
             }
             <partial name="_PlayerStatus" model="r.Status" />
         </span>

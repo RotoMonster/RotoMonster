@@ -56,6 +56,7 @@
         <table class="rm-injp-table" id="injpTable">
             <thead>
                 <tr>
+                    <th class="rm-injp-fit rm-injp-own-col" aria-label="Owned"></th>
                     <th class="rm-injp-sort rm-injp-fit" data-sort="name" aria-sort="none">Player</th>
                     <th class="rm-injp-fit">Status</th>
                     <th class="rm-injp-hide-sm rm-injp-grow">Injury</th>
@@ -73,14 +74,10 @@
                 {
                     <tr data-name="@row.Name.ToLowerInvariant()" data-team="@((row.TeamCode ?? "").ToLowerInvariant())" data-group="@row.Group" data-pos=" @row.PositionCodes "
                         data-age="@row.MinutesAgo.ToString("0")" data-own="@(row.Own.HasValue ? row.Own.Value.ToString("0.0") : "-1")" data-start="@(row.Start.HasValue ? row.Start.Value.ToString("0.0") : "-1")" data-mine="@row.Mine" data-ret="@(row.PlayerStatus.EstimatedReturnDate.HasValue ? row.PlayerStatus.EstimatedReturnDate.Value.ToString("yyyyMMdd") : "99999999")" data-retdays="@(row.PlayerStatus.EstimatedReturnDate.HasValue ? (row.PlayerStatus.EstimatedReturnDate.Value.Date - DateTime.Today).Days.ToString() : "")">
+                        <td class="own-cell text-white rm-injp-own-col"><partial name="_DisplayPlayerOwn" model="row.DisplayPlayer" /></td>
                         <td>
                             <div class="rm-injp-player">
                                 <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=row.DisplayPlayer}" />
-                                @if (row.Mine > 0)
-                                {
-                                    var mineTip = ViewContext.HttpContext.NextTooltipId();
-                                    <span class="bm-tooltip-wrap"><span class="rm-inj-mine @(row.Mine == 2 ? "rm-inj-mine--on" : "") bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@mineTip">@(row.Mine == 2 ? "Starting" : "Bench")</span><div class="bm-tooltip-content" id="@mineTip" role="tooltip">@(row.Mine == 2 ? "He's on your roster and in your starting lineup" : "He's on your roster, on your bench")</div></span>
-                                }
                             </div>
                         </td>
                         <td>

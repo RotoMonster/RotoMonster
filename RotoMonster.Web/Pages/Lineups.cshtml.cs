@@ -27,6 +27,7 @@ namespace RotoMonster.Pages
         public bool IsFeatured { get; set; }
         public string Group { get; set; } = "";
         public OwnershipPlayer Ownership { get; set; }
+        public DisplayPlayer OwnDisplay { get; set; }
     }
 
     public class LineupRowView
@@ -133,6 +134,21 @@ namespace RotoMonster.Pages
                     owned[tp.PlayerId] = (owned.TryGetValue(tp.PlayerId, out var a) && a) || tp.IsActive;
             }
 
+            var leagueOwn = new Dictionary<int, UserLeagueTeamPlayer>();
+            UserLeague badgeLeague = null;
+            if (UserId != null && SelectedUserLeagueId > 0)
+            {
+                badgeLeague = await db.GetUserLeagueAsync(UserId, SelectedUserLeagueId);
+                if (badgeLeague != null)
+                {
+                    foreach (var ltp in await db.GetUserLeagueTeamPlayersAsync(badgeLeague))
+                    {
+                        if (!leagueOwn.ContainsKey(ltp.PlayerId))
+                            leagueOwn[ltp.PlayerId] = ltp;
+                    }
+                }
+            }
+
             var statusByPlayer = statuses.GroupBy(s => s.PlayerId).ToDictionary(gr => gr.Key, gr => gr.OrderByDescending(s => s.DateAdded).First());
 
             var ownershipByPlayer = new Dictionary<int, OwnershipPlayer>();
@@ -212,7 +228,16 @@ namespace RotoMonster.Pages
                             IsOwned = owned.ContainsKey(playerId),
                             IsActive = owned.TryGetValue(playerId, out var act) && act,
                             IsFeatured = featured,
-                            Ownership = ownershipByPlayer.TryGetValue(playerId, out var own) ? own : null
+                            Ownership = ownershipByPlayer.TryGetValue(playerId, out var own) ? own : null,
+                            OwnDisplay = leagueOwn.TryGetValue(playerId, out var otp) && otp.UserLeagueTeam != null
+                                ? new DisplayPlayer
+                                {
+                                    UserLeagueTeam = otp.UserLeagueTeam,
+                                    IsMyPlayer = otp.UserLeagueTeam.ProviderId == badgeLeague.MyProviderTeamId,
+                                    IsActive = otp.IsActive,
+                                    IsIR = otp.IsIR
+                                }
+                                : null
                         };
                         if (Sport.IsMLB && player != null)
                             r.Hand = (r.Position != null && IsCode(r.Position, "SP")) ? (player.Throws ?? "") : (player.Bats ?? "");

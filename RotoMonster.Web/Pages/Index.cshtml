@@ -258,7 +258,7 @@
                                 @{
                                     var injOwnedIds = new HashSet<int>(Model.OwnedGameUserLeagueTeamPlayers.Select(gp => gp.UserLeagueTeamPlayer.PlayerId));
                                     var injSorted = Model.InjuryDisplayPlayers
-                                        .OrderByDescending(x => injOwnedIds.Contains(x.SeasonPlayer.PlayerId))
+                                        .OrderByDescending(x => x.IsMyPlayer)
                                         .ThenByDescending(x => x.OwnershipPlayer != null ? x.OwnershipPlayer.OwnershipPercent : 0)
                                         .ToList();
                                     int injIndex = 0;
@@ -268,15 +268,7 @@
                                     <tr class="@(injIndex++ >= 10 ? "rm-inj-more" : "")">
                                         <td class="ps-1 pe-1">
                                             <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=dp}" />
-                                        @{
-                                            bool injOwned = Model.OwnedGameUserLeagueTeamPlayers.Any(gp => gp.UserLeagueTeamPlayer.PlayerId == dp.SeasonPlayer.PlayerId);
-                                            bool injActive = Model.ActiveGameUserLeagueTeamPlayers.Any(gp => gp.UserLeagueTeamPlayer.PlayerId == dp.SeasonPlayer.PlayerId);
-                                        }
-                                        @if (injOwned)
-                                        {
-                                            var mineTip = ViewContext.HttpContext.NextTooltipId();
-                                            <span class="bm-tooltip-wrap rm-inj-mine-wrap"><span class="rm-inj-mine @(injActive ? "rm-inj-mine--on" : "") bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@mineTip">@(injActive ? "Starting" : "Bench")</span><div class="bm-tooltip-content" id="@mineTip" role="tooltip">@(injActive ? "He's on your roster and in your starting lineup" : "He's on your roster, on your bench")</div></span>
-                                        }
+                                        <span class="rm-inj-own own-cell text-white"><partial name="_DisplayPlayerOwn" model="dp" /></span>
                                         </td>
 
                                         @if (dp.OwnershipPlayer != null)
