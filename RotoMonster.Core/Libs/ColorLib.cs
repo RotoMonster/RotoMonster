@@ -282,12 +282,7 @@ namespace RotoMonster.Core.Libs
                 return title + " until " + displayPlayer.WaiverDate.Value.ToString("MMM d");
             }
 
-            if (state != OwnBadgeState.OtherStarting
-                && state != OwnBadgeState.OtherBench
-                && state != OwnBadgeState.OtherIR)
-                return title;
-
-            if (displayPlayer.UserLeagueTeam == null)
+            if (displayPlayer == null || displayPlayer.UserLeagueTeam == null)
                 return title;
 
             string teamTitle = displayPlayer.UserLeagueTeam.Title;
@@ -320,7 +315,7 @@ namespace RotoMonster.Core.Libs
             {
                 case OwnBadgeState.Starting:
                 case OwnBadgeState.OtherStarting:
-                    return "Active";
+                    return "Starting";
                 case OwnBadgeState.Bench:
                 case OwnBadgeState.OtherBench:
                     return "Bench";

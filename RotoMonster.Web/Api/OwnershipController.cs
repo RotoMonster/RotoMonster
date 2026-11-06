@@ -188,8 +188,7 @@ namespace RotoMonster.Api
                 {
                     var db = scope.ServiceProvider.GetRequiredService<IRMData>();
                     season = db.GetDefaultSeason();
-                    var waiversString = db.GetCategoriesString(WaiversCategoriesStringId);
-                    code = waiversString != null && !string.IsNullOrEmpty(waiversString.Code) ? waiversString.Code : WaiversCode;
+                    code = "nowaiver";
                     summary.CategoriesCode = code;
                     unknownIds = db.GetUserLeagueIdsNeedingWaiverTime(season);
                 }

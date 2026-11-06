@@ -35,6 +35,8 @@ namespace RotoMonster.Pages
         public string Message { get; set; }
         public string Error { get; set; }
         public List<TwitterColumn> Columns { get; set; } = new List<TwitterColumn>();
+        public List<NewsCardInput> Statuses { get; set; } = new List<NewsCardInput>();
+        public int? EditStatusId { get; set; }
     }
 
     [Authorize(Roles = "Admin")]
@@ -70,7 +72,7 @@ namespace RotoMonster.Pages
 
         public async Task OnGetAsync(CancellationToken ct)
         {
-            ViewData["PageHeading"] = "Twitter";
+            ViewData["PageHeading"] = "Admin";
             await BuildAsync(null, null, ct);
         }
 
@@ -84,12 +86,38 @@ namespace RotoMonster.Pages
 
         public async Task<IActionResult> OnPostAsync(CancellationToken ct)
         {
-            ViewData["PageHeading"] = "Twitter";
+            ViewData["PageHeading"] = "Admin";
             State.ClearedAt = Request.Form["clearedAt"];
             State.Paused = Request.Form["paused"] == "true";
             State.ShowAll = Request.Form["showAll"] == "true";
 
             var form = Request.Form.Keys.ToDictionary(k => k, k => Request.Form[k].FirstOrDefault(v => !string.IsNullOrEmpty(v)) ?? "");
+
+            var news = new NewsCardService().Process(form);
+            if (news.DeleteNewsId.HasValue || news.SavePressed || news.CancelPressed || news.ToggleEditNewsId.HasValue || news.SetTagPressed)
+            {
+                if (news.DeleteNewsId.HasValue)
+                {
+                    State.Error = await DeleteStatusAsync(news.DeleteNewsId.Value, ct);
+                    if (State.Error == null) State.Message = "Deleted the status.";
+                }
+                else if (news.SavePressed && news.SaveNewsId.HasValue)
+                {
+                    State.Error = await SaveStatusAsync(news.SaveNewsId.Value, news, ct);
+                    if (State.Error == null) State.Message = "Saved the status.";
+                    else State.EditStatusId = news.SaveNewsId;
+                }
+                else if (news.SetTagPressed)
+                {
+                    State.EditStatusId = news.SetTagNewsId;
+                }
+                else if (news.ToggleEditNewsId.HasValue && !news.CancelPressed)
+                {
+                    State.EditStatusId = news.ToggleEditNewsId;
+                }
+                await BuildAsync(null, null, ct);
+                return Page();
+            }
             var result = new TweetCardService().Process(form);
             if (!result.TweetId.HasValue)
             {
@@ -171,6 +199,101 @@ namespace RotoMonster.Pages
             return null;
         }
 
+        private const int StatusLimit = 40;
+
+        private async Task BuildStatusesAsync(CancellationToken ct)
+        {
+            var options = StatusOptions();
+            var dark = Request.Cookies["monster-theme"] == "dark";
+            var sport = string.Equals(_config["Sport"], "MLB", StringComparison.OrdinalIgnoreCase) ? NewsCardSport.MLB : NewsCardSport.NBA;
+            var byId = Players().Values.GroupBy(p => p.Id).ToDictionary(g => g.Key, g => g.First());
+
+            var rows = await _db.PlayerStatuses.AsNoTracking()
+                .Include(s => s.PlayerStatusType)
+                .Include(s => s.PlayerStatusTagType)
+                .Include(s => s.Player)
+                .Where(s => s.IsActive && s.DateDeleted == null)
+                .OrderByDescending(s => s.DateAdded)
+                .Take(StatusLimit)
+                .ToListAsync(ct);
+
+            var now = DateTime.UtcNow;
+            foreach (var s in rows)
+            {
+                RmPlayer rm;
+                byId.TryGetValue(s.PlayerId, out rm);
+                var name = rm != null ? rm.Name : (s.Player != null ? ((s.Player.FirstName ?? "") + " " + (s.Player.LastName ?? "")).Trim() : "");
+                var typeTitle = s.PlayerStatusType != null ? s.PlayerStatusType.Title : "";
+                var tagTitle = s.PlayerStatusTagType != null ? s.PlayerStatusTagType.Title : null;
+
+                State.Statuses.Add(new NewsCardInput
+                {
+                    NewsId = s.Id,
+                    DisplayPlayerInput = new DisplayPlayerInput { PlayerId = s.PlayerId, PlayerName = name, TeamCode = rm != null ? rm.TeamCode : "" },
+                    Sport = sport,
+                    IsDarkMode = dark,
+                    StatusTypeText = typeTitle,
+                    StatusTypeTag = tagTitle,
+                    CurrentStatusTypeText = typeTitle,
+                    CurrentStatusTypeTag = tagTitle,
+                    CurrentStatusNewsTitle = s.Subject,
+                    NewsTitle = s.Subject,
+                    NewsDetails = s.Comment,
+                    SourceURL = s.SourceUrl,
+                    TimeSinceCreated = now - s.DateAdded,
+                    UserCanEdit = true,
+                    UserCanDelete = true,
+                    IsEditing = State.EditStatusId == s.Id,
+                    StatusTypeOptions = options.Item1,
+                    StatusTypeTagOptions = options.Item2
+                });
+            }
+        }
+
+        private async Task<string> SaveStatusAsync(int id, NewsCardResult r, CancellationToken ct)
+        {
+            var s = await _db.PlayerStatuses.FirstOrDefaultAsync(x => x.Id == id, ct);
+            if (s == null) return "That status no longer exists.";
+
+            if (!string.IsNullOrWhiteSpace(r.StatusTypeText))
+            {
+                var type = _data.GetPlayerStatusTypeByName(r.StatusTypeText.Trim());
+                if (type == null) return "Unknown status: " + r.StatusTypeText;
+                s.PlayerStatusTypeId = type.Id;
+            }
+
+            int? tagId = null;
+            if (!string.IsNullOrWhiteSpace(r.StatusTypeTag))
+            {
+                var tagTitle = r.StatusTypeTag.Trim();
+                tagId = await _db.PlayerStatusTagTypes.AsNoTracking()
+                    .Where(t => t.Title == tagTitle)
+                    .Select(t => (int?)t.Id)
+                    .FirstOrDefaultAsync(ct);
+            }
+
+            s.PlayerStatusTagTypeId = tagId;
+            s.Subject = Trim(r.NewsTitle);
+            s.Comment = Trim(r.NewsDetails);
+            s.SourceUrl = Trim(r.SourceURL);
+            await _db.SaveChangesAsync(ct);
+            return null;
+        }
+
+        private async Task<string> DeleteStatusAsync(int id, CancellationToken ct)
+        {
+            var s = await _db.PlayerStatuses.FirstOrDefaultAsync(x => x.Id == id, ct);
+            if (s == null) return "That status no longer exists.";
+
+            var now = DateTime.UtcNow;
+            s.IsActive = false;
+            s.DateDeactivated = now;
+            s.DateDeleted = now;
+            s.DeletedByUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await _db.SaveChangesAsync(ct);
+            return null;
+        }
+
         private static string Trim(string s)
         {
             return string.IsNullOrWhiteSpace(s) ? null : s.Trim();
@@ -185,6 +308,8 @@ namespace RotoMonster.Pages
 
         private async Task BuildAsync(FeedTweet active, TweetCardResult result, CancellationToken ct)
         {
+            await BuildStatusesAsync(ct);
+
             if (!_feed.Enabled)
             {
                 State.Error = "Twitter isn't set up for this sport. Add TwitterApi:ApiKey (and TwitterApi:SportId for NFL/NHL) to appsettings.";
@@ -219,8 +344,7 @@ namespace RotoMonster.Pages
 
             State.Columns.Add(new TwitterColumn { Key = "news", Title = "News", Cards = visible.Where(t => t.IsNews).Select(card).ToList() });
             State.Columns.Add(new TwitterColumn { Key = "top", Title = "Top", Cards = visible.Where(t => t.IsTop).Select(card).ToList() });
-            if (State.ShowAll)
-                State.Columns.Add(new TwitterColumn { Key = "all", Title = "All", Cards = visible.Select(card).ToList() });
+            State.Columns.Add(new TwitterColumn { Key = "all", Title = "All", Cards = visible.Select(card).ToList() });
         }
 
         private Tuple<List<string>, List<string>> StatusOptions()

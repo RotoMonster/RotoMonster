@@ -38,7 +38,7 @@ namespace RotoMonster.Pages
         {
         }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int? l)
         {
             InitGet("Injuries");
             ViewData["sport"] = db.Sport.Title;
@@ -46,7 +46,10 @@ namespace RotoMonster.Pages
             var season = db.GetDefaultSeason();
 
             var leagues = UserId != null ? await db.GetTrackedUserLeaguesAsync(UserId) : new List<UserLeague>();
-            var selectedLeague = UserId != null ? await db.SelectUserLeagueAsync(UserId, null) : null;
+            var pickedLeague = UserId != null && l.HasValue ? await db.GetUserLeagueAsync(UserId, l.Value) : null;
+            var selectedLeague = UserId != null ? await db.SelectUserLeagueAsync(UserId, pickedLeague) : null;
+            if (selectedLeague != null)
+                SelectedUserLeagueId = selectedLeague.Id;
             HasMine = selectedLeague != null;
 
             var userLeague = selectedLeague ?? leagues.FirstOrDefault();

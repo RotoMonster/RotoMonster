@@ -3864,7 +3864,8 @@ namespace RotoMonster.Data
 
         private IQueryable<UserLeague> WaiverCandidateLeagues(Season season)
         {
-            var defaultLeague = (from ul in db.UserLeagues.AsNoTracking() where ul.IsDefault select ul).FirstOrDefault();
+            var defaultLeague = (from ul in db.UserLeagues.AsNoTracking() where ul.IsDefault && ul.SeasonId == season.Id select ul).FirstOrDefault()
+                ?? (from ul in db.UserLeagues.AsNoTracking() where ul.IsDefault orderby ul.SeasonId descending, ul.Id descending select ul).FirstOrDefault();
             if (defaultLeague == null)
                 return Enumerable.Empty<UserLeague>().AsQueryable();
 

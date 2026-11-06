@@ -46,7 +46,7 @@
             .WithTitle("Home")
             .WithPurpose("Your home page pulls together your leagues, today's games and the latest injuries, so you can check everything in one place.")
             .AddSection("Your leagues", "<p>Each league you import gets its own card with your team, your roster and how your players are doing.</p><p>The gear icon opens the league's settings and the refresh icon pulls your latest roster. Rosters also refresh on their own every few hours.</p>")
-            .AddSection("MonsterBot", "<p><strong>MonsterBot Rating</strong> shows how your roster stacks up by average ownership and active percent.</p><p><strong>MonsterBot Recommendations</strong> are moves worth making, and <strong>Top Free Agents</strong> are the best players available in that league. The banner at the top tells you when there are recommendations to check.</p>")
+            .AddSection("MonsterBot", "<p><strong>MonsterBot Rating</strong> shows how your roster stacks up by average own and start percent.</p><p><strong>MonsterBot Recommendations</strong> are moves worth making, and <strong>Top Free Agents</strong> are the best players available in that league. The banner at the top tells you when there are recommendations to check.</p>")
             .AddSection("Scores", "<p>The scores box shows the day's games with live scores. Click <strong>Box score</strong> on any game for the full stats.</p>")
             .AddSection("Recent injuries", "<p>The latest injury news, with your players first. <strong>All injuries</strong> opens the full list.</p>")
             .AddSection("Waiver trends and scoring log", "<p><strong>Waiver Trends</strong> shows the players being added the most right now. The <strong>Scoring Log</strong> shows big games from your players as they happen.</p>")
@@ -275,9 +275,9 @@
             {
                 <div class="card mb-3 border-danger bg rm-inj">
                     <div class="card-header text-nowrap">
-                        <div class="rm-sb-header"><a class="rm-sb-title" href="#RecentInjuries" data-bs-toggle="collapse">@Model.Sport.Title Recent Injuries</a><span class="rm-sb-count">@Model.InjuryDisplayPlayers.Count recent &middot; <a class="rm-inj-all" asp-page="/Injuries">All injuries &rsaquo;</a></span></div>
+                        <div class="rm-sb-header"><a class="rm-sb-title" asp-page="/Injuries">@Model.Sport.Title Recent Injuries</a><span class="rm-sb-count">@Model.InjuryDisplayPlayers.Count recent &middot; <a class="rm-inj-all" asp-page="/Injuries">All injuries &rsaquo;</a></span></div>
                     </div>
-                    <div id="RecentInjuries" class="collapse.show">
+                    <div id="RecentInjuries">
                         <div class="card-body p-2">
                             <table class="table table-sm small rm-front-list">
                                 <tr class="rm-inj-head">
@@ -497,9 +497,9 @@
                                         @{ var tipAct = ViewContext.HttpContext.NextTooltipId(); }
                                         <span class="bm-tooltip-wrap">
                                         <span class="me-1 bm-tooltip-trigger bm-tooltip-trigger--hover rm-badge rm-badge--inline" data-bm-tooltip="@tipAct" style="background-color:#@colorLib.ActiveGetPercentColor(analysisPlayerType.AverageActivePercent)">
-                                            @String.Format("{0:##0}% avg active", analysisPlayerType.AverageActivePercent)
+                                            @String.Format("{0:##0}% avg start", analysisPlayerType.AverageActivePercent)
                                         </span>
-                                        <div class="bm-tooltip-content" id="@tipAct" role="tooltip">Average active %</div>
+                                        <div class="bm-tooltip-content" id="@tipAct" role="tooltip">Average start %</div>
                                         </span>
                                         @analysisPlayerType.PlayerType.DisplayTitle
                                     </div>

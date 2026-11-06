@@ -1,7 +1,7 @@
 @page
 @model RotoMonster.Pages.TwitterViewModel
 @{
-    ViewData["Title"] = "Twitter";
+    ViewData["Title"] = "Admin";
 }
 
 <form method="post" id="tv-form" class="container-fluid px-4 rm-twitter-view">
@@ -17,11 +17,16 @@
             <button type="button" class="btn btn-sm rm-at-b" id="tv-clear">Clear</button>
             <button type="button" class="btn btn-sm rm-at-b@(Model.State.Paused ? " rm-tv-on" : "")" id="tv-pause">@(Model.State.Paused ? "Resume" : "Pause")</button>
         </div>
-        <button type="button" class="btn btn-sm rm-at-b@(Model.State.ShowAll ? " rm-tv-on" : "")" id="tv-all" aria-pressed="@(Model.State.ShowAll ? "true" : "false")">All Tweets</button>
     </div>
 
-    <div id="tv-box" data-columns-url="@Url.Page("/TwitterView", "Columns")" data-refresh="@Model.RefreshSeconds">
-        <partial name="_TwitterViewColumns" model="Model.State" />
+    <div class="rm-adm-grid">
+        <div id="tv-box" data-columns-url="@Url.Page("/TwitterView", "Columns")" data-refresh="@Model.RefreshSeconds">
+            <partial name="_TwitterViewColumns" model="Model.State" />
+        </div>
+        <section class="rm-tv-col rm-adm-tasks" id="admin-tasks" data-list-url="@Url.Page("/AdminTasks", "List")" data-post-url="@Url.Page("/AdminTasks")">
+            <h2 class="rm-tv-col-title">Tasks</h2>
+            <div id="admin-tasks-body" class="rm-tv-empty">Loading tasks...</div>
+        </section>
     </div>
 </form>
 
@@ -44,7 +49,7 @@
     }
 
     function editing() {
-        if (box.querySelector('.tweet-card--posting')) return true;
+        if (box.querySelector('.tweet-card--posting, .news-card-edit-form')) return true;
         var a = document.activeElement;
         return a && box.contains(a) && /INPUT|TEXTAREA|SELECT/.test(a.tagName);
     }
@@ -85,7 +90,7 @@
         if (!p) refresh(true); else stamp();
     });
 
-    allBtn.addEventListener('click', function () {
+    if (allBtn) allBtn.addEventListener('click', function () {
         var on = showAll.value !== 'true';
         showAll.value = on ? 'true' : 'false';
         allBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -95,6 +100,56 @@
 
     var target = document.getElementById('tweet-card-selected');
     if (target) target.scrollIntoView({ block: 'center' });
+
+    var tasks = document.getElementById('admin-tasks');
+    var tasksBody = document.getElementById('admin-tasks-body');
+    var tokenEl = document.querySelector('#tv-form input[name="__RequestVerificationToken"]');
+    var viewAll = false;
+    var taskBusy = false;
+
+    async function loadTasks() {
+        if (taskBusy) return;
+        try {
+            var r = await fetch(tasks.dataset.listUrl + '&viewAll=' + viewAll, { credentials: 'same-origin' });
+            if (r.ok) {
+                tasksBody.className = '';
+                tasksBody.innerHTML = await r.text();
+            }
+        } catch (e) { }
+    }
+
+    async function postTask(handler, data) {
+        taskBusy = true;
+        try {
+            var body = new URLSearchParams(Object.assign({ viewAll: viewAll }, data || {}));
+            var r = await fetch(tasks.dataset.postUrl + '?handler=' + handler, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'RequestVerificationToken': tokenEl ? tokenEl.value : '' },
+                body: body
+            });
+            if (r.ok) tasksBody.innerHTML = await r.text();
+        } catch (e) {
+        } finally {
+            taskBusy = false;
+        }
+    }
+
+    tasks.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-handler]');
+        if (!b) return;
+        e.preventDefault();
+        b.disabled = true;
+        postTask(b.dataset.handler, b.dataset.id ? { id: b.dataset.id } : null);
+    });
+
+    tasks.addEventListener('change', function (e) {
+        if (e.target.matches('[data-viewall]')) { viewAll = e.target.checked; loadTasks(); }
+        if (e.target.matches('[data-auto]')) { postTask('Auto', { auto: e.target.checked }); }
+    });
+
+    loadTasks();
+    setInterval(function () { if (!document.hidden) loadTasks(); }, 10000);
 
     stamp();
     setInterval(function () { refresh(false); }, seconds * 1000);

@@ -11,7 +11,7 @@
     .WithTitle("Lineups")
     .WithPurpose("Lineups show who is starting for every team on the selected day, so you can check your players are in before games start.")
     .AddSection("Confirmed vs projected", "<p>Each team card is marked <strong>Confirmed</strong> once the team has posted its lineup. Until then the card shows our <strong>Projected</strong> lineup, which can still change.</p><p>Check back closer to game time for anyone on the edge.</p>")
-    .AddSection("Ownership badges", "<p>The <strong>Own</strong> and <strong>Act</strong> badges show how many tracked leagues roster the player and how many start him. Hover a badge for the exact number and its 24 hour change.</p><p>When you are logged in, players on your team or another team in your selected league are marked the same way they are on Rankings.</p>")
+    .AddSection("Ownership badges", "<p>The <strong>Own</strong> and <strong>Start</strong> badges show how many tracked leagues roster the player and how many start him. Hover a badge for the exact number and its 24 hour change.</p><p>When you are logged in, players on your team or another team in your selected league are marked the same way they are on Rankings.</p>")
     .AddSection("Filtering", "<p><strong>Not started</strong> hides games already underway. <strong>My players</strong> shows only games with someone from your team.</p><p>The team dropdown jumps to one team, and <strong>Show benches</strong> opens every bench at once.</p>")
     .AddSection("Changing the date", "<p>Use the arrows to move a day at a time, or click the date to pick one from the calendar. <strong>Today</strong> brings you back to the current day.</p>")
     .WithTourId("lineups-tour")
@@ -73,7 +73,7 @@
     <div class="rm-lu-legend">
         <span><i class="rm-lu-sw rm-lu-sw--ok"></i>Confirmed</span>
         <span><i class="rm-lu-sw rm-lu-sw--proj"></i>Projected</span>
-        <span class="bm-tooltip-wrap"><span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="bm-tip-own-legend"><span class="rm-own-pair"><span class="rm-badge rm-badge--inline rm-own-pct" style="background-color:#a6ffff">Own</span><span class="rm-badge rm-badge--inline rm-own-pct" style="background-color:#ffe680">Act</span></span>% owned / active in leagues</span><div class="bm-tooltip-content" id="bm-tip-own-legend" role="tooltip">Own% is how many tracked leagues have the player on a roster. Act% is how many have him in an active lineup spot. Hover any badge for the exact number and its 24-hour change.</div></span>
+        <span class="bm-tooltip-wrap"><span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="bm-tip-own-legend"><span class="rm-own-pair"><span class="rm-badge rm-badge--inline rm-own-pct" style="background-color:#a6ffff">Own</span><span class="rm-badge rm-badge--inline rm-own-pct" style="background-color:#ffe680">Start</span></span>% owned / starting in leagues</span><div class="bm-tooltip-content" id="bm-tip-own-legend" role="tooltip">Own% is how many tracked leagues have the player on a roster. Start% is how many have him in a starting lineup spot. Hover any badge for the exact number and its 24-hour change.</div></span>
     </div>
 
     @if (Model.Games.Count == 0)

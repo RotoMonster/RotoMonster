@@ -23,4 +23,15 @@
             }
         </section>
     }
+    <section class="rm-tv-col" data-col="statuses">
+        <h2 class="rm-tv-col-title">Player Statuses <span class="rm-tv-count">(@Model.Statuses.Count)</span></h2>
+        @if (Model.Statuses.Count == 0)
+        {
+            <div class="rm-tv-empty">No active statuses.</div>
+        }
+        @foreach (var status in Model.Statuses)
+        {
+            @Html.Raw(new NewsCard(status).Render())
+        }
+    </section>
 </div>

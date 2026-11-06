@@ -5253,3 +5253,26 @@ button.rm-sc-game:hover { background: rgba(var(--brand-primary-rgb), 0.07); }
 #rankingsForm table.table.rm-pt > tbody > tr > td.rm-pt-lastcol {
     padding-right: 28px !important;
 }
+
+.rm-twitter-view .rm-adm-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(300px, 1fr));
+    gap: 14px;
+    align-items: start;
+    overflow-x: auto;
+}
+.rm-twitter-view .rm-adm-grid > #tv-box,
+.rm-twitter-view .rm-adm-grid #tv-columns {
+    display: contents;
+}
+.rm-twitter-view .rm-adm-grid .rm-tv-note {
+    grid-column: 1 / -1;
+}
+.rm-adm-tasks .rm-at-head h2,
+.rm-adm-tasks .rm-at-source {
+    display: none;
+}
+.rm-adm-tasks .rm-at-duty {
+    flex-direction: column;
+    align-items: flex-start;
+}

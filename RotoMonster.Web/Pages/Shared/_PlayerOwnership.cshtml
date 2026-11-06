@@ -7,7 +7,7 @@
     var tipKey = Model.PlayerId + "-" + Guid.NewGuid().ToString("N").Substring(0, 6);
     var ownTip = string.Format("Own%: rostered in {0:0}% of tracked leagues", Model.OwnershipPercent)
         + (Model.PercentOwnershipChange != 0 ? string.Format(" ({0:+0;-0} in the last 24 hours)", Model.PercentOwnershipChange) : "");
-    var actTip = string.Format("Act%: in an active lineup spot in {0:0}% of tracked leagues", Model.ActivePercent)
+    var actTip = string.Format("Start%: in a starting lineup spot in {0:0}% of tracked leagues", Model.ActivePercent)
         + (Model.PercentActiveChange != 0 ? string.Format(" ({0:+0;-0} in the last 24 hours)", Model.PercentActiveChange) : "");
     <span class="rm-own-pair">
         <span class="bm-tooltip-wrap">

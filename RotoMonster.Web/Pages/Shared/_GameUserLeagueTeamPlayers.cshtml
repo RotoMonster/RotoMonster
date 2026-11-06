@@ -3,7 +3,7 @@
 @if (Model.GameUserLeagueTeamPlayers.Count > 0)
 {
     string kindClass = Model.UseOwnColor ? "rm-gp-count--own" : "rm-gp-count--act";
-    string tooltip = Model.UseOwnColor ? "Owned: " : "Active: ";
+    string tooltip = Model.UseOwnColor ? "Owned: " : "Starting: ";
     tooltip += string.Join(", ", Model.GameUserLeagueTeamPlayers.Select(tp => tp.UserLeagueTeamPlayer.Player.ForwardName));
 
     var tipId = Context.NextTooltipId();
