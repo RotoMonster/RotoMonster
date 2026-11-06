@@ -7,6 +7,24 @@
 
 <div class="container-fluid px-4 rm-injp">
 
+@Html.Raw(new PageGuide("injuries-guide")
+    .WithTitle("Injuries")
+    .WithPurpose("Every player with a current injury or status in one list, so you can see who is out, who might play, and when they are expected back.")
+    .AddSection("Reading the table", "<p><strong>Status</strong> is the player's latest designation and <strong>Injury</strong> is the reason. <strong>Return</strong> is the estimated return date when one has been reported, and <strong>Updated</strong> is how long ago the status last changed.</p><p><strong>Own%</strong> and <strong>Start%</strong> show how widely the player is rostered and started across leagues.</p>")
+    .AddSection("Your players", "<p>When you are logged in, players on your team or another team in your selected league are marked in the first column, the same way they are on Rankings. <strong>Only my players</strong> narrows the list to your team.</p>")
+    .AddSection("Filtering and sorting", "<p>Search by name, pick a team, or use the <strong>Status</strong> and <strong>Positions</strong> buttons to narrow the list.</p><p>Click a column header to sort. <strong>Return</strong> sorts soonest first, which is handy for finding players about to come back.</p>")
+    .WithTourId("injuries-tour")
+    .Render())
+
+@Html.Raw(new Tour("injuries-tour")
+    .WithManualTrigger()
+    .AddStep("injpSearch", "Search for a player by name.", TooltipPosition.Bottom)
+    .AddStep("injpTeam", "Show injuries for a single team.", TooltipPosition.Bottom)
+    .AddStep("rm-tour-injp-status", "Narrow to players who are out, doubtful or questionable.", TooltipPosition.Bottom)
+    .AddStep("rm-tour-injp-pos", "Narrow to one position.", TooltipPosition.Bottom)
+    .AddStep("rm-tour-injp-head", "Click any column header to sort. Return sorts soonest first.", TooltipPosition.Bottom)
+    .Render())
+
     <div class="rm-injp-sub">Every player with a current status &middot; <span id="injpCount">@Model.Rows.Count</span> players</div>
 
     <div class="rm-injp-wrap">
@@ -23,7 +41,7 @@
             </select>
         </div>
         <div class="rm-filter-section modern-filter-row" data-title="Status">
-            <div class="rm-injp-chips" data-filter="group">
+            <div class="rm-injp-chips" id="rm-tour-injp-status" data-filter="group">
                 <button type="button" class="rm-injp-chip rm-injp-chip--on" data-value="">All</button>
                 <button type="button" class="rm-injp-chip" data-value="out" style="--cc:#e8590c">Out / IR</button>
                 <button type="button" class="rm-injp-chip" data-value="doubtful" style="--cc:#f59e0b">Doubtful</button>
@@ -31,7 +49,7 @@
             </div>
         </div>
         <div class="rm-filter-section modern-filter-row" data-title="Positions">
-            <div class="rm-injp-chips" data-filter="pos">
+            <div class="rm-injp-chips" id="rm-tour-injp-pos" data-filter="pos">
                 <button type="button" class="rm-injp-chip rm-injp-chip--on" data-value="">All pos</button>
                 @foreach (var pos in Model.Rows.SelectMany(r => r.DisplayPlayer.Positions).Where(p => p != null && !string.IsNullOrWhiteSpace(p.Abbreviation)).GroupBy(p => p.Abbreviation.Trim()).Select(g => g.First()).OrderBy(p => p.Id))
                 {
@@ -54,7 +72,7 @@
 
     <div class="rm-sc-card rm-injp-card rm-injp-v2">
         <table class="rm-injp-table" id="injpTable">
-            <thead>
+            <thead id="rm-tour-injp-head">
                 <tr>
                     <th class="rm-injp-fit rm-injp-own-col" aria-label="Owned"></th>
                     <th class="rm-injp-sort rm-injp-fit" data-sort="name" aria-sort="none">Player</th>

@@ -96,7 +96,7 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Helpers
+                                    Shortcuts
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     @foreach (Helper helper in (List<Helper>)ViewData["Helpers"])
@@ -317,25 +317,6 @@
     <div id="rmMessages">
         <partial name="_Messages" />
     </div>
-
-    @if (ViewData["Helper"] != null)
-    {
-        Helper helper = (Helper)ViewData["Helper"];
-        <div class="container rm-helper" id="rmHelper">
-            <button type="button" class="rm-helper-close" aria-label="Dismiss" onclick="document.getElementById('rmHelper').remove()">&times;</button>
-            <div class="rm-helper-label">Helper</div>
-            <div class="rm-helper-title">@Html.Raw(helper.Title)</div>
-            @if (!string.IsNullOrWhiteSpace(helper.OnPageDetails))
-            {
-                <div class="rm-helper-details">@Html.Raw(helper.OnPageDetails)</div>
-            }
-            else if (!string.IsNullOrWhiteSpace(helper.Description))
-            {
-                <div class="rm-helper-details">@Html.Raw(helper.Description)</div>
-            }
-            <a class="rm-helper-more" href="@Url.Page("/Help", new { from = helper.Id })#shortcuts">More shortcuts and help &rsaquo;</a>
-        </div>
-    }
 
     <div class="ms-2 @(ViewData["identity"] != null ? "rm-identity" : "")">
         <main role="main" class="pb-3">

@@ -44,13 +44,30 @@
 
 <div class="container-fluid px-4">
 
+    @Html.Raw(new PageGuide("scores-guide")
+        .WithTitle("Scores")
+        .WithPurpose("Scores shows every game on the selected day with live scores, and the box score for whichever game you pick.")
+        .AddSection("The game list", "<p>Games on the left update on their own while they are live. Click any game to open its box score on the right.</p><p>When you are logged in, the <strong>yours</strong> pill shows how many of your players are in that game.</p>")
+        .AddSection("Box score", "<p>The box score lists every player's stats for the game, so you can see exactly how your players did.</p>")
+        .AddSection("Changing the date", "<p>Use the arrows to move a day at a time, or click the date to pick one from the calendar. <strong>Today</strong> brings you back to the current day, and <strong>Refresh</strong> pulls the latest scores.</p>")
+        .WithTourId("scores-tour")
+        .Render())
+
+    @Html.Raw(new Tour("scores-tour")
+        .WithManualTrigger()
+        .AddStep("rm-tour-sc-list", "Every game for the day. Scores update on their own while games are live, and the yours pill shows how many of your players are in each game.", TooltipPosition.Right)
+        .AddStep("luDateBtn", "Click the date to pick a different day from the calendar.", TooltipPosition.Bottom)
+        .AddStep("rm-tour-sc-refresh", "Refresh pulls the latest scores right away.", TooltipPosition.Bottom)
+        .AddStep("rm-tour-sc-box", "Click any game in the list to see its box score here.", TooltipPosition.Left)
+        .Render())
+    
     <form method="post" id="scoresForm" class="rm-live-section" data-rm-live>
 
         <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
 
         <div class="rm-sc">
 
-            <aside class="rm-sc-side">
+            <aside class="rm-sc-side" id="rm-tour-sc-list">
                 <div class="rm-sc-card">
 
                     <div class="rm-sc-nav">
@@ -75,7 +92,7 @@
                         {
                             <a class="rm-lu-today" asp-page="./Scores" asp-route-date='@scToday.ToString("yyyy-MM-dd")' asp-route-l="@Model.SelectedUserLeagueId">Today</a>
                         }
-                        <button class="rm-sc-refresh" title="Refresh">Refresh</button>
+                        <button class="rm-sc-refresh" id="rm-tour-sc-refresh" title="Refresh">Refresh</button>
                         <div class="rm-lu-cal" id="luCal" data-today='@scToday.ToString("yyyy-MM-dd")' role="dialog" aria-label="Choose a date" hidden></div>
                     </div>
                     <script src="~/js/rm-lineups-cal.js" asp-append-version="true" defer></script>
@@ -155,7 +172,7 @@
                 </div>
             </aside>
 
-            <div class="rm-sc-main">
+            <div class="rm-sc-main" id="rm-tour-sc-box">
 
                 @if (selectedGame != null)
                 {

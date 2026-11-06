@@ -11,6 +11,14 @@
 
 <div class="container-fluid px-4 rm-players rm-pp">
 
+    @Html.Raw(new PageGuide("players-guide")
+        .WithTitle("Player Details")
+        .WithPurpose("Everything about one player in one place: team, status, ownership and stats.")
+        .AddSection("Finding a player", "<p>Type a name in the search box at the top. You can also click any player name elsewhere on the site to land here.</p>")
+        .AddSection("Status and ownership", "<p>If the player has an injury or status, it shows under his name with how long ago it was updated.</p><p>The <strong>% Own</strong> and <strong>% Active</strong> badges show how widely he is rostered and started across leagues. When you are logged in, <strong>Yours in</strong> and <strong>Available in</strong> show which of your leagues he is on your team or a free agent. Hover them to see the league names.</p>")
+        .AddSection("Stats", "<p><strong>Season stats</strong> shows his totals by season. <strong>Game log</strong> shows each game. <strong>Show all stats</strong> adds the extra columns.</p>")
+        .Render())
+
     <form method="get" class="rm-pp-search">
         <div class="input-group">
             <input type="search" id="tags" placeholder="Enter player name" class="form-control" asp-for="SearchTerm" />

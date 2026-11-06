@@ -3,6 +3,16 @@
 
 <div class="container-fluid px-4 rm-sgp">
 
+    @Html.Raw(new PageGuide("schedule-grid-guide")
+        .WithTitle("Schedule Grid")
+        .WithPurpose("The schedule grid shows how many games each team plays in every fantasy week, colored by how easy the opponents are, so you can plan pickups and streaming around the schedule.")
+        .AddSection("Reading the grid", "<p>Each column is a team and each row is a fantasy week. The number is how many games that team plays that week.</p><p>With <strong>Ease Coloring</strong> the cell color shows how easy the opponents are. The legend at the top shows which color is easier.</p>")
+        .AddSection("Quality Games", "<p>In sports that use them, the small number next to the game count is <strong>Quality Games</strong>: games on lighter nights, which are easier to fit into your lineup.</p>")
+        .AddSection("Picking a range", "<p>Use the arrows on a week to set it as the start or end of your range. The summary rows add up games across the range so you can compare teams over a stretch, like your playoff weeks.</p><p>Expand a week to see the games day by day.</p>")
+        .AddSection("Coloring and sorting", "<p><strong>Coloring</strong> switches the colors between most games, opponent ease and Quality Games. <strong>Sort By</strong> reorders the teams so the best schedules rise to the top.</p>")
+        .WithTourId("schedule-grid-tour")
+        .Render())
+
     <div class="rm-sgp-head">
         <span class="rm-sgp-sub">Games per fantasy week, colored by how easy the opponents are</span>
     </div>
@@ -25,5 +35,24 @@
         <input type="hidden" name="@(RotoMonster.Pages.ScheduleGridModel.GridId)-expanded" value="@Model.ExpandedCsv" />
         @Html.Raw(Model.GridHtml)
     </form>
+
+    @Html.Raw(new Tour("schedule-grid-tour")
+        .WithManualTrigger()
+        .AddStep("rm-tour-sg-controls", "Coloring changes what the cell colors are based on, and Sort By reorders the teams so the best schedules come first.", TooltipPosition.Bottom)
+        .AddStep("rm-tour-sg-summary", "These rows add up each team's games, max weeks and opponent ease across your selected range.", TooltipPosition.Bottom)
+        .AddStep("rm-tour-sg-arrows", "Use the arrows on any week to set it as the start or end of your range, like your playoff weeks.", TooltipPosition.Right)
+        .AddStep("rm-tour-sg-date", "Expand a week to see each team's games day by day.", TooltipPosition.Right)
+        .Render())
+
+    <script>
+        (function () {
+            var g = document.getElementById("rm-schedule-grid");
+            if (!g) return;
+            [["rm-tour-sg-controls", ".schedule-grid-controls"], ["rm-tour-sg-summary", ".schedule-grid-summary-row"], ["rm-tour-sg-arrows", ".schedule-grid-arrows-cell"], ["rm-tour-sg-date", ".schedule-grid-date-cell"]].forEach(function (x) {
+                var el = g.querySelector(x[1]);
+                if (el && !el.id) el.id = x[0];
+            });
+        })();
+    </script>
 
 </div>

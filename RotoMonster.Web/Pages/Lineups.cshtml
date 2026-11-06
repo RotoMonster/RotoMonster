@@ -7,6 +7,24 @@
 
 <div class="container-fluid px-4 rm-lu rm-lu--@Model.SportKey">
 
+@Html.Raw(new PageGuide("lineups-guide")
+    .WithTitle("Lineups")
+    .WithPurpose("Lineups show who is starting for every team on the selected day, so you can check your players are in before games start.")
+    .AddSection("Confirmed vs projected", "<p>Each team card is marked <strong>Confirmed</strong> once the team has posted its lineup. Until then the card shows our <strong>Projected</strong> lineup, which can still change.</p><p>Check back closer to game time for anyone on the edge.</p>")
+    .AddSection("Ownership badges", "<p>The <strong>Own</strong> and <strong>Act</strong> badges show how many tracked leagues roster the player and how many start him. Hover a badge for the exact number and its 24 hour change.</p><p>When you are logged in, players on your team or another team in your selected league are marked the same way they are on Rankings.</p>")
+    .AddSection("Filtering", "<p><strong>Not started</strong> hides games already underway. <strong>My players</strong> shows only games with someone from your team.</p><p>The team dropdown jumps to one team, and <strong>Show benches</strong> opens every bench at once.</p>")
+    .AddSection("Changing the date", "<p>Use the arrows to move a day at a time, or click the date to pick one from the calendar. <strong>Today</strong> brings you back to the current day.</p>")
+    .WithTourId("lineups-tour")
+    .Render())
+
+@Html.Raw(new Tour("lineups-tour")
+    .WithManualTrigger()
+    .AddStep("luDateBtn", "Click the date to pick a day from the calendar, or use the arrows on either side to move a day at a time.", TooltipPosition.Bottom)
+    .AddStep("rm-tour-lu-filter", "Show all games, only games that have not started, or only games with your players.", TooltipPosition.Bottom)
+    .AddStep("luFind", "Jump straight to one team's lineup.", TooltipPosition.Bottom)
+    .AddStep("rm-tour-lu-card", "Each card is one game with both teams' lineups. Confirmed lineups have been posted by the team, projected ones are our best guess and can still change.", TooltipPosition.Bottom)
+    .Render())
+
     <form method="post" class="rm-lu-toolbar">
         <input type="hidden" asp-for="@Model.SelectedUserLeagueId" />
         <h1 class="rm-lu-title">@Model.Sport.Title Lineups</h1>
@@ -31,7 +49,7 @@
             <a class="rm-lu-today" asp-page="./Lineups" asp-route-date='@luToday.ToString("yyyy-MM-dd")' asp-route-l="@Model.SelectedUserLeagueId">Today</a>
         }
         <span class="rm-lu-count">@(Model.IsWeek ? "Week of " + Model.RangeStart.ToString("MMM d") + " \u2013 " + Model.RangeEnd.ToString("MMM d") : Model.SelectedDate.ToString("dddd, MMM d")) &middot; @Model.Games.Count games</span>
-        <div class="rm-lu-seg" role="group" aria-label="Filter games">
+        <div class="rm-lu-seg" id="rm-tour-lu-filter" role="group" aria-label="Filter games">
             <button type="button" data-lu-filter="all" aria-pressed="true">All games</button>
             <button type="button" data-lu-filter="upcoming" aria-pressed="false">Not started</button>
             @if (Model.IsLoggedIn)
@@ -65,12 +83,12 @@
 
     <div class="rm-lu-empty" id="luNoMatch" hidden>No games match.</div>
 
-    <div class="rm-lu-grid">
+    <div class="rm-lu-grid" id="rm-tour-lu-games">
         @for (int gi = 0; gi < Model.Games.Count; gi++)
         {
             var lg = Model.Games[gi];
             <article class="rm-lu-card" data-state="@lg.State" data-own="@(lg.HasOwned ? "1" : "0")" data-teams="@(" " + string.Join(" ", lg.Teams.Select(t => (t.Team.Code ?? "").ToLowerInvariant())) + " ")">
-                <div class="rm-lu-chead">
+                <div class="rm-lu-chead" id="@(gi == 0 ? "rm-tour-lu-card" : null)">
                     <span class="rm-lu-status rm-lu-status--@lg.State">@lg.StatusText</span>
                     <span class="rm-lu-matchup">@lg.Game.GameText</span>
                     <span class="rm-lu-spacer"></span>

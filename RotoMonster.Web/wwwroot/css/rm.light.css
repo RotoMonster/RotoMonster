@@ -4998,3 +4998,10 @@ button.rm-sc-game:hover { background: rgba(var(--brand-primary-rgb), 0.07); }
 
 .rm-injp-wrap { width: 100%; max-width: 1100px; }
 .rm-injp-wrap .rm-injp-card.rm-injp-v2, .rm-injp-v2 table.rm-injp-table { width: 100%; }
+
+.bm-tour-tooltip{transition:opacity .15s ease}
+.bm-tour-tooltip--moving{opacity:0;pointer-events:none}
+.bm-tour-next:active,.bm-tour-back:active{transform:scale(.95)}
+
+.rm-front-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rm-front-actions .bm-page-guide-trigger{margin:0}

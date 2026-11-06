@@ -557,6 +557,7 @@ document.addEventListener('click', function(e) {
     function startTour(tourEl) {
         var steps = JSON.parse(tourEl.getAttribute('data-tour-steps'));
         var current = 0;
+        var dir = 1;
 
         var overlay = document.createElement('div');
         overlay.className = 'bm-tour-tooltip';
@@ -570,13 +571,31 @@ document.addEventListener('click', function(e) {
             clearPulse();
             var step = steps[current];
             var target = document.getElementById(step.targetId ? step.targetId : step.TargetId);
-            if (!target) return;
+            if (!target) {
+                current += dir;
+                if (current < 0 || current >= steps.length) endTour();
+                else render();
+                return;
+            }
+            if (target.tagName === 'SELECT' && target.closest('.bm-custom-select')) target = target.closest('.bm-custom-select');
 
-            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            setTimeout(function() {
+            var r = target.getBoundingClientRect();
+            if (r.top >= 70 && r.bottom <= window.innerHeight - 180) {
                 positionAndShow(step, target);
-            }, 350);
+                return;
+            }
+
+            overlay.classList.add('bm-tour-tooltip--moving');
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            var shown = false;
+            function show() {
+                if (shown) return;
+                shown = true;
+                window.removeEventListener('scrollend', show);
+                positionAndShow(step, target);
+            }
+            window.addEventListener('scrollend', show);
+            setTimeout(show, 450);
         }
 
         function positionAndShow(step, target) {
@@ -602,6 +621,7 @@ document.addEventListener('click', function(e) {
 
             overlay.style.top = top + 'px';
             overlay.style.left = left + 'px';
+            overlay.classList.remove('bm-tour-tooltip--moving');
             overlay.innerHTML =
                 '<p class="bm-tour-step-count">Step ' + (current + 1) + ' of ' + steps.length + '</p>' +
                 '<p class="bm-tour-text">' + text + '</p>' +
@@ -615,6 +635,7 @@ document.addEventListener('click', function(e) {
 
             overlay.querySelector('.bm-tour-next').addEventListener('click', function() {
                 if (current < steps.length - 1) {
+                    dir = 1;
                     current++;
                     render();
                 } else {
@@ -623,6 +644,7 @@ document.addEventListener('click', function(e) {
             });
             overlay.querySelector('.bm-tour-back').addEventListener('click', function() {
                 if (current > 0) {
+                    dir = -1;
                     current--;
                     render();
                 }

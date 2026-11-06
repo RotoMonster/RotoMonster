@@ -7,6 +7,26 @@
 }
 
 <div class="container-fluid px-4 rm-front">
+
+    @Html.Raw(new Tour("front-tour")
+        .WithManualTrigger()
+        .AddStep("rm-tour-front-league", "Each league you import gets a card like this with your team and roster.", TooltipPosition.Bottom)
+        .AddStep("rm-tour-front-refresh", "Refresh pulls your latest roster. Rosters also refresh on their own every few hours.", TooltipPosition.Bottom)
+        .AddStep("rm-tour-front-scores", "Today's games and live scores. Click Box score on a game for the full stats.", TooltipPosition.Bottom)
+        .AddStep("rm-tour-front-inj", "The latest injuries, with your players first. All injuries opens the full list.", TooltipPosition.Bottom)
+        .Render())
+
+    <script>
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest || !e.target.closest('[data-start-tour="front-tour"]')) return;
+            [["rm-tour-front-league", "#rmLeagueGrid .card-header, #rmLeagueGrid .rm-front-empty"], ["rm-tour-front-refresh", '#rmLeagueGrid a[title="Refresh Rosters"]'], ["rm-tour-front-scores", "#FrontGameScoresContainer .rm-sb-header, #FrontGameScoresContainer .rm-sb-title"], ["rm-tour-front-inj", ".rm-inj .card-header"]].forEach(function (x) {
+                var old = document.getElementById(x[0]);
+                if (old) old.removeAttribute("id");
+                var el = document.querySelector(x[1]);
+                if (el && !el.id) el.id = x[0];
+            });
+        }, true);
+    </script>
     @{
         int monsterBotPlayerCount = 0;
         foreach (var view in Model.UserLeagueViews)
@@ -17,12 +37,22 @@
         }
     }
 
-    @if (Model.UserLeagueViews.Count > 0)
-    {
-        <div class="mb-2 ms-1">
+    <div class="mb-2 ms-1 rm-front-actions">
+        @if (Model.UserLeagueViews.Count > 0)
+        {
             <a class="btn btn-primary" asp-page="./UserLeagues/Import">Add Leagues</a>
-        </div>
-    }
+        }
+        @Html.Raw(new PageGuide("front-guide")
+            .WithTitle("Home")
+            .WithPurpose("Your home page pulls together your leagues, today's games and the latest injuries, so you can check everything in one place.")
+            .AddSection("Your leagues", "<p>Each league you import gets its own card with your team, your roster and how your players are doing.</p><p>The gear icon opens the league's settings and the refresh icon pulls your latest roster. Rosters also refresh on their own every few hours.</p>")
+            .AddSection("MonsterBot", "<p><strong>MonsterBot Rating</strong> shows how your roster stacks up by average ownership and active percent.</p><p><strong>MonsterBot Recommendations</strong> are moves worth making, and <strong>Top Free Agents</strong> are the best players available in that league. The banner at the top tells you when there are recommendations to check.</p>")
+            .AddSection("Scores", "<p>The scores box shows the day's games with live scores. Click <strong>Box score</strong> on any game for the full stats.</p>")
+            .AddSection("Recent injuries", "<p>The latest injury news, with your players first. <strong>All injuries</strong> opens the full list.</p>")
+            .AddSection("Waiver trends and scoring log", "<p><strong>Waiver Trends</strong> shows the players being added the most right now. The <strong>Scoring Log</strong> shows big games from your players as they happen.</p>")
+            .WithTourId("front-tour")
+            .Render())
+    </div>
 
     <div class="row rm-front-row">
         <div class="col-auto p-2 rm-front-side">

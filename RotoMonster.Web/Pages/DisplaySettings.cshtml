@@ -6,6 +6,23 @@
 }
 
 <div class="container rm-display">
+
+    @Html.Raw(new PageGuide("display-guide")
+        .WithTitle("Display Settings")
+        .WithPurpose("Pick your timezone and which columns show in the player tables, like on Rankings.")
+        .AddSection("Timezone", "<p>Game times across the site show in the timezone you pick here. It saves as soon as you change it.</p>")
+        .AddSection("Choosing columns", "<p>Check the <strong>Stat Columns</strong> and <strong>Other Columns</strong> you want to see, then click <strong>Save</strong>.</p><p>Use the search box to find a column, <strong>Use defaults</strong> to go back to the standard set, or <strong>Select all</strong> and <strong>Clear all</strong> to start fresh.</p>")
+        .WithTourId("display-tour")
+        .Render())
+
+    @Html.Raw(new Tour("display-tour")
+        .WithManualTrigger()
+        .AddStep("rmTimezone", "Game times across the site show in this timezone. It saves as soon as you change it.", TooltipPosition.Bottom)
+        .AddStep("rmDisplayFilter", "Search for a column by name.", TooltipPosition.Bottom)
+        .AddStep("rmDisplayDefaults", "Go back to the standard set of columns.", TooltipPosition.Bottom)
+        .AddStep("rm-tour-disp-stats", "Check the columns you want to see in the player tables.", TooltipPosition.Bottom)
+        .AddStep("rm-tour-disp-save", "Save your columns when you are done.", TooltipPosition.Bottom)
+        .Render())
     <form method="post" asp-page-handler="Timezone" class="rm-tz-form" id="timezone">
         <label for="rmTimezone" class="rm-tz-label">Show game times in</label>
         <select id="rmTimezone" name="tz" class="form-select rm-tz-select" onchange="this.form.requestSubmit()">
@@ -31,12 +48,12 @@
             <button type="button" class="rm-display-link" id="rmDisplayNone">Clear all</button>
         </div>
         <div class="mt-2 mb-2">
-            <button class="btn btn-primary">Save</button>
+            <button class="btn btn-primary" id="rm-tour-disp-save">Save</button>
         </div>
 
         <div class="row">
             <div class="col-auto m-2">
-                <h4>Stat Columns</h4>
+                <h4 id="rm-tour-disp-stats">Stat Columns</h4>
                 @for (var i = 0; i < Model.DisplayCategorySelects.Count(); i++)
                 {
                     <div class="ms-2 @(Model.DisplayCategorySelects[i].Category.IsDefaultDisplayCategory ? "rm-default" : "")">
