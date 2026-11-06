@@ -43,6 +43,7 @@ namespace RotoMonster.Models.Shared
         public bool ShowCurrentGame { get; set; } = true;
         public bool ShowGames { get; set; } = true;
         public bool ShowPositionPercents { get; set; } = false;
+        public bool Modern { get; set; } = false;
 
         public bool ShowIR { get; set; } = false;
         public int NextPick { get; set; } = 0;

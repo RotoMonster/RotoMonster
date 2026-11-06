@@ -739,3 +739,17 @@ td.tdleft {
 .rm-injp-age--new { color: #4ade80; }
 
 .rm-injp-v2 .display-player-name { color: #7cb0ee; }
+
+:root {
+    --rm-pt-own: #4cc9f0;
+    --rm-pt-start: #f5c542;
+    --rm-pt-good: #3ccf91;
+    --rm-pt-bad: #ff7a7a;
+    --rm-pt-zero: #4a576b;
+    --rm-pt-hover: #243247;
+    --rm-pt-chip: #2a3a52;
+    --rm-pt-bg: #1e293b;
+    --rm-pt-head: #172133;
+}
+
+:root { --rm-pt-k: 1; }

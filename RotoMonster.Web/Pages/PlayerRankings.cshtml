@@ -6,14 +6,14 @@
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
 }
 
-<div class="ms-1 container rm-rankings">
+<div class="ms-1 container-fluid rm-rankings">
     <div>
         @Html.Raw(new PageGuide("rankings-guide")
     .WithTitle("Player Rankings")
     .WithPurpose("This page ranks every player by how much value they have produced, so you can compare your roster against what is available and decide who to start, add or drop.")
     .AddSection("Total value vs per game value", "<p>The table sorts by <strong>TotalV</strong> by default, which is the value a player has produced across the whole date range. Click <strong>GameV</strong> to sort by value per game instead.</p><p>Total value rewards players who have stayed healthy and played often. Per game value shows who is most productive when they do play, which is the better view when you are deciding between two players for a single day.</p>")
     .AddSection("Narrowing the list", "<p>Use <strong>Value Settings</strong> at the top to switch between all players, only your team, or free agents. The <strong>Positions</strong> row filters to a single position.</p><p>The <strong>Date Range</strong> buttons change the window the values are calculated over. A short window shows who is hot right now, a full season shows who has been reliable.</p>")
-    .AddSection("Ownership columns", "<p><strong>Own%</strong> is the percent of leagues where a player is rostered, and <strong>Act%</strong> is the percent where they are actively started.</p><p>A player with high ownership but low active percent is being held rather than used, which can be a signal they are droppable in your league too.</p>")
+    .AddSection("Ownership columns", "<p><strong>Own%</strong> is the percent of leagues where a player is rostered, and <strong>Start%</strong> is the percent where they are started.</p><p>A player with high ownership but low start percent is being held rather than used, which can be a signal they are droppable in your league too.</p>")
     .AddSection("Changing which columns show", "<p>The <strong>display options</strong> link below the buttons opens Display Settings, where you can pick exactly which stat and value columns appear in this table.</p>")
     .WithTourId("rankings-tour")
     .Render())
@@ -170,11 +170,17 @@
         </div>
 
         <div class="rm-filter-section modern-filter-row" data-title="Display">
-            <span>
+            <span hidden>
                 <div class="form-check form-switch rm-switch">
                     <input asp-for="ColorStats" class="form-check-input" role="switch" onchange="this.form.requestSubmit()">
                     <label class="form-check-label" asp-for="ColorStats"></label>
                 </div>
+            </span>
+
+            <span class="ms-3 rm-pt-viewseg" id="rmPtView" role="group" aria-label="Show stats or values">
+                <button type="button" data-v="stats">Stats</button>
+                <button type="button" data-v="values">Values</button>
+                <button type="button" data-v="both">Both</button>
             </span>
 
             <span class="ms-2">
@@ -334,6 +340,201 @@
 
             setupHeaders();
             document.addEventListener('rm:live-updated', setupHeaders);
+        })();
+
+        (function () {
+            function num(el) {
+                if (!el) return null;
+                var t = el.textContent;
+                var ch = el.querySelector('.rm-badge-change');
+                if (ch) t = t.replace(ch.textContent, '');
+                t = t.replace(/[,%\s]/g, '');
+                if (t === '' || t === '-' || t === '–') return null;
+                var n = parseFloat(t);
+                return isNaN(n) ? null : n;
+            }
+            function alpha(v, max) {
+                return Math.round(8 + 24 * Math.min(1, max > 0 ? Math.abs(v) / max : 0)) + '%';
+            }
+            function pin(table) {
+                var head = table.querySelectorAll('thead tr:first-child > .rm-pt-pin');
+                var lefts = [], x = 0;
+                head.forEach(function (th) { lefts.push(x); x += th.getBoundingClientRect().width; });
+                table.querySelectorAll('tr').forEach(function (tr) {
+                    var cells = tr.querySelectorAll(':scope > .rm-pt-pin');
+                    cells.forEach(function (c, i) {
+                        c.style.left = (lefts[i] || 0) + 'px';
+                        c.classList.toggle('rm-pt-pin-last', i === cells.length - 1);
+                    });
+                });
+            }
+            function groups(table) {
+                var old = table.querySelector('thead tr.rm-pt-groups');
+                if (old) old.remove();
+                var head = table.tHead.rows[0];
+                var map = { ptd: 'Passing', patt: 'Passing', pyrd: 'Passing', pairy: 'Passing', int: 'Passing', comp: 'Passing', poort: 'Passing', sack: 'Passing', rtd: 'Rushing', ratt: 'Rushing', ryrd: 'Rushing', ryac: 'Rushing', rtbrk: 'Rushing', fumtd: 'Rushing', rxtd: 'Receiving', rxyrd: 'Receiving', rxairy: 'Receiving', rec: 'Receiving', targ: 'Receiving', rxrzt: 'Receiving' };
+                var cells = Array.prototype.filter.call(head.cells, function (c) { return !c.classList.contains('rm-pt-hide') && !c.classList.contains('rm-pt-off'); });
+                var known = false;
+                var specs = cells.map(function (th) {
+                    var kind = th.getAttribute('data-pt');
+                    if (kind !== 'stat' && kind !== 'cval') return null;
+                    var btn = th.querySelector('button');
+                    var ab = (btn ? btn.textContent : th.textContent).trim().toLowerCase().replace(/\s+v$/, '');
+                    if (map[ab]) known = true;
+                    return { g: map[ab] || 'Other', v: kind === 'cval' };
+                });
+                if (!specs.some(Boolean)) return;
+                var tr = document.createElement('tr');
+                tr.className = 'rm-pt-groups';
+                var i = 0, first = true;
+                while (i < cells.length) {
+                    var s = specs[i], th = document.createElement('th');
+                    if (!s) {
+                        if (cells[i].classList.contains('rm-pt-pin')) th.className = 'rm-pt-pin';
+                        tr.appendChild(th);
+                        i++;
+                        continue;
+                    }
+                    var n = 0;
+                    while (i + n < cells.length && specs[i + n] && specs[i + n].v === s.v && (!known || specs[i + n].g === s.g)) n++;
+                    th.colSpan = n;
+                    th.className = 'rm-pt-grp' + (first ? ' rm-pt-grp-first' : '');
+                    th.innerHTML = '<span>' + (known ? s.g : 'Stats') + (s.v ? ' value' : '') + '</span>';
+                    tr.appendChild(th);
+                    first = false;
+                    i += n;
+                }
+                head.parentNode.insertBefore(tr, head);
+                table.style.setProperty('--rm-pt-h1', tr.getBoundingClientRect().height + 'px');
+            }
+            function viewMode() {
+                var v = 'stats';
+                try { v = localStorage.getItem('rmPtView') || 'stats'; } catch (e) { }
+                return v;
+            }
+            function applyView(table) {
+                var mode = viewMode();
+                var headRow = table.tHead.querySelector('tr:not(.rm-pt-groups)');
+                var rows = Array.prototype.slice.call(table.querySelectorAll('tbody > tr'));
+                Array.prototype.forEach.call(headRow.cells, function (th, i) {
+                    var k = th.getAttribute('data-pt');
+                    if (k !== 'stat' && k !== 'cval') return;
+                    var off = (mode === 'stats' && k === 'cval') || (mode === 'values' && k === 'stat');
+                    th.classList.toggle('rm-pt-off', off);
+                    rows.forEach(function (r) { if (r.cells[i]) r.cells[i].classList.toggle('rm-pt-off', off); });
+                });
+                document.querySelectorAll('#rmPtView button').forEach(function (b) {
+                    b.classList.toggle('on', b.getAttribute('data-v') === mode);
+                });
+            }
+            document.addEventListener('click', function (e) {
+                var b = e.target.closest ? e.target.closest('#rmPtView button') : null;
+                if (!b) return;
+                e.preventDefault();
+                try { localStorage.setItem('rmPtView', b.getAttribute('data-v')); } catch (err) { }
+                document.querySelectorAll('#rmPtView button').forEach(function (x) {
+                    x.classList.toggle('on', x === b);
+                });
+                var t = document.querySelector('table.rm-pt');
+                if (!t) return;
+                applyView(t);
+                groups(t);
+                lastCol(t);
+                pin(t);
+            });
+            function lastCol(table) {
+                var headRow = table.tHead.querySelector('tr:not(.rm-pt-groups)');
+                var last = -1;
+                Array.prototype.forEach.call(headRow.cells, function (c, i) {
+                    if (!c.classList.contains('rm-pt-hide') && !c.classList.contains('rm-pt-off')) last = i;
+                });
+                table.querySelectorAll('.rm-pt-lastcol').forEach(function (c) { c.classList.remove('rm-pt-lastcol'); });
+                table.querySelectorAll('tbody > tr').forEach(function (r) { if (r.cells[last]) r.cells[last].classList.add('rm-pt-lastcol'); });
+                if (headRow.cells[last]) headRow.cells[last].classList.add('rm-pt-lastcol');
+                var g = table.tHead.querySelector('tr.rm-pt-groups');
+                if (g && g.lastElementChild) g.lastElementChild.classList.add('rm-pt-lastcol');
+            }
+            function hideCol(th, cells) {
+                th.classList.add('rm-pt-hide');
+                cells.forEach(function (c) { c.classList.add('rm-pt-hide'); });
+            }
+            function modern() {
+                var table = document.querySelector('table.rm-pt');
+                if (!table || !table.tHead) return;
+                var headRow = table.tHead.querySelector('tr:not(.rm-pt-groups)');
+                var heads = Array.prototype.slice.call(headRow.cells);
+                var rows = Array.prototype.slice.call(table.querySelectorAll('tbody > tr'));
+                table.querySelectorAll('tbody .rm-badge, tbody .pct-badge, tbody .value-badge, tbody .rm-badge-change').forEach(function (b) { b.style.backgroundColor = ''; });
+                heads.forEach(function (th, i) {
+                    var kind = th.getAttribute('data-pt');
+                    if (!kind) return;
+                    var cells = rows.map(function (r) { return r.cells[i]; }).filter(Boolean);
+                    var vals = cells.map(function (c) { return num(c.querySelector('.pct-badge, .value-badge, .rm-badge') || c); });
+                    if (kind === 'extra') {
+                        cells.forEach(function (c) { c.style.backgroundColor = ''; });
+                        if (cells.every(function (c) { return c.textContent.trim() === ''; })) hideCol(th, cells);
+                        return;
+                    }
+                    if (kind === 'trend') {
+                        if (vals.every(function (v) { return v === null || Math.abs(v) < 0.005; })) { hideCol(th, cells); return; }
+                        cells.forEach(function (c) {
+                            c.style.backgroundColor = '';
+                            var v = num(c);
+                            c.classList.add(v === null ? 'rm-pt-z' : (v > 0 ? 'rm-pt-up' : 'rm-pt-dn'));
+                        });
+                        return;
+                    }
+                    if (kind === 'own' || kind === 'start') {
+                        cells.forEach(function (c, j) {
+                            var b = c.querySelector('.pct-badge');
+                            if (!b || vals[j] === null) return;
+                            b.classList.add('rm-pt-pct', 'rm-pt-' + kind);
+                            b.style.setProperty('--a', alpha(vals[j], 100));
+                            var ch = b.querySelector('.rm-badge-change');
+                            if (ch) {
+                                var d = parseFloat(ch.textContent);
+                                ch.classList.add(d > 0 ? 'rm-pt-up' : 'rm-pt-dn');
+                                b.after(ch);
+                            }
+                        });
+                        return;
+                    }
+                    var nonZero = vals.some(function (v) { return v !== null && Math.abs(v) >= 0.005; });
+                    if ((kind === 'stat' || kind === 'cval') && !nonZero) {
+                        th.classList.add('rm-pt-hide');
+                        cells.forEach(function (c) { c.classList.add('rm-pt-hide'); });
+                        return;
+                    }
+                    if (kind === 'stat') {
+                        cells.forEach(function (c, j) {
+                            var b = c.querySelector('.rm-badge');
+                            if (b) b.classList.add('rm-pt-plain');
+                            if (vals[j] === null || Math.abs(vals[j]) < 0.005) {
+                                c.classList.add('rm-pt-z');
+                                if (b && b.textContent.trim() === '') b.textContent = '0';
+                            }
+                        });
+                        return;
+                    }
+                    var max = 0;
+                    vals.forEach(function (v) { if (v !== null && Math.abs(v) > max) max = Math.abs(v); });
+                    cells.forEach(function (c, j) {
+                        var b = c.querySelector('.value-badge, .rm-badge');
+                        var v = vals[j];
+                        if (!b || v === null) return;
+                        if (Math.abs(v) < 0.005) { b.classList.add('rm-pt-plain'); c.classList.add('rm-pt-z'); return; }
+                        b.classList.add('rm-pt-tint', v > 0 ? 'rm-pt-p' : 'rm-pt-n');
+                        b.style.setProperty('--a', alpha(v, max));
+                    });
+                });
+                applyView(table);
+                groups(table);
+                lastCol(table);
+                pin(table);
+            }
+            modern();
+            document.addEventListener('rm:live-updated', modern);
+            window.addEventListener('resize', function () { var t = document.querySelector('table.rm-pt'); if (t) pin(t); });
         })();
     </script>
 }

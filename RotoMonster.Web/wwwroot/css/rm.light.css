@@ -5005,3 +5005,251 @@ button.rm-sc-game:hover { background: rgba(var(--brand-primary-rgb), 0.07); }
 
 .rm-front-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .rm-front-actions .bm-page-guide-trigger{margin:0}
+
+:root {
+    --rm-pt-own: #0b8fb3;
+    --rm-pt-start: #a87900;
+    --rm-pt-good: #16a36a;
+    --rm-pt-bad: #d64545;
+    --rm-pt-zero: #b8c0cc;
+    --rm-pt-hover: #f2f5fa;
+    --rm-pt-chip: #eef1f5;
+    --rm-pt-bg: #ffffff;
+    --rm-pt-head: #f7f8fa;
+}
+.rm-rankings .modern-filter-container { max-width: none; }
+#rankingsForm .rm-pt-scroll {
+    overflow: auto;
+    max-height: calc(100vh - 90px);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--rm-pt-bg);
+    margin-bottom: 16px;
+}
+#rankingsForm table.table.rm-pt {
+    width: max-content;
+    min-width: 100%;
+    margin: 0;
+    border: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+}
+#rankingsForm table.table.rm-pt > :not(caption) > * > * {
+    --bs-table-bg: var(--rm-pt-bg);
+    --bs-table-accent-bg: transparent;
+    --bs-table-bg-state: transparent;
+    background-color: var(--rm-pt-bg) !important;
+    color: var(--color-text-primary);
+    border-width: 0 0 1px 0;
+    border-style: solid;
+    border-color: var(--color-border-light);
+    padding: 0 10px;
+    height: 36px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+#rankingsForm table.table.rm-pt > tbody > tr:hover > * {
+    background-color: var(--rm-pt-hover) !important;
+}
+#rankingsForm table.table.rm-pt > thead > tr > th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    height: auto;
+    padding: 9px 10px;
+    background-color: var(--rm-pt-head) !important;
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--color-border);
+}
+#rankingsForm table.table.rm-pt > thead > tr > th .btn {
+    color: inherit !important;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    padding: 0 !important;
+}
+#rankingsForm table.table.rm-pt > thead > tr > th .rm-th-sorted {
+    color: var(--brand-primary) !important;
+}
+#rankingsForm table.table.rm-pt > :not(caption) > tr > .rm-pt-pin {
+    position: sticky;
+    z-index: 1;
+}
+#rankingsForm table.table.rm-pt > thead > tr > th.rm-pt-pin {
+    z-index: 3;
+}
+#rankingsForm table.table.rm-pt > :not(caption) > tr > .rm-pt-pin-last {
+    box-shadow: inset -1px 0 0 var(--color-border);
+}
+#rankingsForm table.table.rm-pt .rm-pt-hide {
+    display: none;
+}
+#rankingsForm table.table.rm-pt > tbody > tr > td > .rm-badge,
+#rankingsForm table.table.rm-pt > tbody > tr > td > .pct-badge,
+#rankingsForm table.table.rm-pt > tbody > tr > td > .value-badge {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border-radius: 5px;
+    background: none;
+    color: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+#rankingsForm table.table.rm-pt > tbody > tr > td.rm-pt-z,
+#rankingsForm table.table.rm-pt > tbody > tr > td.rm-pt-z > * {
+    color: var(--rm-pt-zero);
+}
+#rankingsForm table.table.rm-pt > tbody > tr > td > .pct-badge.rm-pt-pct {
+    min-width: 40px;
+    padding: 2px 7px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--rm-pt-c);
+    background: color-mix(in srgb, var(--rm-pt-c) var(--a, 15%), transparent);
+}
+#rankingsForm table.table.rm-pt .rm-pt-own { --rm-pt-c: var(--rm-pt-own); }
+#rankingsForm table.table.rm-pt .rm-pt-start { --rm-pt-c: var(--rm-pt-start); }
+#rankingsForm table.table.rm-pt > tbody > tr > td > .rm-pt-tint {
+    min-width: 48px;
+    padding: 2px 7px;
+    font-weight: 600;
+    text-align: right;
+}
+#rankingsForm table.table.rm-pt > tbody > tr > td > .rm-pt-tint.rm-pt-p {
+    color: var(--rm-pt-good);
+    background: color-mix(in srgb, var(--rm-pt-good) var(--a), transparent);
+}
+#rankingsForm table.table.rm-pt > tbody > tr > td > .rm-pt-tint.rm-pt-n {
+    color: var(--rm-pt-bad);
+    background: color-mix(in srgb, var(--rm-pt-bad) var(--a), transparent);
+}
+#rankingsForm table.table.rm-pt .rm-badge-change {
+    position: static;
+    transform: none;
+    background: none;
+    padding: 0;
+    margin-left: 3px;
+    font-size: 10px;
+    font-weight: 600;
+}
+#rankingsForm table.table.rm-pt .rm-pt-up { color: var(--rm-pt-good); }
+#rankingsForm table.table.rm-pt .rm-pt-dn { color: var(--rm-pt-bad); }
+#rankingsForm table.table.rm-pt .rm-pt-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--rm-pt-chip);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 12px;
+}
+#rankingsForm table.table.rm-pt .rm-pt-chip-t { color: var(--color-text-secondary); }
+#rankingsForm table.table.rm-pt .rm-pt-chip-o { font-weight: 600; }
+#rankingsForm table.table.rm-pt .rm-pt-chip.rm-pt-live .rm-pt-chip-t { color: var(--rm-pt-bad); font-weight: 600; }
+
+#rankingsForm table.table.rm-pt td.own-cell {
+    width: 40px;
+    padding: 0 6px 0 10px;
+}
+#rankingsForm table.table.rm-pt td.own-cell .own-badge {
+    width: 28px;
+    min-width: 0;
+    height: 20px;
+}
+#rankingsForm table.table.rm-pt td.own-cell .own-badge-icon {
+    width: 12px;
+    height: 12px;
+}
+#rankingsForm table.table.rm-pt > thead > tr.rm-pt-groups > th {
+    padding: 8px 6px 0;
+    text-align: center;
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+    border-bottom: 0;
+}
+#rankingsForm table.table.rm-pt > thead > tr.rm-pt-groups > th.rm-pt-grp > span {
+    display: block;
+    padding-bottom: 3px;
+    border-bottom: 2px solid var(--color-border);
+}
+#rankingsForm table.table.rm-pt > thead > tr.rm-pt-groups > th.rm-pt-grp-first {
+    box-shadow: inset 1px 0 0 var(--color-border);
+}
+#rankingsForm table.table.rm-pt > thead > tr:not(.rm-pt-groups) > th {
+    top: var(--rm-pt-h1, 0px);
+}
+#rankingsForm table.table.rm-pt > thead > tr.rm-pt-groups,
+#rankingsForm table.table.rm-pt > thead > tr.rm-pt-groups > th {
+    border-bottom: 0 !important;
+}
+
+#rankingsForm table.table.rm-pt .rm-pt-off {
+    display: none;
+}
+#rankingsForm table.table.rm-pt > :not(caption) > * > * {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+#rankingsForm table.table.rm-pt > tbody > tr > td > .pct-badge.rm-pt-pct {
+    background: color-mix(in srgb, var(--rm-pt-c) calc(var(--a, 15%) * var(--rm-pt-k, 1)), transparent);
+}
+#rankingsForm table.table.rm-pt > tbody > tr > td > .rm-pt-tint.rm-pt-p {
+    background: color-mix(in srgb, var(--rm-pt-good) calc(var(--a, 15%) * var(--rm-pt-k, 1)), transparent);
+}
+#rankingsForm table.table.rm-pt > tbody > tr > td > .rm-pt-tint.rm-pt-n {
+    background: color-mix(in srgb, var(--rm-pt-bad) calc(var(--a, 15%) * var(--rm-pt-k, 1)), transparent);
+}
+:root { --rm-pt-k: .6; }
+.rm-pt-viewseg {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-bg-secondary);
+    vertical-align: middle;
+}
+.rm-pt-viewseg button {
+    border: 0;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.rm-pt-viewseg button.on {
+    background: var(--brand-primary);
+    color: #fff;
+    font-weight: 600;
+}
+
+#rankingsForm table.table.rm-pt > :not(caption) > tr > .rm-pt-lastcol {
+    padding-right: 28px;
+}
+
+#rankingsForm table.table.rm-pt > tbody > tr > td:has(> .rm-badge),
+#rankingsForm table.table.rm-pt > tbody > tr > td:has(> .pct-badge),
+#rankingsForm table.table.rm-pt > tbody > tr > td:has(> .value-badge),
+#rankingsForm table.table.rm-pt > tbody > tr > td.rm-badge-cell,
+#rankingsForm table.table.rm-pt > tbody > tr > td.pct-badge-cell,
+#rankingsForm table.table.rm-pt > tbody > tr > td.value-badge-cell {
+    padding: 0 12px !important;
+    height: 36px;
+}
+#rankingsForm table.table.rm-pt > tbody > tr > td.rm-pt-lastcol {
+    padding-right: 28px !important;
+}

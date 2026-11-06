@@ -1175,6 +1175,7 @@ namespace RotoMonster.Pages
             PlayerTableModel.DisplayPlayers = new List<DisplayPlayer>();
             PlayerTableModel.ValuePerValues = db.GetPerValues(selectedPlayerType.Id);
             PlayerTableModel.ColorStats = ColorStats;
+            PlayerTableModel.Modern = true;
             PlayerTableModel.ShowDraft = ShowDraft;
             PlayerTableModel.ShowAdp = adpPlayers.Count > 0;
             PlayerTableModel.ShowAllAdp = allAdpPlayers != null;

@@ -6,22 +6,22 @@
     bool isUser = (Model.UserId != null);
 }
 
-<div class="container-fuild ms-0 p-0">
-    <table class="@RotoMonster.Core.RMCss.DataTable">
+<div class="@(Model.Modern ? "rm-pt-scroll" : "container-fuild ms-0 p-0")">
+    <table class="@RotoMonster.Core.RMCss.DataTable @(Model.Modern ? "rm-pt" : "")">
         <thead class="@RotoMonster.Core.RMCss.DataTableTHead">
             <tr>
                 @if (!Model.IsPlayerHistory)
                 {
                     @if (isUser)
                     {
-                        <th>Own</th>
+                        <th class="@(Model.Modern ? "rm-pt-pin" : "")">Own</th>
                     }
                 }
 
                 @if (Model.ShowMonsterBot)
                 @if (Model.ShowMonsterBot)
                 {
-                    <th class="tdc">
+                    <th class="tdc @(Model.Modern ? "rm-pt-pin" : "")">
                         @{ var tipId1 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <span class="bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@tipId1">
@@ -34,10 +34,10 @@
 
                 @if (Model.ShowRank)
                 {
-                    <th>Rank</th>
+                    <th class="@(Model.Modern ? "rm-pt-pin" : "")">Rank</th>
                 }
 
-                <th>@Model.PlayerHeaderTitle</th>
+                <th class="@(Model.Modern ? "rm-pt-pin" : "")">@Model.PlayerHeaderTitle</th>
 
                 @if (Model.ShowTeam)
                 {
@@ -100,7 +100,7 @@
 
                 @if (!Model.IsPlayerHistory && Model.ShowOwnership)
                 {
-                    <th class="text-nowrap">
+                    <th class="text-nowrap" data-pt="own">
                         @{ var tipId5 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
@@ -123,7 +123,7 @@
                     {
                         @if (Model.ShowTrending && Model.ShowTrending)
                         {
-                            <th class="text-nowrap">
+                            <th class="text-nowrap" data-pt="trend">
                                 @{ var tipId7 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
@@ -135,22 +135,22 @@
                             </th>
                         }
 
-                        <th class="text-nowrap">
+                        <th class="text-nowrap" data-pt="start">
                             @{ var tipId8 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
                                     asp-route-sort="ACTIVECHANGE" data-bm-tooltip="@tipId8">
                                 +-
                             </button>
-<div class="bm-tooltip-content" id="@tipId8" role="tooltip">Change in Active Percent</div>
+<div class="bm-tooltip-content" id="@tipId8" role="tooltip">Change in Start Percent</div>
 </span>
                             @{ var tipId9 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
                                     asp-route-sort="ACTIVE" data-bm-tooltip="@tipId9">
-                                Act%
+                                Start%
                             </button>
-<div class="bm-tooltip-content" id="@tipId9" role="tooltip">Active Percent</div>
+<div class="bm-tooltip-content" id="@tipId9" role="tooltip">Start Percent</div>
 </span>
                         </th>
                     }
@@ -173,7 +173,7 @@
                     if (!Model.UserDisplayColumns.IsSelected("Skill Value") && pv.ColumnTitle == "SkillV")
                         continue;
 
-                    <th>
+                    <th data-pt="val">
                         @{ var tipId10 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
@@ -189,7 +189,7 @@
                 {
                     @if (Model.ExtraColumnTitle1.Length > 0)
                     {
-                        <th class="tdc">
+                        <th class="tdc" data-pt="extra">
                             @{ var tipId11 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
@@ -203,7 +203,7 @@
 
                     @if (Model.ExtraColumnTitle2.Length > 0)
                     {
-                        <th class="tdc">
+                        <th class="tdc" data-pt="extra">
                             @{ var tipId12 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
@@ -217,7 +217,7 @@
 
                     @if (Model.ExtraColumnTitle3.Length > 0)
                     {
-                        <th class="tdc">
+                        <th class="tdc" data-pt="extra">
                             @{ var tipId13 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
@@ -435,25 +435,25 @@
 
                 @foreach (var dc in Model.BeforeCategories)
                 {
-                    <th class="text-nowrap"><partial name="_PlayerTableCategoryTitle" model="@dc.Category" /></th>
+                    <th class="text-nowrap" data-pt="stat"><partial name="_PlayerTableCategoryTitle" model="@dc.Category" /></th>
                 }
                 @if (Model.UserDisplayCategories != null)
                 {
                     @foreach (var cs in Model.UserDisplayCategories)
                     {
-                        <th class="text-nowrap"><partial name="_PlayerTableCategoryTitle" model="@cs.Category" /></th>
+                        <th class="text-nowrap" data-pt="stat"><partial name="_PlayerTableCategoryTitle" model="@cs.Category" /></th>
                     }
                 }
                 @foreach (var dc in Model.AfterCategories)
                 {
-                    <th class="text-nowrap"><partial name="_PlayerTableCategoryTitle" model="@dc.Category" /></th>
+                    <th class="text-nowrap" data-pt="stat"><partial name="_PlayerTableCategoryTitle" model="@dc.Category" /></th>
                 }
 
                 @if (Model.ShowCategoryValues)
                 {
                     @foreach (var cs in Model.CategorySettings)
                     {
-                        <th class="text-nowrap">@cs.Category.Abbreviation V</th>
+                        <th class="text-nowrap" data-pt="cval">@cs.Category.Abbreviation V</th>
                     }
                 }
             </tr>
@@ -469,7 +469,7 @@
                 {
                     @if (isUser)
                     {
-                        <td class="tdc text-center text-nowrap text-white @colorLib.GetDisplayPlayerOwnCss(dp)">
+                        <td class="tdc text-center text-nowrap text-white @colorLib.GetDisplayPlayerOwnCss(dp) @(Model.Modern ? "rm-pt-pin" : "")">
                             <partial name="_DisplayPlayerOwn" model="dp" />
                         </td>
                     }
@@ -477,7 +477,7 @@
 
                 @if (Model.ShowMonsterBot)
                 {
-                    <td class="tdc text-center text-nowrap">
+                    <td class="tdc text-center text-nowrap @(Model.Modern ? "rm-pt-pin" : "")">
                         <partial name="_MonsterBotPlayer" model="dp.MonsterBotPlayer" />
                     </td>
                 }
@@ -488,7 +488,7 @@
 
                 @if (Model.ShowRank)
                 {
-                    <td class="tdr @trClass">
+                    <td class="tdr @trClass @(Model.Modern ? "rm-pt-pin" : "")">
                         @if (dp.ValuePlayer != null)
                         {
                             @dp.ValuePlayer.Rank
@@ -496,7 +496,7 @@
                     </td>
                 }
 
-                <td class="text-nowrap @titleCss">
+                <td class="text-nowrap @titleCss @(Model.Modern ? "rm-pt-pin" : "")">
                     @if (dp.DisplayTitle == "")
                     {
                         <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=dp, Player=dp.SeasonPlayer.Player,SelectedUserLeague=Model.SelectedUserLeague,PlayerGameState=dp.PlayerGameState}" />
@@ -738,6 +738,26 @@
                     {
                         @if (Model.Sport.IsNFL || Model.Sport.IsNBA || Model.Sport.IsNHL || Model.Sport.IsMLB)
                         {
+                            @if (Model.Modern)
+                            {
+                                <td class="rm-pt-gamec">
+                                    @if (dp.Game != null)
+                                    {
+                                        var ptGame = dp.Game;
+                                        var ptTeam = dp.SeasonPlayer.Team;
+                                        if (ptGame.HasStarted || ptGame.IsFinished)
+                                        {
+                                            <span class="rm-pt-chip @(ptGame.IsFinished ? "" : "rm-pt-live")"><span class="rm-pt-chip-t">@(ptGame.IsFinished ? "Final" : "Live")</span><span>@(ptGame.GetTeamScore(ptTeam) + "-" + ptGame.GetOpponentTeamScore(ptTeam))</span><span class="rm-pt-chip-o">@ptGame.GetOpponentText(ptTeam)</span></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="rm-pt-chip"><span class="rm-pt-chip-t">@ptGame.EasternTime.ToString("ddd h:mm")</span><span class="rm-pt-chip-o">@ptGame.GetOpponentText(ptTeam)</span></span>
+                                        }
+                                    }
+                                </td>
+                            }
+                            else
+                            {
                             <td>
                                 @if (dp.Game != null)
                                 {
@@ -746,6 +766,7 @@
                                     </div>
                                 }
                             </td>
+                            }
                         }
                     }
                 }
