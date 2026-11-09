@@ -71,7 +71,7 @@ namespace RotoMonster.Pages
 
         public async Task OnGetAsync(DateTime date, int? g, int? l, bool? top, int? hid)
         {
-            InitGet("Scores");
+            InitGet("Box Scores");
 
             if (UserId != null)
             {

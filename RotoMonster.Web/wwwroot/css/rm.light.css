@@ -151,11 +151,11 @@ select {
 }
 
 .nfl {
-    background-color: #86592d;
+    background-color: #993366;
 }
 
 .nfl-txt {
-    color: #86592d;
+    color: #993366;
 }
 
 .nhl {
@@ -3270,7 +3270,7 @@ a.rm-live-busy svg {
 :root {
     --logo-nba: #f08a4b;
     --logo-mlb: #3f9142;
-    --logo-nfl: #86592d;
+    --logo-nfl: #993366;
     --logo-nhl: #0077b3;
 }
 
@@ -3564,7 +3564,7 @@ a.rm-live-busy svg {
 .rm-lu { --lu-sport: #2d7a3e; --lu-name: var(--lu-sport); padding-bottom: 32px; }
 .rm-lu--mlb { --lu-sport: #2d7a3e; }
 .rm-lu--nba { --lu-sport: #e65c00; }
-.rm-lu--nfl { --lu-sport: #a8743f; }
+.rm-lu--nfl { --lu-sport: #993366; }
 .rm-lu--nhl { --lu-sport: #0077b3; }
 
 .rm-lu-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 16px 0 6px; }
@@ -3926,7 +3926,7 @@ a.rm-live-busy svg {
 .rm-dc-page.rm-lu--nhl { --brand-primary-rgb: 0, 119, 179; --brand-accent-rgb: 0, 119, 179; }
 .rm-dc-page.rm-lu--nba { --brand-primary-rgb: 230, 92, 0; --brand-accent-rgb: 230, 92, 0; }
 .rm-dc-page.rm-lu--mlb { --brand-primary-rgb: 45, 122, 62; --brand-accent-rgb: 45, 122, 62; }
-.rm-dc-page.rm-lu--nfl { --brand-primary-rgb: 168, 116, 63; --brand-accent-rgb: 168, 116, 63; }
+.rm-dc-page.rm-lu--nfl { --brand-primary-rgb: 153, 51, 102; --brand-accent-rgb: 153, 51, 102; }
 .rm-dc-page .bm-custom-select { --brand-primary: var(--lu-sport); --brand-accent: var(--lu-sport); }
 /* end rm-dc-brand */
 
@@ -5046,7 +5046,7 @@ button.rm-sc-game:hover { background: rgba(var(--brand-primary-rgb), 0.07); }
     border-style: solid;
     border-color: var(--color-border-light);
     padding: 0 10px;
-    height: 36px;
+    height: 30px;
     vertical-align: middle;
     white-space: nowrap;
 }
@@ -5248,7 +5248,7 @@ button.rm-sc-game:hover { background: rgba(var(--brand-primary-rgb), 0.07); }
 #rankingsForm table.table.rm-pt > tbody > tr > td.pct-badge-cell,
 #rankingsForm table.table.rm-pt > tbody > tr > td.value-badge-cell {
     padding: 0 12px !important;
-    height: 36px;
+    height: 30px;
 }
 #rankingsForm table.table.rm-pt > tbody > tr > td.rm-pt-lastcol {
     padding-right: 28px !important;
@@ -5275,4 +5275,89 @@ button.rm-sc-game:hover { background: rgba(var(--brand-primary-rgb), 0.07); }
 .rm-adm-tasks .rm-at-duty {
     flex-direction: column;
     align-items: flex-start;
+}
+
+#rankingsForm table.table.rm-pt > tbody > tr > td > .rm-pt-orig {
+    min-width: 44px;
+    padding: 1px 7px;
+    font-weight: 600;
+    text-align: center;
+    color: #14181f;
+}
+
+.rm-sc-box-head .rm-sc-score { margin-right: 2px !important; }
+.rm-scores-table td.rm-sc-z .rm-badge {
+    background: none !important;
+    color: var(--color-text-tertiary) !important;
+    opacity: .55;
+}
+
+.rm-sgp .schedule-grid-team-cell.rm-sg-zero {
+    background-color: var(--color-bg-secondary) !important;
+}
+.rm-sgp .schedule-grid-team-cell.rm-sg-zero .schedule-grid-team-games {
+    color: var(--color-text-tertiary) !important;
+    opacity: .5;
+}
+.rm-sgp .schedule-grid-period-row.rm-sg-empty > td {
+    opacity: .45;
+}
+
+.rm-lu-ownbadge { min-width: 26px; }
+.rm-lu-ownbadge .bm-tooltip-wrap { display: inline-flex; }
+.rm-lu-ownbadge .own-badge { width: 26px; min-width: 0; height: 17px; border-radius: 4px; }
+.rm-lu-ownbadge .own-badge-icon { width: 11px; height: 11px; }
+.rm-lu-ownbadge .own-badge-icon--ir { width: 13px; height: 13px; }
+.rm-lu-ownbadge .own-badge-text { font-size: .56rem; }
+.rm-dc .rm-dc-row { grid-template-columns: 28px 20px minmax(0, 1fr) auto; gap: 0; }
+.rm-dc-head { grid-template-columns: 28px 20px minmax(0, 1fr) auto; }
+.rm-dc .rm-dc-row .rm-lu-name { padding-left: 7px; }
+.rm-dc-ownslot { justify-content: flex-start; }
+
+#rankingsForm .rm-pt-scroll {
+    overflow: visible;
+    max-height: none;
+    width: max-content;
+    min-width: 100%;
+}
+#rankingsForm table.table.rm-pt > :not(caption) > tr > .rm-pt-unpin {
+    position: static;
+    box-shadow: none;
+}
+@media (max-width: 767.98px) {
+    #rankingsForm table.table.rm-pt > :not(caption) > tr > .rm-pt-pin-last {
+        max-width: 130px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+.rm-sgp .schedule-grid-team-cell.rm-sg-zero {
+    background-color: color-mix(in srgb, var(--color-text-tertiary) 25%, transparent) !important;
+}
+
+#rankingsForm .rm-pt-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-height: none;
+    width: auto;
+    min-width: 0;
+}
+#rankingsForm table.table.rm-pt > thead > tr > th {
+    will-change: transform;
+}
+.rm-pt-hbar {
+    position: fixed;
+    bottom: 0;
+    z-index: 900;
+    height: 17px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: var(--rm-pt-bg);
+    border-top: 1px solid var(--color-border);
+}
+.rm-pt-hbar[hidden] {
+    display: none;
+}
+.rm-pt-hbar > div {
+    height: 1px;
 }

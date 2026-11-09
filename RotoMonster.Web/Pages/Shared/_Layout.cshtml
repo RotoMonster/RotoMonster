@@ -29,14 +29,14 @@
     @* rm.light.css carries the sizing and layout for both themes; rm.dark.css
        only flips the colours that were hardcoded for a light page. *@
     <link rel="stylesheet" href="~/css/rm.light.css" asp-append-version="true" />
-    @if (sportCss == "mlb")
+    @if (sportCss == "mlb" || sportCss == "nfl")
     {
         <link rel="stylesheet" href="~/css/rm.@(sportCss).light.css" asp-append-version="true" />
     }
     @if (rmTheme == "dark")
     {
         <link rel="stylesheet" href="~/css/rm.dark.css" asp-append-version="true" />
-        @if (sportCss == "mlb")
+        @if (sportCss == "mlb" || sportCss == "nfl")
         {
             <link rel="stylesheet" href="~/css/rm.@(sportCss).dark.css" asp-append-version="true" />
         }

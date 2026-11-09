@@ -72,8 +72,8 @@
                             <div class="rm-lu-line-rows">
                                 @foreach (var dp in grp.Players)
                                 {
-                                    var ownCss = colorLib.GetDisplayPlayerOwnCss(dp);
                                     <div class="rm-lu-row rm-dc-row">
+                                        <span class="rm-lu-ownbadge rm-dc-ownslot"><partial name="_DisplayPlayerOwn" model="dp" /></span>
                                         <span class="rm-lu-slot rm-dc-depth">
                                             @if (dp.DepthPlayer != null && dp.DepthPlayer.Depth > 0)
                                             {
@@ -81,10 +81,6 @@
                                             }
                                         </span>
                                         <span class="rm-lu-name">
-                                            @if (!string.IsNullOrWhiteSpace(ownCss))
-                                            {
-                                                <span class="rm-dc-own text-white @ownCss"><partial name="_DisplayPlayerOwn" model="dp" /></span>
-                                            }
                                             <a asp-page="/Players" asp-route-playerId="@dp.SeasonPlayer.PlayerId" asp-route-l="@Model.SelectedUserLeagueId">@dp.SeasonPlayer.Player.ForwardName</a>
                                             @if (dp.Positions != null && dp.Positions.Count > 0)
                                             {

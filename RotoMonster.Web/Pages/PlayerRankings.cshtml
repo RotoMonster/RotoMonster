@@ -177,10 +177,11 @@
                 </div>
             </span>
 
+            @{ var ptView = ViewContext.HttpContext.Request.Cookies["rmPtView"] ?? "stats"; }
             <span class="ms-3 rm-pt-viewseg" id="rmPtView" role="group" aria-label="Show stats or values">
-                <button type="button" data-v="stats">Stats</button>
-                <button type="button" data-v="values">Values</button>
-                <button type="button" data-v="both">Both</button>
+                <button type="button" data-v="stats" class="@(ptView == "stats" ? "on" : null)">Stats</button>
+                <button type="button" data-v="values" class="@(ptView == "values" ? "on" : null)">Values</button>
+                <button type="button" data-v="both" class="@(ptView == "both" ? "on" : null)">Both</button>
             </span>
 
             <span class="ms-2">
@@ -360,11 +361,15 @@
                 var head = table.querySelectorAll('thead tr:first-child > .rm-pt-pin');
                 var lefts = [], x = 0;
                 head.forEach(function (th) { lefts.push(x); x += th.getBoundingClientRect().width; });
+                var narrow = window.innerWidth < 768;
                 table.querySelectorAll('tr').forEach(function (tr) {
                     var cells = tr.querySelectorAll(':scope > .rm-pt-pin');
                     cells.forEach(function (c, i) {
-                        c.style.left = (lefts[i] || 0) + 'px';
-                        c.classList.toggle('rm-pt-pin-last', i === cells.length - 1);
+                        var last = i === cells.length - 1;
+                        var off = narrow && !last;
+                        c.classList.toggle('rm-pt-unpin', off);
+                        c.style.left = off ? '' : (narrow ? 0 : (lefts[i] || 0)) + 'px';
+                        c.classList.toggle('rm-pt-pin-last', last);
                     });
                 });
             }
@@ -409,6 +414,8 @@
             }
             function viewMode() {
                 var v = 'stats';
+                var m = document.cookie.match(/(?:^|;\s*)rmPtView=([^;]+)/);
+                if (m) return decodeURIComponent(m[1]);
                 try { v = localStorage.getItem('rmPtView') || 'stats'; } catch (e) { }
                 return v;
             }
@@ -431,6 +438,7 @@
                 var b = e.target.closest ? e.target.closest('#rmPtView button') : null;
                 if (!b) return;
                 e.preventDefault();
+                document.cookie = 'rmPtView=' + encodeURIComponent(b.getAttribute('data-v')) + '; path=/; max-age=31536000; samesite=lax';
                 try { localStorage.setItem('rmPtView', b.getAttribute('data-v')); } catch (err) { }
                 document.querySelectorAll('#rmPtView button').forEach(function (x) {
                     x.classList.toggle('on', x === b);
@@ -464,7 +472,7 @@
                 var headRow = table.tHead.querySelector('tr:not(.rm-pt-groups)');
                 var heads = Array.prototype.slice.call(headRow.cells);
                 var rows = Array.prototype.slice.call(table.querySelectorAll('tbody > tr'));
-                table.querySelectorAll('tbody .rm-badge, tbody .pct-badge, tbody .value-badge, tbody .rm-badge-change').forEach(function (b) { b.style.backgroundColor = ''; });
+                table.querySelectorAll('tbody .rm-badge, tbody .pct-badge, tbody .value-badge, tbody .rm-badge-change').forEach(function (b) { if (b.dataset.bg === undefined) b.dataset.bg = b.style.backgroundColor; b.style.backgroundColor = ''; });
                 heads.forEach(function (th, i) {
                     var kind = th.getAttribute('data-pt');
                     if (!kind) return;
@@ -488,8 +496,8 @@
                         cells.forEach(function (c, j) {
                             var b = c.querySelector('.pct-badge');
                             if (!b || vals[j] === null) return;
-                            b.classList.add('rm-pt-pct', 'rm-pt-' + kind);
-                            b.style.setProperty('--a', alpha(vals[j], 100));
+                            b.classList.add('rm-pt-orig');
+                            if (b.dataset.bg) b.style.backgroundColor = b.dataset.bg;
                             var ch = b.querySelector('.rm-badge-change');
                             if (ch) {
                                 var d = parseFloat(ch.textContent);
@@ -516,6 +524,15 @@
                         });
                         return;
                     }
+                    if (kind === 'val' || kind === 'cval') {
+                        cells.forEach(function (c) {
+                            var b = c.querySelector('.value-badge, .rm-badge');
+                            if (!b || !b.dataset.bg) return;
+                            b.classList.add('rm-pt-orig');
+                            b.style.backgroundColor = b.dataset.bg;
+                        });
+                        return;
+                    }
                     var max = 0;
                     vals.forEach(function (v) { if (v !== null && Math.abs(v) > max) max = Math.abs(v); });
                     cells.forEach(function (c, j) {
@@ -535,6 +552,62 @@
             modern();
             document.addEventListener('rm:live-updated', modern);
             window.addEventListener('resize', function () { var t = document.querySelector('table.rm-pt'); if (t) pin(t); });
+            (function () {
+                var bar = document.createElement('div');
+                bar.className = 'rm-pt-hbar';
+                bar.hidden = true;
+                bar.innerHTML = '<div></div>';
+                document.body.appendChild(bar);
+                var syncing = false;
+                function box() {
+                    var t = document.querySelector('table.rm-pt');
+                    return t ? t.closest('.rm-pt-scroll') : null;
+                }
+                function update() {
+                    var b = box();
+                    if (!b) { bar.hidden = true; return; }
+                    var t = b.querySelector('table.rm-pt');
+                    var r = b.getBoundingClientRect();
+                    var head = t.tHead;
+                    var h = head ? head.getBoundingClientRect().height : 0;
+                    var y = Math.max(0, Math.min(-r.top, r.height - h - 40));
+                    if (head) head.querySelectorAll('th').forEach(function (th) { th.style.transform = y > 0 ? 'translateY(' + y + 'px)' : ''; });
+                    if (!b.dataset.hbar) {
+                        b.dataset.hbar = '1';
+                        b.addEventListener('scroll', function () {
+                            if (syncing) { syncing = false; return; }
+                            syncing = true;
+                            bar.scrollLeft = b.scrollLeft;
+                        });
+                    }
+                    var wide = b.scrollWidth > b.clientWidth + 1;
+                    var show = wide && r.top < window.innerHeight - 40 && r.bottom > window.innerHeight;
+                    bar.hidden = !show;
+                    if (show) {
+                        bar.style.left = Math.max(0, r.left) + 'px';
+                        bar.style.width = Math.min(r.width, window.innerWidth - Math.max(0, r.left)) + 'px';
+                        bar.firstChild.style.width = b.scrollWidth + 'px';
+                        if (Math.abs(bar.scrollLeft - b.scrollLeft) > 1) { syncing = true; bar.scrollLeft = b.scrollLeft; }
+                    }
+                }
+                bar.addEventListener('scroll', function () {
+                    if (syncing) { syncing = false; return; }
+                    var b = box();
+                    if (!b) return;
+                    syncing = true;
+                    b.scrollLeft = bar.scrollLeft;
+                });
+                var queued = false;
+                function queue() {
+                    if (queued) return;
+                    queued = true;
+                    requestAnimationFrame(function () { queued = false; update(); });
+                }
+                window.addEventListener('scroll', queue, { passive: true });
+                window.addEventListener('resize', queue);
+                document.addEventListener('rm:live-updated', function () { setTimeout(update, 0); });
+                update();
+            })();
         })();
     </script>
 }

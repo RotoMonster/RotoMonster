@@ -45,7 +45,7 @@
 <div class="container-fluid px-4">
 
     @Html.Raw(new PageGuide("scores-guide")
-        .WithTitle("Scores")
+        .WithTitle("Box Scores")
         .WithPurpose("Scores shows every game on the selected day with live scores, and the box score for whichever game you pick.")
         .AddSection("The game list", "<p>Games on the left update on their own while they are live. Click any game to open its box score on the right.</p><p>When you are logged in, the <strong>yours</strong> pill shows how many of your players are in that game.</p>")
         .AddSection("Box score", "<p>The box score lists every player's stats for the game, so you can see exactly how your players did.</p>")
@@ -196,9 +196,9 @@
                     {
                         <section class="rm-sc-card rm-sc-box" style="--tc: @TeamColor(team);">
                             <header class="rm-sc-box-head">
+                                <span class="rm-sc-score" style="@selectedGame.GetTeamStyle(team)">@selectedGame.GetTeamScore(team)</span>
                                 <span class="rm-sc-head-code">@team.Code</span>
                                 <span class="rm-sc-head-name">@team.Name</span>
-                                <span class="rm-sc-score" style="@selectedGame.GetTeamStyle(team)">@selectedGame.GetTeamScore(team)</span>
                             </header>
 
                             @foreach (var playerType in Model.BoxScoreModel.PlayerTypes)
@@ -240,3 +240,19 @@
     </form>
 
 </div>
+
+@section scripts{
+    <script>
+        (function () {
+            function grayZeros() {
+                document.querySelectorAll('.rm-scores-table td.rm-badge-cell').forEach(function (c) {
+                    var t = c.textContent.replace(/[,%\s]/g, '');
+                    var n = parseFloat(t);
+                    c.classList.toggle('rm-sc-z', t === '' || t === '-' || (!isNaN(n) && Math.abs(n) < 0.005));
+                });
+            }
+            grayZeros();
+            document.addEventListener('rm:live-updated', grayZeros);
+        })();
+    </script>
+}

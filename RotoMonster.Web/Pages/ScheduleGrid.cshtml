@@ -48,6 +48,18 @@
         (function () {
             var g = document.getElementById("rm-schedule-grid");
             if (!g) return;
+            g.querySelectorAll(".schedule-grid-period-row").forEach(function (row) {
+                var cells = row.querySelectorAll(".schedule-grid-team-cell");
+                var any = false;
+                cells.forEach(function (c) {
+                    var s = c.querySelector(".schedule-grid-team-games");
+                    var n = s ? parseInt(s.textContent, 10) : 0;
+                    var none = !s || isNaN(n) || n === 0;
+                    c.classList.toggle("rm-sg-zero", none);
+                    if (!none) any = true;
+                });
+                row.classList.toggle("rm-sg-empty", cells.length > 0 && !any);
+            });
             [["rm-tour-sg-controls", ".schedule-grid-controls"], ["rm-tour-sg-summary", ".schedule-grid-summary-row"], ["rm-tour-sg-arrows", ".schedule-grid-arrows-cell"], ["rm-tour-sg-date", ".schedule-grid-date-cell"]].forEach(function (x) {
                 var el = g.querySelector(x[1]);
                 if (el && !el.id) el.id = x[0];
