@@ -1,7 +1,7 @@
 :root {
-    --brand-primary: #b34d80;
-    --brand-primary-rgb: 179, 77, 128;
-    --brand-primary-light: #cc6699;
-    --brand-primary-dark: #993366;
-    --brand-accent: #d98cb3;
+    --brand-primary: #a33d70;
+    --brand-primary-rgb: 163, 61, 112;
+    --brand-primary-light: #b85585;
+    --brand-primary-dark: #73264c;
+    --brand-accent: #cc6699;
 }

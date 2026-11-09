@@ -151,11 +151,11 @@ select {
 }
 
 .nfl {
-    background-color: #993366;
+    background-color: #73264c;
 }
 
 .nfl-txt {
-    color: #993366;
+    color: #73264c;
 }
 
 .nhl {
@@ -3270,7 +3270,7 @@ a.rm-live-busy svg {
 :root {
     --logo-nba: #f08a4b;
     --logo-mlb: #3f9142;
-    --logo-nfl: #993366;
+    --logo-nfl: #73264c;
     --logo-nhl: #0077b3;
 }
 
@@ -3564,7 +3564,7 @@ a.rm-live-busy svg {
 .rm-lu { --lu-sport: #2d7a3e; --lu-name: var(--lu-sport); padding-bottom: 32px; }
 .rm-lu--mlb { --lu-sport: #2d7a3e; }
 .rm-lu--nba { --lu-sport: #e65c00; }
-.rm-lu--nfl { --lu-sport: #993366; }
+.rm-lu--nfl { --lu-sport: #73264c; }
 .rm-lu--nhl { --lu-sport: #0077b3; }
 
 .rm-lu-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 16px 0 6px; }
@@ -3926,7 +3926,7 @@ a.rm-live-busy svg {
 .rm-dc-page.rm-lu--nhl { --brand-primary-rgb: 0, 119, 179; --brand-accent-rgb: 0, 119, 179; }
 .rm-dc-page.rm-lu--nba { --brand-primary-rgb: 230, 92, 0; --brand-accent-rgb: 230, 92, 0; }
 .rm-dc-page.rm-lu--mlb { --brand-primary-rgb: 45, 122, 62; --brand-accent-rgb: 45, 122, 62; }
-.rm-dc-page.rm-lu--nfl { --brand-primary-rgb: 153, 51, 102; --brand-accent-rgb: 153, 51, 102; }
+.rm-dc-page.rm-lu--nfl { --brand-primary-rgb: 115, 38, 76; --brand-accent-rgb: 115, 38, 76; }
 .rm-dc-page .bm-custom-select { --brand-primary: var(--lu-sport); --brand-accent: var(--lu-sport); }
 /* end rm-dc-brand */
 
