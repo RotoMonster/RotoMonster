@@ -24,7 +24,7 @@ namespace RotoMonster.Api
         public const string WaiversCode = "waivers";
         public const int WaiversCategoriesStringId = 1;
 
-        private static int _running;
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> _running = new System.Collections.Concurrent.ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, RunSummary> _lastRuns = new System.Collections.Concurrent.ConcurrentDictionary<string, RunSummary>(StringComparer.OrdinalIgnoreCase);
 
         private readonly IServiceScopeFactory _scopeFactory;
@@ -86,7 +86,7 @@ namespace RotoMonster.Api
             request = request ?? new FillOwnershipRequest();
             var key = request.CategoriesCode ?? "";
 
-            var alreadyRunning = Interlocked.Exchange(ref _running, 1) == 1;
+            var alreadyRunning = !_running.TryAdd(key, true);
             var started = false;
 
             if (!alreadyRunning)
@@ -116,7 +116,7 @@ namespace RotoMonster.Api
                     }
                     finally
                     {
-                        Interlocked.Exchange(ref _running, 0);
+                        _running.TryRemove(key, out _);
                     }
                 });
             }
@@ -145,7 +145,7 @@ namespace RotoMonster.Api
 
             return new
             {
-                running = Volatile.Read(ref _running) == 1,
+                running = _running.ContainsKey(code ?? ""),
                 startedRun = startedNow,
                 lastRun = last == null ? null : new
                 {
