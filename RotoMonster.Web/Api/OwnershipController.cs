@@ -43,7 +43,7 @@ namespace RotoMonster.Api
             public string CategoriesCode { get; set; }
             public int LeagueCount { get; set; } = 100;
             public int PauseSeconds { get; set; } = 3;
-            public int WaiverChecks { get; set; } = 50;
+            public int WaiverChecks { get; set; } = 300;
         }
 
         public class LeagueResult
