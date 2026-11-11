@@ -201,6 +201,77 @@ namespace RotoMonster.Pages
 
         private const int StatusLimit = 40;
 
+        private Dictionary<int, RotoMonster.Core.PlayerStatus> _activeStatuses = new Dictionary<int, RotoMonster.Core.PlayerStatus>();
+
+        private string TeamColor(string code)
+        {
+            var sport = _data.Sport != null ? (_data.Sport.Title ?? "") : "";
+            var c = (code ?? "").Trim();
+            if (sport == "NBA") return TeamColorHelper.GetNbaTeamColorVar(c);
+            if (sport == "NFL" || sport == "NHL") return "var(--team-" + sport.ToLower() + "-" + c.ToLower() + ", var(--brand-primary))";
+            return TeamColorHelper.GetTeamColorVar(c);
+        }
+
+        private Dictionary<int, List<DisplayPosition>> PlayerPositions()
+        {
+            return _cache.GetOrCreate("twitterview-positions", e =>
+            {
+                e.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
+                var season = _data.GetDefaultSeason();
+                if (season == null) return new Dictionary<int, List<DisplayPosition>>();
+                return _data.GetPlayerSeasonPositions(_data.GetDefaultFantasyProvider(), season)
+                    .Where(p => p.Position != null && !string.IsNullOrWhiteSpace(p.Position.Abbreviation))
+                    .GroupBy(p => p.PlayerId)
+                    .ToDictionary(g => g.Key, g => g.Select(p => new DisplayPosition
+                    {
+                        Id = p.Position.Id,
+                        Abbreviation = p.Position.Abbreviation,
+                        Color = "var(--pos-" + p.Position.Abbreviation.Trim().ToLower() + ")"
+                    }).ToList());
+            });
+        }
+
+        private Dictionary<int, double> Ownership()
+        {
+            return _cache.GetOrCreate("twitterview-ownership", e =>
+            {
+                e.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15);
+                return _data.GetAllDefaultOwnershipPlayers(DateTime.UtcNow)
+                    .GroupBy(o => o.PlayerId)
+                    .ToDictionary(g => g.Key, g => g.First().OwnershipPercent);
+            });
+        }
+
+        private DisplayPlayerInput Display(int playerId, string name, string teamCode)
+        {
+            List<DisplayPosition> positions;
+            double own;
+            return new DisplayPlayerInput
+            {
+                PlayerId = playerId,
+                PlayerName = name,
+                TeamCode = teamCode,
+                TeamColor = string.IsNullOrEmpty(teamCode) ? null : TeamColor(teamCode),
+                Positions = PlayerPositions().TryGetValue(playerId, out positions) ? positions.ToList() : new List<DisplayPosition>(),
+                OwnershipPercent = Ownership().TryGetValue(playerId, out own) ? (int?)Math.Round(own) : null
+            };
+        }
+
+        private InjuryBadgeInput StatusBadge(int playerId)
+        {
+            RotoMonster.Core.PlayerStatus ps;
+            if (!_activeStatuses.TryGetValue(playerId, out ps) || ps.PlayerStatusType == null) return null;
+            var label = (ps.PlayerStatusType.TextFormat ?? "").Replace("{t}", "").Trim();
+            if (label.Length == 0) return null;
+            return new InjuryBadgeInput
+            {
+                StatusAbbreviation = label,
+                StatusText = ps.PlayerStatusType.Title,
+                StatusColor = ps.PlayerStatusType.BackgroundColor,
+                StatusDetails = ps.Subject
+            };
+        }
+
         private async Task BuildStatusesAsync(CancellationToken ct)
         {
             var options = StatusOptions();
@@ -229,10 +300,12 @@ namespace RotoMonster.Pages
                 State.Statuses.Add(new NewsCardInput
                 {
                     NewsId = s.Id,
-                    DisplayPlayerInput = new DisplayPlayerInput { PlayerId = s.PlayerId, PlayerName = name, TeamCode = rm != null ? rm.TeamCode : "" },
+                    DisplayPlayerInput = Display(s.PlayerId, name, rm != null ? rm.TeamCode : ""),
                     Sport = sport,
                     IsDarkMode = dark,
                     StatusTypeText = typeTitle,
+                    StatusTypeColorCode = s.PlayerStatusType != null ? s.PlayerStatusType.BackgroundColor : null,
+                    CurrentStatusTypeColorCode = s.PlayerStatusType != null ? s.PlayerStatusType.BackgroundColor : null,
                     StatusTypeTag = tagTitle,
                     CurrentStatusTypeText = typeTitle,
                     CurrentStatusTypeTag = tagTitle,
@@ -309,6 +382,10 @@ namespace RotoMonster.Pages
         private async Task BuildAsync(FeedTweet active, TweetCardResult result, CancellationToken ct)
         {
             await BuildStatusesAsync(ct);
+
+            _activeStatuses = (await _data.GetActivePlayerStatusesAsync())
+                .GroupBy(s => s.PlayerId)
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(s => s.DateAdded).First());
 
             if (!_feed.Enabled)
             {
@@ -418,12 +495,25 @@ namespace RotoMonster.Pages
             {
                 RmPlayer rm;
                 if (!players.TryGetValue(NameKey(p.FirstName, p.LastName), out rm) || !seen.Add(rm.Id)) continue;
+                var dpi = Display(rm.Id, rm.Name, rm.TeamCode);
+                dpi.IsExactMatch = p.IsExactMatch;
+                dpi.FirstName = p.FirstName;
+                dpi.LastName = p.LastName;
                 cardPlayers.Add(new TweetCardPlayer
                 {
-                    DisplayPlayerInput = new DisplayPlayerInput { PlayerId = rm.Id, PlayerName = rm.Name, TeamCode = rm.TeamCode },
-                    MatchConfidence = (double)p.Confidence
+                    DisplayPlayerInput = dpi,
+                    MatchConfidence = (double)p.Confidence,
+                    PercentText = dpi.OwnershipPercent.HasValue ? dpi.OwnershipPercent.Value.ToString() : null,
+                    InjuryBadge = StatusBadge(rm.Id)
                 });
             }
+
+            cardPlayers = cardPlayers
+                .OrderByDescending(cp => cp.DisplayPlayerInput.IsExactMatch)
+                .ThenBy(cp => cp.DisplayPlayerInput.TeamCode ?? "", StringComparer.OrdinalIgnoreCase)
+                .ThenBy(cp => cp.DisplayPlayerInput.LastName ?? "", StringComparer.OrdinalIgnoreCase)
+                .ThenBy(cp => cp.DisplayPlayerInput.FirstName ?? "", StringComparer.OrdinalIgnoreCase)
+                .ToList();
 
             var teams = cardPlayers
                 .Select(p => p.DisplayPlayerInput.TeamCode)

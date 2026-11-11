@@ -26,6 +26,7 @@ namespace RotoMonster.Services
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public decimal Confidence { get; set; }
+        public bool IsExactMatch { get; set; }
     }
 
     public class FeedKeyword
