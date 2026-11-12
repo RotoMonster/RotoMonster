@@ -213,6 +213,7 @@ namespace RotoMonster.Pages
                         playerTableModel.ShowTeam = false;
                         playerTableModel.ShowOwnership = true;
                         playerTableModel.ShowDepth = false;
+                        playerTableModel.Modern = true;
 
                         boxScoreModel.TeamPlayerTableModels[team][playerType] = playerTableModel;
                         playerTableModel.MonsterBarGame = null;

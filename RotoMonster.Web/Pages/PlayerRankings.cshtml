@@ -479,12 +479,11 @@
                     var cells = rows.map(function (r) { return r.cells[i]; }).filter(Boolean);
                     var vals = cells.map(function (c) { return num(c.querySelector('.pct-badge, .value-badge, .rm-badge') || c); });
                     if (kind === 'extra') {
-                        cells.forEach(function (c) { c.style.backgroundColor = ''; });
+                        cells.forEach(function (c, j) { c.style.backgroundColor = ''; c.classList.toggle('rm-pt-z', vals[j] !== null && Math.abs(vals[j]) < 0.005); });
                         if (cells.every(function (c) { return c.textContent.trim() === ''; })) hideCol(th, cells);
                         return;
                     }
                     if (kind === 'trend') {
-                        if (vals.every(function (v) { return v === null || Math.abs(v) < 0.005; })) { hideCol(th, cells); return; }
                         cells.forEach(function (c) {
                             c.style.backgroundColor = '';
                             var v = num(c);
@@ -525,9 +524,11 @@
                         return;
                     }
                     if (kind === 'val' || kind === 'cval') {
-                        cells.forEach(function (c) {
+                        cells.forEach(function (c, j) {
                             var b = c.querySelector('.value-badge, .rm-badge');
-                            if (!b || !b.dataset.bg) return;
+                            if (!b) return;
+                            if (vals[j] !== null && Math.abs(vals[j]) < 0.005) { c.classList.add('rm-pt-z'); if (b.textContent.trim() === '-0.00') b.textContent = '0.00'; return; }
+                            if (!b.dataset.bg) return;
                             b.classList.add('rm-pt-orig');
                             b.style.backgroundColor = b.dataset.bg;
                         });

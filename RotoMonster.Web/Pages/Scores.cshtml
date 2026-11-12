@@ -192,7 +192,13 @@
                         }
                     </div>
 
-                    @foreach (var team in selectedGame.GetTeams())
+                    @if (Model.Sport != null && Model.Sport.IsNFL)
+                    {
+                        <partial name="_NflBoxScore" model="Model" />
+                    }
+                    else
+                    {
+                    foreach (var team in selectedGame.GetTeams())
                     {
                         <section class="rm-sc-card rm-sc-box" style="--tc: @TeamColor(team);">
                             <header class="rm-sc-box-head">
@@ -206,16 +212,37 @@
                                 var playerTableModel = Model.BoxScoreModel.TeamPlayerTableModels[team][playerType];
                                 if (playerTableModel.DisplayPlayers.Count > 0)
                                 {
-                                    if (Model.BoxScoreModel.PlayerTypes.Count > 1)
+                                    var allPlayers = playerTableModel.DisplayPlayers;
+                                    var typeTitle = string.IsNullOrEmpty(playerType.PluralTitle) ? playerType.Title : playerType.PluralTitle;
+                                    var boxGroups = new List<KeyValuePair<string, List<RotoMonster.Core.DisplayPlayer>>>();
+                                    var qbs = playerTableModel.Sport != null && playerTableModel.Sport.IsNFL
+                                        ? allPlayers.Where(p => p.Positions != null && p.Positions.Any(x => x != null && x.Abbreviation == "QB")).ToList()
+                                        : new List<RotoMonster.Core.DisplayPlayer>();
+                                    if (qbs.Count > 0 && qbs.Count < allPlayers.Count)
                                     {
-                                        <div class="rm-sc-box-type">@(string.IsNullOrEmpty(playerType.PluralTitle) ? playerType.Title : playerType.PluralTitle)</div>
+                                        boxGroups.Add(new KeyValuePair<string, List<RotoMonster.Core.DisplayPlayer>>("Quarterbacks", qbs));
+                                        boxGroups.Add(new KeyValuePair<string, List<RotoMonster.Core.DisplayPlayer>>(typeTitle, allPlayers.Where(p => !qbs.Contains(p)).ToList()));
                                     }
-                                    <div class="rm-scores-table">
-                                        <partial name="_PlayerTable" model="playerTableModel" />
-                                    </div>
+                                    else
+                                    {
+                                        boxGroups.Add(new KeyValuePair<string, List<RotoMonster.Core.DisplayPlayer>>(typeTitle, allPlayers));
+                                    }
+                                    foreach (var boxGroup in boxGroups)
+                                    {
+                                        playerTableModel.DisplayPlayers = boxGroup.Value;
+                                        if (Model.BoxScoreModel.PlayerTypes.Count > 1 || boxGroups.Count > 1)
+                                        {
+                                            <div class="rm-sc-box-type">@boxGroup.Key</div>
+                                        }
+                                        <div class="rm-scores-table">
+                                            @await Html.PartialAsync("_PlayerTable", playerTableModel)
+                                        </div>
+                                    }
+                                    playerTableModel.DisplayPlayers = allPlayers;
                                 }
                             }
                         </section>
+                    }
                     }
 
                     if (Model.BoxScoreModel.Articles != null && Model.BoxScoreModel.Articles.Count > 0)
@@ -242,10 +269,11 @@
 </div>
 
 @section scripts{
+    <script src="~/js/rm-boxtable.js" asp-append-version="true"></script>
     <script>
         (function () {
             function grayZeros() {
-                document.querySelectorAll('.rm-scores-table td.rm-badge-cell').forEach(function (c) {
+                document.querySelectorAll('.rm-scores-table td.tdr, .rm-scores-table td.rm-badge-cell, .rm-scores-table td.value-badge-cell, .rm-scores-table td.pct-badge-cell').forEach(function (c) {
                     var t = c.textContent.replace(/[,%\s]/g, '');
                     var n = parseFloat(t);
                     c.classList.toggle('rm-sc-z', t === '' || t === '-' || (!isNaN(n) && Math.abs(n) < 0.005));

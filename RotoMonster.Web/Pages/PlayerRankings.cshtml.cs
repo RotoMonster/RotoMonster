@@ -584,7 +584,7 @@ namespace RotoMonster.Pages
                 //OwnershipLeagueCount = (from a in ownershipPlayers select a.LeagueCount).Max();
             }
 
-            PlayerTableModel.ShowTrending = displaySeason.HasStarted;
+            PlayerTableModel.ShowTrending = PlayerTableModel.ShowTrending && displaySeason.HasStarted;
             List<OwnershipPlayer> trendingPlayers = PlayerTableModel.ShowTrending ? db.GetTrendingPlayers() : null;
 
             var waiverPlayers = await db.GetUserLeagueWaiverPlayersAsync(userLeague);

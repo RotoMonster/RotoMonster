@@ -1,0 +1,196 @@
+@model RotoMonster.Pages.ScoresModel
+@inject RotoMonster.Data.IRMData idb
+@functions {
+    public class NbRow
+    {
+        public RotoMonster.Core.Team Team { get; set; }
+        public RotoMonster.Core.PlayerType PlayerType { get; set; }
+        public RotoMonster.Core.DisplayPlayer Dp { get; set; }
+        public RotoMonster.Models.Shared.PlayerTableModel Ptm { get; set; }
+        public Dictionary<string, RotoMonster.Core.Category> Cats { get; set; }
+
+        public double V(string abbr)
+        {
+            if (Dp.StatPlayer == null || Cats == null || !Cats.TryGetValue(abbr, out var c)) return 0;
+            return Dp.StatPlayer.Get(Ptm.DisplayPerValue, c.Id);
+        }
+
+        public double VC(RotoMonster.Core.Category c)
+        {
+            if (Dp.StatPlayer == null || c == null) return 0;
+            return Dp.StatPlayer.Get(Ptm.DisplayPerValue, c.Id);
+        }
+    }
+
+    public class NbSection
+    {
+        public string Title { get; set; }
+        public List<string> Heads { get; set; } = new List<string>();
+        public Dictionary<int, List<KeyValuePair<NbRow, List<string>>>> Rows { get; set; } = new Dictionary<int, List<KeyValuePair<NbRow, List<string>>>>();
+    }
+
+    static string N(double v) => Math.Abs(v - Math.Round(v)) < 0.001 ? Math.Round(v).ToString("0") : v.ToString("0.#");
+}
+@{
+    var bsm = Model.BoxScoreModel;
+    var game = bsm.Game;
+    var teams = game.GetTeams().Where(t => t != null).ToList();
+
+    string TeamColor(RotoMonster.Core.Team team)
+    {
+        if (team == null) return "var(--brand-primary)";
+        return "var(--team-nfl-" + (team.Code ?? "").Trim().ToLower() + ", var(--brand-primary))";
+    }
+
+    var cats = new Dictionary<int, Dictionary<string, RotoMonster.Core.Category>>();
+    foreach (var pt in bsm.PlayerTypes)
+    {
+        cats[pt.Id] = idb.GetCategories(pt)
+            .Where(c => !string.IsNullOrWhiteSpace(c.Abbreviation))
+            .GroupBy(c => c.Abbreviation.Trim().ToUpperInvariant())
+            .ToDictionary(g => g.Key, g => g.First());
+    }
+
+    var rows = new List<NbRow>();
+    foreach (var team in teams)
+    {
+        if (!bsm.TeamPlayerTableModels.ContainsKey(team)) continue;
+        foreach (var pt in bsm.PlayerTypes)
+        {
+            if (!bsm.TeamPlayerTableModels[team].ContainsKey(pt)) continue;
+            var ptm = bsm.TeamPlayerTableModels[team][pt];
+            foreach (var dp in ptm.DisplayPlayers)
+                rows.Add(new NbRow { Team = team, PlayerType = pt, Dp = dp, Ptm = ptm, Cats = cats[pt.Id] });
+        }
+    }
+
+    var offense = bsm.PlayerTypes.FirstOrDefault(pt => cats[pt.Id].ContainsKey("PATT"));
+    var sections = new List<NbSection>();
+
+    NbSection Make(string title, List<string> heads, Func<NbRow, bool> keep, Func<NbRow, double> sort, Func<NbRow, List<string>> cells)
+    {
+        var s = new NbSection { Title = title, Heads = heads };
+        foreach (var team in teams)
+        {
+            s.Rows[team.Id] = rows.Where(r => r.Team.Id == team.Id && keep(r))
+                .OrderByDescending(sort)
+                .Select(r => new KeyValuePair<NbRow, List<string>>(r, cells(r)))
+                .ToList();
+        }
+        return s;
+    }
+
+    if (offense != null)
+    {
+        Func<NbRow, bool> isOff = r => r.PlayerType.Id == offense.Id;
+        sections.Add(Make("Passing", new List<string> { "C/Att", "Yds", "Air", "TD", "Int" },
+            r => isOff(r) && r.V("PATT") > 0, r => r.V("PYRD"),
+            r => new List<string> { N(r.V("COMP")) + "/" + N(r.V("PATT")), N(r.V("PYRD")), N(r.V("PAIRY")), N(r.V("PTD")), N(r.V("INT")) }));
+        sections.Add(Make("Rushing", new List<string> { "Car", "Yds", "Avg", "TD" },
+            r => isOff(r) && r.V("RATT") > 0, r => r.V("RYRD"),
+            r => new List<string> { N(r.V("RATT")), N(r.V("RYRD")), (r.V("RYRD") / r.V("RATT")).ToString("0.0"), N(r.V("RTD")) }));
+        sections.Add(Make("Receiving", new List<string> { "Rec", "Tgt", "Yds", "Air", "TD" },
+            r => isOff(r) && (r.V("TARG") > 0 || r.V("REC") > 0), r => r.V("RXYRD"),
+            r => new List<string> { N(r.V("REC")), N(r.V("TARG")), N(r.V("RXYRD")), N(r.V("RXAIRY")), N(r.V("RXTD")) }));
+    }
+
+    foreach (var pt in bsm.PlayerTypes.Where(pt => offense == null || pt.Id != offense.Id))
+    {
+        var typeRows = rows.Where(r => r.PlayerType.Id == pt.Id).ToList();
+        var shown = typeRows.SelectMany(r => r.Ptm.UserDisplayCategories ?? new List<RotoMonster.Core.UserDisplayCategory>())
+            .Select(u => u.Category)
+            .Where(c => c != null)
+            .GroupBy(c => c.Id)
+            .Select(g => g.First())
+            .Where(c => typeRows.Any(r => Math.Abs(r.VC(c)) > 0.001))
+            .ToList();
+        if (shown.Count == 0) continue;
+        sections.Add(Make(string.IsNullOrEmpty(pt.PluralTitle) ? pt.Title : pt.PluralTitle,
+            shown.Select(c => c.Abbreviation).ToList(),
+            r => r.PlayerType.Id == pt.Id && shown.Any(c => Math.Abs(r.VC(c)) > 0.001),
+            r => r.Dp.ValuePlayer != null ? r.Dp.ValuePlayer.LeagueValue : 0,
+            r => shown.Select(c => N(r.VC(c))).ToList()));
+    }
+
+    var leaders = rows.Where(r => r.Dp.ValuePlayer != null && r.Dp.ValuePlayer.LeagueValue > 0.005)
+        .OrderByDescending(r => r.Dp.ValuePlayer.LeagueValue)
+        .Take(6)
+        .ToList();
+}
+
+<div class="rm-nb">
+    @if (leaders.Count > 0)
+    {
+        <div class="rm-nb-label">Fantasy leaders</div>
+        <div class="rm-nb-leaders">
+            @foreach (var l in leaders)
+            {
+                var pos = l.Dp.Positions != null && l.Dp.Positions.Count > 0 ? l.Dp.Positions[0].Abbreviation : "";
+                <div class="rm-nb-lead">
+                    <div class="rm-nb-lead-top"><span class="rm-nb-teamtag" style="--tc:@TeamColor(l.Team)">@l.Team.Code</span><span class="rm-nb-pos" style="color:var(--pos-@(pos.Trim().ToLower()))">@pos</span></div>
+                    <a class="rm-nb-name" asp-page="/Players" asp-route-playerId="@l.Dp.SeasonPlayer.Player.Id" asp-route-l="@(l.Ptm.SelectedUserLeague != null ? l.Ptm.SelectedUserLeague.Id : 0)">@l.Dp.SeasonPlayer.Player.FirstName @l.Dp.SeasonPlayer.Player.LastName</a>
+                    <div class="rm-nb-lead-bottom">
+                        <span class="rm-nb-pts">@l.Dp.ValuePlayer.LeagueValue.ToString("0.00")</span>
+                        @if (l.Dp.OwnershipPlayer != null)
+                        {
+                            <span class="rm-nb-pills">
+                                <span class="rm-nb-pill rm-nb-own" title="Own%">@l.Dp.OwnershipPlayer.OwnershipPercent.ToString("0")</span>
+                                <span class="rm-nb-pill rm-nb-start" title="Start%">@l.Dp.OwnershipPlayer.ActivePercent.ToString("0")</span>
+                            </span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @foreach (var s in sections)
+    {
+        var gridCols = "minmax(0,1fr) repeat(" + s.Heads.Count + ", 44px) 56px";
+        <section class="rm-nb-sec">
+            <div class="rm-nb-sec-title">@s.Title</div>
+            <div class="rm-nb-halves">
+                @foreach (var team in teams)
+                {
+                    var teamRows = s.Rows.ContainsKey(team.Id) ? s.Rows[team.Id] : new List<KeyValuePair<NbRow, List<string>>>();
+                    <div class="rm-nb-half">
+                        <div class="rm-nb-th" style="grid-template-columns:@gridCols">
+                            <span class="rm-nb-th-team" style="color:@TeamColor(team)">@team.Name</span>
+                            @foreach (var h in s.Heads)
+                            {
+                                <span class="rm-nb-n">@h</span>
+                            }
+                            <span class="rm-nb-n">Pts</span>
+                        </div>
+                        @foreach (var kv in teamRows)
+                        {
+                            var r = kv.Key;
+                            <div class="rm-nb-tr" style="grid-template-columns:@gridCols">
+                                <span class="rm-nb-player">
+                                    <span class="rm-nb-ownslot own-cell"><partial name="_DisplayPlayerOwn" model="r.Dp" /></span>
+                                    <a class="rm-nb-name" asp-page="/Players" asp-route-playerId="@r.Dp.SeasonPlayer.Player.Id" asp-route-l="@(r.Ptm.SelectedUserLeague != null ? r.Ptm.SelectedUserLeague.Id : 0)">@r.Dp.SeasonPlayer.Player.FirstName @r.Dp.SeasonPlayer.Player.LastName</a>
+                                    @{ var rpos = r.Dp.Positions != null && r.Dp.Positions.Count > 0 ? r.Dp.Positions[0].Abbreviation.Trim() : ""; }
+                                    <span class="rm-nb-pos" style="color:var(--pos-@(rpos.ToLower()))">@rpos</span>
+                                    @if (r.Dp.PlayerStatus != null)
+                                    {
+                                        <partial name="_PlayerStatus" model="r.Dp.PlayerStatus" />
+                                    }
+                                </span>
+                                @foreach (var c in kv.Value)
+                                {
+                                    <span class="rm-nb-n @(c == "0" || c == "0/0" || c == "0.00" || c == "–" ? "rm-nb-z" : "")">@c</span>
+                                }
+                                @{ var pts = r.Dp.ValuePlayer != null ? r.Dp.ValuePlayer.LeagueValue : 0; }
+                                <span class="rm-nb-n rm-nb-pts-cell @(Math.Abs(pts) < 0.005 ? "rm-nb-z" : pts < 0 ? "rm-nb-neg" : "")">@pts.ToString("0.00")</span>
+                            </div>
+                        }
+                        @if (teamRows.Count == 0)
+                        {
+                            <div class="rm-nb-empty">No stats</div>
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+    }
+</div>

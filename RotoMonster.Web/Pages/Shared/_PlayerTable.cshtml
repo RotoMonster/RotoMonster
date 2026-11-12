@@ -541,14 +541,14 @@
 
                 @if (Model.MonsterBarGame != null)
                 {
-                    <td class="text-nowrap flex-nowrap">
+                    <td class="text-nowrap flex-nowrap rm-mbar-cell">
                         <partial name="_MonsterBarBadge" model="RotoMonster.Models.Shared.MonsterBarBadgeViewModel.From(dp.MonsterBarGamePlayer, Model.MonsterBarGame.MonsterBarItems)" />
                     </td>
                 }
 
                 @if (Model.MonsterBarTotal != null)
                 {
-                    <td class="text-nowrap flex-nowrap">
+                    <td class="text-nowrap flex-nowrap rm-mbar-cell">
                         <partial name="_MonsterBarBadge" model="RotoMonster.Models.Shared.MonsterBarBadgeViewModel.From(dp.MonsterBarTotalPlayer, Model.MonsterBarTotal.MonsterBarItems, false, null, true)" />
                     </td>
                 }
