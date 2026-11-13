@@ -112,6 +112,8 @@
             r => shown.Select(c => N(r.VC(c))).ToList()));
     }
 
+    var maxPts = rows.Where(r => r.Dp.ValuePlayer != null).Select(r => Math.Abs(r.Dp.ValuePlayer.LeagueValue)).DefaultIfEmpty(0).Max();
+
     var leaders = rows.Where(r => r.Dp.ValuePlayer != null && r.Dp.ValuePlayer.LeagueValue > 0.005)
         .OrderByDescending(r => r.Dp.ValuePlayer.LeagueValue)
         .Take(6)
@@ -181,7 +183,8 @@
                                     <span class="rm-nb-n @(c == "0" || c == "0/0" || c == "0.00" || c == "–" ? "rm-nb-z" : "")">@c</span>
                                 }
                                 @{ var pts = r.Dp.ValuePlayer != null ? r.Dp.ValuePlayer.LeagueValue : 0; }
-                                <span class="rm-nb-n rm-nb-pts-cell @(Math.Abs(pts) < 0.005 ? "rm-nb-z" : pts < 0 ? "rm-nb-neg" : "")">@pts.ToString("0.00")</span>
+                                @{ var ptsBg = r.Dp.ValuePlayer != null && Math.Abs(pts) >= 0.005 && !string.IsNullOrEmpty(r.Dp.ValuePlayer.LeagueValueColor) ? "background-color:#" + r.Dp.ValuePlayer.LeagueValueColor : ""; }
+                                <span class="rm-nb-n"><span class="rm-nb-pts-cell @(Math.Abs(pts) < 0.005 ? "rm-nb-z" : pts < 0 ? "rm-nb-ptv" : "rm-nb-ptv")" style="@ptsBg">@pts.ToString("0.00")</span></span>
                             </div>
                         }
                         @if (teamRows.Count == 0)

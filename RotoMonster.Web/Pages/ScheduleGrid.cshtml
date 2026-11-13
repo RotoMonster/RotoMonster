@@ -60,6 +60,21 @@
                 });
                 row.classList.toggle("rm-sg-empty", cells.length > 0 && !any);
             });
+            var opps = @Html.Raw(Model.OpponentsJson);
+            var firstHead = g.querySelector(".schedule-grid-team-header");
+            var codes = firstHead ? Array.prototype.map.call(firstHead.parentNode.querySelectorAll(".schedule-grid-team-header"), function (h) { return h.textContent.trim(); }) : [];
+            g.querySelectorAll(".schedule-grid-period-row").forEach(function (row) {
+                var pc = row.querySelector(".schedule-grid-period-cell");
+                if (!pc || !pc.firstChild) return;
+                var period = String(parseInt(pc.firstChild.nodeValue || pc.textContent, 10));
+                row.querySelectorAll(".schedule-grid-team-cell").forEach(function (c, i) {
+                    var s = c.querySelector(".schedule-grid-team-games");
+                    var team = opps[codes[i]];
+                    if (!s || !team || !team[period] || s.textContent.trim() !== "1") return;
+                    s.textContent = team[period];
+                    s.classList.add("rm-sg-opp");
+                });
+            });
             [["rm-tour-sg-controls", ".schedule-grid-controls"], ["rm-tour-sg-summary", ".schedule-grid-summary-row"], ["rm-tour-sg-arrows", ".schedule-grid-arrows-cell"], ["rm-tour-sg-date", ".schedule-grid-date-cell"]].forEach(function (x) {
                 var el = g.querySelector(x[1]);
                 if (el && !el.id) el.id = x[0];

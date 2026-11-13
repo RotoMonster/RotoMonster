@@ -19,7 +19,15 @@
             }
             @foreach (var card in col.Cards)
             {
-                @Html.Raw(new TweetCard(card).Render())
+                var ageMin = card.TimeSinceCreated.HasValue ? card.TimeSinceCreated.Value.TotalMinutes : 9999;
+                var agePct = Math.Max(0, Math.Min(100, 100 - ageMin / 60.0 * 100));
+                <div class="rm-tv-age">
+                    @if (agePct > 0)
+                    {
+                        <span class="rm-tv-age-bar" style="width:calc((100% - 4px) * @((agePct / 100).ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)))"></span>
+                    }
+                    @Html.Raw(new TweetCard(card).Render())
+                </div>
             }
         </section>
     }

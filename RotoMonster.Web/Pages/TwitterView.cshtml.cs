@@ -420,8 +420,8 @@ namespace RotoMonster.Pages
             };
 
             State.Columns.Add(new TwitterColumn { Key = "news", Title = "News", Cards = visible.Where(t => t.IsNews).Select(card).ToList() });
-            State.Columns.Add(new TwitterColumn { Key = "top", Title = "Top", Cards = visible.Where(t => t.IsTop).Select(card).ToList() });
-            State.Columns.Add(new TwitterColumn { Key = "all", Title = "All", Cards = visible.Select(card).ToList() });
+            State.Columns.Add(new TwitterColumn { Key = "top", Title = "Top", Cards = visible.Where(t => t.IsTop && !t.IsNews).Select(card).ToList() });
+            State.Columns.Add(new TwitterColumn { Key = "all", Title = "All", Cards = visible.Where(t => !t.IsNews && !t.IsTop).Select(card).ToList() });
         }
 
         private Tuple<List<string>, List<string>> StatusOptions()

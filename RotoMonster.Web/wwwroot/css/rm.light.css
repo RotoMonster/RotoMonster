@@ -5508,3 +5508,27 @@ td.rm-mbar-cell,
 .rm-nb-tr .rm-nb-n, .rm-nb-th .rm-nb-n { font-size: 0.8rem; }
 
 .rm-nb-pos { font-size: 0.72rem; font-weight: 700; flex: none; }
+
+
+
+
+
+
+.rm-nb .rm-nb-pts-cell { display: inline-block; min-width: 50px; padding: 2px 7px; border-radius: 6px; text-align: right; }
+.rm-nb .rm-nb-pts-cell.rm-nb-pos { background: color-mix(in srgb, var(--rm-pt-good) var(--a), transparent); color: var(--rm-pt-good); }
+.rm-nb .rm-nb-pts-cell.rm-nb-neg { background: color-mix(in srgb, var(--rm-pt-bad) var(--a), transparent); color: var(--rm-pt-bad); }
+.rm-nb .rm-nb-pts-cell.rm-nb-z { background: none; }
+
+.rm-nb .rm-nb-pts-cell.rm-nb-ptup { background: color-mix(in srgb, var(--rm-pt-good) var(--a), transparent); color: var(--rm-pt-good); }
+.rm-nb .rm-nb-pts-cell.rm-nb-ptdn { background: color-mix(in srgb, var(--rm-pt-bad) var(--a), transparent); color: var(--rm-pt-bad); }
+
+.rm-nb .rm-nb-pts-cell.rm-nb-ptv { color: #14181f; font-weight: 700; }
+
+.rm-sgp .schedule-grid-team-games.rm-sg-opp { font-size: .68rem; font-weight: 600; white-space: nowrap; letter-spacing: -.2px; }
+
+.rm-tv-age { position: relative; }
+.rm-tv-age-bar { position: absolute; left: 2px; top: 2px; height: 4px; background: #f5c542; border-top-left-radius: 8px; z-index: 2; pointer-events: none; }
+
+.rm-tv-age .time-since-badge { background: none !important; padding: 0; }
+.rm-tv-age .time-since-badge .time-since { color: var(--color-text-secondary) !important; }
+.rm-tv-age .tweet-card.card-age-shade { border-color: var(--tweet-card-border) !important; }

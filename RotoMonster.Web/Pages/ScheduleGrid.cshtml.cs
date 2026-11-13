@@ -24,6 +24,7 @@ namespace RotoMonster.Pages
         public int QualityLimit { get; set; }
         public string SportTitle { get; set; } = "";
         public string ExpandedCsv { get; set; } = "";
+        public string OpponentsJson { get; set; } = "{}";
 
         public ScheduleGridModel(IConfiguration config, IRMData db, IRMSharedData sharedDb, UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor, ILogger<PageModel> logger)
             : base(config, db, sharedDb, userManager, contextAccessor, logger)
@@ -188,6 +189,17 @@ namespace RotoMonster.Pages
                 var alpha = (int)Math.Round(Math.Abs(scaled) * 0x59);
                 t.Summary.AvgEaseColor = Math.Abs(scaled) < 0.1 ? null : (scaled > 0 ? "22c55e" : "ef4444") + alpha.ToString("x2");
             }
+
+            var opponents = new Dictionary<string, Dictionary<string, string>>();
+            foreach (var t in gridTeams)
+            {
+                var code = t.TeamCode ?? "";
+                if (code.Length == 0 || opponents.ContainsKey(code)) continue;
+                opponents[code] = t.Periods
+                    .Where(kv => kv.Value.Games == 1 && kv.Value.Days.Count == 1 && !string.IsNullOrEmpty(kv.Value.Days[0].Opponent))
+                    .ToDictionary(kv => kv.Key.ToString(), kv => (kv.Value.Days[0].IsAwayGame ? "@" : "") + kv.Value.Days[0].Opponent);
+            }
+            OpponentsJson = System.Text.Json.JsonSerializer.Serialize(opponents);
 
             ExpandedCsv = string.Join(",", expanded);
 
