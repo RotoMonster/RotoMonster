@@ -18,6 +18,32 @@
     {
         <div class="rm-news-col-empty">@Model.EmptyText</div>
     }
+    @if (Model.Compact)
+    {
+        <div class="rm-news-rows">
+            @foreach (var card in Model.Cards)
+            {
+                var span = card.TimeSinceCreated ?? TimeSpan.Zero;
+                var ago = span.TotalMinutes < 60 ? Math.Max(1, (int)span.TotalMinutes) + "m" : span.TotalHours < 24 ? (int)span.TotalHours + "h" : span.TotalDays < 14 ? span.TotalDays.ToString("0.#") + "d" : (DateTime.Now - span).ToString("M/d");
+                var text = string.Join(" - ", new[] { card.NewsTitle, card.NewsDetails }.Where(x => !string.IsNullOrWhiteSpace(x)));
+                var color = string.IsNullOrEmpty(card.StatusTypeColorCode) ? "#64748b" : (card.StatusTypeColorCode.StartsWith("#") ? card.StatusTypeColorCode : "#" + card.StatusTypeColorCode);
+                <div class="rm-news-row @(span.TotalMinutes < Model.AgeWindowMinutes ? "rm-news-row--new" : "")">
+                    <span class="rm-news-row-badge" style="background:@color">@card.StatusTypeText</span>
+                    <span class="rm-news-row-text">@(text.Length > 0 ? text : "\u2014")</span>
+                    @if (!string.IsNullOrEmpty(card.SourceURL))
+                    {
+                        <a class="rm-news-row-time" href="@card.SourceURL" target="_blank" rel="noopener">@ago</a>
+                    }
+                    else
+                    {
+                        <span class="rm-news-row-time">@ago</span>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
     <div class="rm-news-col-cards">
         @foreach (var card in Model.Cards)
         {
@@ -34,4 +60,10 @@
             </div>
         }
     </div>
+    }
 </section>
+<script class="rm-news-tipfix">
+document.querySelectorAll('.rm-news-col .news-card-test-status-corner-wrap .bm-tooltip-content').forEach(function (el) {
+    el.textContent = el.textContent.split(' - ').map(function (s) { return s.trim(); }).filter(Boolean).join(' - ');
+});
+</script>

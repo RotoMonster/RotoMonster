@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RotoMonster.Core;
@@ -30,6 +31,28 @@ namespace RotoMonster.Pages
         public PlayerStatus PlayerStatus { get; set; }
         public List<UserLeague> OwnedInUserLeagues = null;
         public List<UserLeague> AvailableInUserLeagues = null;
+        public List<RotoMonster.Services.FeedTweet> PlayerTweets { get; set; } = new List<RotoMonster.Services.FeedTweet>();
+        public List<UpcomingGame> UpcomingGames { get; set; } = new List<UpcomingGame>();
+        public List<RecentGame> RecentGames { get; set; } = new List<RecentGame>();
+        public PlayerNewsColumnModel StatusNews { get; set; } = new PlayerNewsColumnModel { Title = null };
+
+        public class RecentGame
+        {
+            public string When { get; set; }
+            public string Opponent { get; set; }
+            public bool Missed { get; set; }
+            public string Points { get; set; }
+            public string Color { get; set; }
+            public string Line { get; set; }
+        }
+
+        public class UpcomingGame
+        {
+            public string When { get; set; }
+            public string Opponent { get; set; }
+            public string EaseColor { get; set; }
+            public bool IsBye { get; set; }
+        }
 
         [BindProperty(SupportsGet = true)]
         public string SearchTerm { get; set; }
@@ -37,6 +60,178 @@ namespace RotoMonster.Pages
         public PlayersModel(IConfiguration config, IRMData db, IRMSharedData sharedDb, UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor, ILogger<PageModel> logger)
             : base(config, db, sharedDb, userManager, contextAccessor, logger)
         {
+        }
+
+        private async Task FillPlayerExtrasAsync(Season season)
+        {
+            try
+            {
+                var feed = HttpContext.RequestServices.GetService(typeof(RotoMonster.Services.TwitterFeedService)) as RotoMonster.Services.TwitterFeedService;
+                if (feed != null && feed.Enabled && Player != null)
+                {
+                    var tweets = await feed.GetTweetsAsync();
+                    PlayerTweets = tweets
+                        .Where(t => t.Players != null && t.Players.Any(p => p.PlayerId == Player.Id))
+                        .OrderByDescending(t => t.CreatedDate)
+                        .Take(5)
+                        .ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogWarning(ex, "Player tweets failed");
+            }
+
+            try
+            {
+                var team = SeasonPlayer?.Team;
+                if (team == null || season == null) return;
+                var sport = db.Sport;
+                var today = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Game.DisplayZone).Date;
+                var ease = OpponentEaseScaled(season);
+                var games = db.GetGames(season, today, today.AddDays(sport.IsNFL ? 42 : 14))
+                    .Where(g => g.IsPostponed != true && g.AwayTeam != null && g.HomeTeam != null && (g.AwayTeamId == team.Id || g.HomeTeamId == team.Id))
+                    .OrderBy(g => g.GameDate)
+                    .ToList();
+
+                if (sport.IsNFL)
+                {
+                    var start = today;
+                    while (start.DayOfWeek != DayOfWeek.Tuesday)
+                        start = start.AddDays(-1);
+                    for (int w = 0; w < 5; w++)
+                    {
+                        var ws = start.AddDays(7 * w);
+                        if (ws > season.EndDate.Date) break;
+                        var we = ws.AddDays(7);
+                        var g = games.FirstOrDefault(x => x.GameDate.Date >= ws && x.GameDate.Date < we);
+                        UpcomingGames.Add(g == null
+                            ? new UpcomingGame { When = ws.AddDays(5).ToString("MMM d"), Opponent = "BYE", IsBye = true }
+                            : MakeUpcoming(g, team, ease));
+                    }
+                }
+                else
+                {
+                    UpcomingGames = games.Take(6).Select(g => MakeUpcoming(g, team, ease)).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogWarning(ex, "Player schedule failed");
+            }
+        }
+
+        private void FillRecentGames()
+        {
+            try
+            {
+                if (GameLogGames == null) return;
+                var cats = (HistoryTableModel.UserDisplayCategories ?? new List<UserDisplayCategory>())
+                    .Select(u => u.Category)
+                    .Where(c => c != null && c.Id != HistoryTableModel.GamesCategoryId && !string.IsNullOrWhiteSpace(c.Abbreviation))
+                    .ToList();
+                foreach (var g in GameLogGames.Where(x => !x.IsBreak && x.Game != null).OrderByDescending(x => x.Game.GameDate).Take(5))
+                {
+                    var team = g.StatPlayer != null && g.StatPlayer.Team != null ? g.StatPlayer.Team : SeasonPlayer.Team;
+                    var rg = new RecentGame
+                    {
+                        When = g.Game.GameDate.ToString("ddd M/d"),
+                        Opponent = team != null ? g.Game.GetOpponentText(team) : "",
+                        Missed = g.PlayerGameMissed != null || g.StatPlayer == null
+                    };
+                    if (!rg.Missed)
+                    {
+                        if (g.ValuePlayer != null)
+                        {
+                            rg.Points = g.ValuePlayer.LeagueValue.ToString("0.00");
+                            rg.Color = g.ValuePlayer.LeagueValueColor;
+                        }
+                        var parts = new List<string>();
+                        foreach (var c in cats)
+                        {
+                            var v = g.StatPlayer.Get(HistoryTableModel.DisplayPerValue, c.Id);
+                            if (Math.Abs(v) < 0.005) continue;
+                            var fmt = c.CategoryPerValues != null && GameLogPerValue != null ? c.CategoryPerValues.Where(df => df.PerValueId == GameLogPerValue.Id).Select(df => df.DisplayFormat).FirstOrDefault() : null;
+                            parts.Add(string.Format("{0:" + (string.IsNullOrEmpty(fmt) ? "0.##" : fmt) + "}", v).Trim() + " " + c.Abbreviation.Trim());
+                            if (parts.Count == 3) break;
+                        }
+                        rg.Line = string.Join(" \u00b7 ", parts);
+                    }
+                    RecentGames.Add(rg);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogWarning(ex, "Player recent games failed");
+            }
+        }
+
+        private async Task FillStatusNewsAsync()
+        {
+            try
+            {
+                var ctx = HttpContext.RequestServices.GetService(typeof(RMDBContext)) as RMDBContext;
+                if (ctx == null || Player == null || SeasonPlayer == null) return;
+                var rows = await ctx.PlayerStatuses.AsNoTracking()
+                    .Include(s => s.PlayerStatusType)
+                    .Where(s => s.PlayerId == Player.Id && s.DateDeleted == null)
+                    .OrderByDescending(s => s.DateAdded)
+                    .Take(2)
+                    .ToListAsync();
+                var dp = new DisplayPlayer();
+                dp.SeasonPlayer = SeasonPlayer;
+                dp.Positions = (PositionSourcePlayers ?? new List<PositionSourcePlayer>()).Select(x => x.Position).Where(x => x != null).ToList();
+                var dark = Request.Cookies["monster-theme"] == "dark";
+                StatusNews.Cards = rows.Where(s => s.PlayerStatusType != null)
+                    .Select(s => PlayerNewsCards.FromStatus(s, dp, db.Sport, null, false, dark))
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                logger?.LogWarning(ex, "Player status news failed");
+            }
+        }
+
+        private static UpcomingGame MakeUpcoming(Game g, Team team, Dictionary<int, double> ease)
+        {
+            var opp = g.GetOpponent(team);
+            var e = opp != null && ease.TryGetValue(opp.Id, out var v) ? v : 0;
+            var f = (float)Math.Max(-1, Math.Min(1, e));
+            return new UpcomingGame
+            {
+                When = g.GameDate.ToString("ddd M/d"),
+                Opponent = (g.AwayTeamId == team.Id ? "@" : "") + (opp?.Code ?? ""),
+                EaseColor = f >= 0 ? RotoMonsterUI.ColorHelper.GetGreenColorCode(f, 0, 1, true) : RotoMonsterUI.ColorHelper.GetRedColorCode(-f, 0, 1, true)
+            };
+        }
+
+        private Dictionary<int, double> OpponentEaseScaled(Season season)
+        {
+            var sums = new Dictionary<int, (double Total, int Count)>();
+            try
+            {
+                var end = DateTime.UtcNow.Date < season.EndDate.Date ? DateTime.UtcNow.Date : season.EndDate.Date;
+                foreach (var playerType in db.GetPlayerTypes())
+                {
+                    var values = db.GetTeamEaseValuePlayers(playerType, season, season.StartDate.Date, end,
+                        SelectedUserLeague.GetCategorySettings(playerType), SelectedUserLeague.ScoringSystem);
+                    foreach (var vp in values)
+                    {
+                        if (vp?.StatPlayer?.Player == null) continue;
+                        var id = vp.Player.Id;
+                        var cur = sums.TryGetValue(id, out var s) ? s : (0d, 0);
+                        sums[id] = (cur.Item1 + vp.LeagueValue, cur.Item2 + 1);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                sums.Clear();
+            }
+            var raw = sums.ToDictionary(kv => kv.Key, kv => kv.Value.Count > 0 ? kv.Value.Total / kv.Value.Count : 0);
+            var mean = raw.Values.DefaultIfEmpty(0).Average();
+            var maxAbs = raw.Values.Select(x => Math.Abs(x - mean)).DefaultIfEmpty(0).Max();
+            return raw.ToDictionary(kv => kv.Key, kv => maxAbs > 0 ? (kv.Value - mean) / maxAbs : 0);
         }
 
         public IActionResult OnPost(
@@ -134,6 +329,7 @@ namespace RotoMonster.Pages
                     HistoryTableModel.AfterCategories = db.GetAfterDisplayCategories(SeasonPlayer.PlayerType);
                     HistoryTableModel.DisplayPlayers = new List<DisplayPlayer>();
                     HistoryTableModel.IsPlayerHistory = true;
+                    HistoryTableModel.ColorStats = false;
                     HistoryTableModel.ShowInjuries = false;
                     HistoryTableModel.PlayerHeaderTitle = "Data Set";
                     HistoryTableModel.ValuePerValues = db.GetPerValues(SeasonPlayer.PlayerType.Id);
@@ -142,6 +338,7 @@ namespace RotoMonster.Pages
                     HistoryTableModel.UserDisplayColumns.DisplayAll = true;
                     HistoryTableModel.MonsterBarGame = db.GetMonsterBar(SeasonPlayer.PlayerType, season, SelectedUserLeague.GetCategorySettings(SeasonPlayer.PlayerType), SelectedUserLeague.ScoringSystem, db.GetPerGamePerValue(SeasonPlayer.PlayerTypeId), db.GetUserLeagueLeagueSize(SelectedUserLeague, SeasonPlayer.PlayerType), SelectedUserLeague.ActiveSize(SeasonPlayer.PlayerType));
 
+                    await FillPlayerExtrasAsync(season);
                     PositionSourcePlayers = (from p in db.GetUserLeagueSeasonPlayerPositions(SelectedUserLeague, season) where p.PlayerId == SeasonPlayer.PlayerId select p).ToList();
 
                     DisplayPlayer fullSeasonDisplayPlayer = AddDisplayPlayer(null, season.Title, false, season, season.StartDate, season.UpdatedDate);
@@ -220,6 +417,9 @@ namespace RotoMonster.Pages
 
                     if (GameLogGames.Count > 0 && GameLogGames.First().IsBreak)
                         GameLogGames.RemoveAt(0);
+
+                    FillRecentGames();
+                    await FillStatusNewsAsync();
 
                     return Page();
                 }

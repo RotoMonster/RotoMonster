@@ -12,6 +12,7 @@ namespace RotoMonster.Pages
         public double AgeWindowMinutes { get; set; } = 15;
         public bool Grid { get; set; }
         public bool Strip { get; set; }
+        public bool Compact { get; set; }
         public string SeeAllUrl { get; set; }
         public Dictionary<int, string> Groups { get; set; } = new Dictionary<int, string>();
         public List<NewsCardInput> Cards { get; set; } = new List<NewsCardInput>();
@@ -46,6 +47,7 @@ namespace RotoMonster.Pages
             var details = (s.Comment ?? "").Trim();
             if (typeTitle.Length > 0 && details.StartsWith(typeTitle + " - ", StringComparison.OrdinalIgnoreCase))
                 details = details.Substring(typeTitle.Length + 3).Trim();
+            if (details.Equals("unknown", StringComparison.OrdinalIgnoreCase)) details = "";
             var title = (s.Subject ?? "").Trim();
             if (title.Equals("unknown", StringComparison.OrdinalIgnoreCase) || (title.Length > 0 && details.IndexOf(title, StringComparison.OrdinalIgnoreCase) >= 0))
                 title = "";

@@ -136,6 +136,89 @@
             </div>
         </div>
 
+        bool ppHasNews = Model.StatusNews.Cards.Count > 0 || Model.PlayerTweets.Count > 0;
+        bool ppHasMain = Model.UpcomingGames.Count > 0 || Model.RecentGames.Count > 0;
+        @if (ppHasMain || ppHasNews)
+        {
+            <div class="rm-pp-row @(ppHasNews && ppHasMain ? "" : "rm-pp-row--single")">
+                @if (ppHasMain)
+                {
+                    <div class="rm-pp-col">
+                        @if (Model.RecentGames.Count > 0)
+                        {
+                            <div class="rm-pp-card rm-pp-recent">
+                                <div class="rm-pp-extra-title">Recent games</div>
+                                <div class="rm-pp-rg-list">
+                                    @foreach (var rg in Model.RecentGames)
+                                    {
+                                        <div class="rm-pp-rg @(rg.Missed ? "rm-pp-rg--dnp" : "")">
+                                            <div class="rm-pp-rg-top"><span class="rm-pp-rg-opp">@rg.Opponent</span><span class="rm-pp-rg-when">@rg.When</span></div>
+                                            @if (rg.Missed)
+                                            {
+                                                <div class="rm-pp-rg-pts">DNP</div>
+                                            }
+                                            else
+                                            {
+                                                <div class="rm-pp-rg-pts" style="@(string.IsNullOrEmpty(rg.Color) ? "" : "--vc:#" + rg.Color)">@rg.Points</div>
+                                                <div class="rm-pp-rg-line">@rg.Line</div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @if (Model.UpcomingGames.Count > 0)
+                        {
+                            <div class="rm-pp-card rm-pp-upcoming">
+                                <div class="rm-pp-extra-title">Upcoming</div>
+                                <div class="rm-pp-games">
+                                    @foreach (var ug in Model.UpcomingGames)
+                                    {
+                                        <div class="rm-pp-game @(ug.IsBye ? "rm-pp-game--bye" : "")" style="@(ug.IsBye || string.IsNullOrEmpty(ug.EaseColor) ? "" : "--ease:#" + ug.EaseColor)">
+                                            <span class="rm-pp-game-opp">@ug.Opponent</span>
+                                            <span class="rm-pp-game-when">@ug.When</span>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="rm-pp-extra-note">Green is an easier matchup, red is tougher.</div>
+                            </div>
+                        }
+                    </div>
+                }
+                @if (ppHasNews)
+                {
+                    <div class="rm-pp-card rm-pp-news">
+                        <div class="rm-pp-extra-title">Recent news</div>
+                        @if (Model.StatusNews.Cards.Count > 0)
+                        {
+                            <partial name="_PlayerNewsColumn" model="Model.StatusNews" />
+                        }
+                        @if (Model.PlayerTweets.Count > 0)
+                        {
+                            <div class="rm-pp-news-sub">On X</div>
+                            @foreach (var tw in Model.PlayerTweets)
+                            {
+                                var mins = (DateTime.UtcNow - tw.CreatedDate).TotalMinutes;
+                                var ago = mins < 60 ? Math.Max(1, (int)mins) + "m ago" : mins < 1440 ? (int)(mins / 60) + "h ago" : (int)(mins / 1440) + "d ago";
+                                <div class="rm-pp-tweet">
+                                    <div class="rm-pp-tweet-head">
+                                        <span class="rm-pp-tweet-name">@tw.DisplayName</span>
+                                        <span class="rm-pp-tweet-handle">@("@" + tw.ScreenUsername)</span>
+                                        <span class="rm-pp-tweet-time">@ago</span>
+                                    </div>
+                                    <div class="rm-pp-tweet-text">@(System.Text.RegularExpressions.Regex.Replace(string.IsNullOrWhiteSpace(tw.AiText) ? (tw.Text ?? "") : tw.AiText, @"https?://t\.co/\S+", "").Trim())</div>
+                                    @if (!string.IsNullOrEmpty(tw.TweetUrl))
+                                    {
+                                        <a class="rm-pp-tweet-link" href="@tw.TweetUrl" target="_blank" rel="noopener">View on X</a>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+            </div>
+        }
+
         <div class="rm-pp-card rm-pp-stats">
             <div class="rm-pp-stats-bar">
                 <div class="rm-pp-tabs" role="tablist">
@@ -287,6 +370,21 @@
 
 @section scripts{
     <partial name="_PlayerSearchScripts" model='"tags"' />
+    <script>
+        document.querySelectorAll('.rm-profile-table td.tdr').forEach(function (c) {
+            var t = c.textContent.replace(/[,%\s]/g, '');
+            var n = parseFloat(t);
+            if (t !== '' && !isNaN(n) && Math.abs(n) < 0.005 && !c.querySelector('.value-badge, .rm-badge')) c.classList.add('rm-pp-z');
+        });
+        document.querySelectorAll('.rm-profile-table td .value-badge, .rm-profile-table td .rm-badge').forEach(function (b) {
+            var t = b.textContent.replace(/[,%\s]/g, '');
+            var n = parseFloat(t);
+            if (t === '' || isNaN(n) || Math.abs(n) >= 0.005) return;
+            b.style.backgroundColor = 'transparent';
+            b.classList.add('rm-pp-zb');
+            if (t === '-0.00') b.textContent = '0.00';
+        });
+    </script>
     <script>
         (function () {
             function isEmptyValue(text) {

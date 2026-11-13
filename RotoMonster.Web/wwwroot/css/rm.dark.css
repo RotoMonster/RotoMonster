@@ -759,3 +759,8 @@ td.tdleft {
 .rm-nb .rm-nb-ptv[style*="--vc"] { color: oklch(from var(--vc) 0.8 calc(c * 2.6) h) !important; }
 .rm-news-col .news-card-test-own-pill { background: rgba(103,232,249,.14); color: #67e8f9; }
 .rm-news-col .news-card-test-mine { background: rgba(250,204,21,.15); color: #fde047; }
+
+.rm-pp-rg-pts[style*="--vc"] { color: oklch(from var(--vc) 0.8 calc(c * 2.6) h); }
+
+.rm-pp-upcoming .rm-pp-game[style*="--ease"] { background: oklch(from var(--ease) 0.55 calc(c * 2.2) h / 0.15) !important; border-color: oklch(from var(--ease) 0.7 calc(c * 2.2) h / 0.45) !important; }
+.rm-pp-upcoming .rm-pp-game[style*="--ease"] .rm-pp-game-opp { color: oklch(from var(--ease) 0.86 calc(c * 1.8) h) !important; }
