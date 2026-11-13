@@ -1,0 +1,37 @@
+@model RotoMonster.Pages.PlayerNewsColumnModel
+
+<section class="rm-news-col @(Model.Grid ? "rm-news-col--grid" : "") @(Model.Strip ? "rm-news-col--strip" : "")">
+    @if (!string.IsNullOrEmpty(Model.Title) || !string.IsNullOrEmpty(Model.SeeAllUrl))
+    {
+        <div class="rm-news-col-head">
+            @if (!string.IsNullOrEmpty(Model.Title))
+            {
+                <h2 class="rm-news-col-title">@Model.Title</h2>
+            }
+            @if (!string.IsNullOrEmpty(Model.SeeAllUrl))
+            {
+                <a class="rm-news-col-all" href="@Model.SeeAllUrl">See all news &rarr;</a>
+            }
+        </div>
+    }
+    @if (Model.Cards.Count == 0)
+    {
+        <div class="rm-news-col-empty">@Model.EmptyText</div>
+    }
+    <div class="rm-news-col-cards">
+        @foreach (var card in Model.Cards)
+        {
+            var ageMin = card.TimeSinceCreated.HasValue ? card.TimeSinceCreated.Value.TotalMinutes : 9999;
+            var agePct = Math.Max(0, Math.Min(100, 100 - ageMin / Model.AgeWindowMinutes * 100));
+            string grp;
+            Model.Groups.TryGetValue(card.NewsId, out grp);
+            <div class="rm-tv-age rm-nc-age" data-group="@(grp ?? "")" data-mine="@(card.IsMyPlayer ? "1" : "0")">
+                @if (agePct > 0)
+                {
+                    <span class="rm-tv-age-bar" style="width:calc((100% - 4px) * @((agePct / 100).ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)))"></span>
+                }
+                @Html.Raw(new NewsCard(card).RenderTest())
+            </div>
+        }
+    </div>
+</section>

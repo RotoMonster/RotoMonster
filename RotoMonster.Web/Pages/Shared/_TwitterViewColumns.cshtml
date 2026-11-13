@@ -20,7 +20,7 @@
             @foreach (var card in col.Cards)
             {
                 var ageMin = card.TimeSinceCreated.HasValue ? card.TimeSinceCreated.Value.TotalMinutes : 9999;
-                var agePct = Math.Max(0, Math.Min(100, 100 - ageMin / 60.0 * 100));
+                var agePct = Math.Max(0, Math.Min(100, 100 - ageMin / 15.0 * 100));
                 <div class="rm-tv-age">
                     @if (agePct > 0)
                     {
@@ -39,7 +39,15 @@
         }
         @foreach (var status in Model.Statuses)
         {
-            @Html.Raw(new NewsCard(status).Render())
+            var stMin = status.TimeSinceCreated.HasValue ? status.TimeSinceCreated.Value.TotalMinutes : 9999;
+            var stPct = Math.Max(0, Math.Min(100, 100 - stMin / 15.0 * 100));
+            <div class="rm-tv-age rm-nc-age">
+                @if (stPct > 0)
+                {
+                    <span class="rm-tv-age-bar" style="width:calc((100% - 4px) * @((stPct / 100).ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)))"></span>
+                }
+                @Html.Raw(new NewsCard(status).RenderTest())
+            </div>
         }
     </section>
 </div>

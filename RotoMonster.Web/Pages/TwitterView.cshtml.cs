@@ -297,6 +297,10 @@ namespace RotoMonster.Pages
                 var typeTitle = s.PlayerStatusType != null ? s.PlayerStatusType.Title : "";
                 var tagTitle = s.PlayerStatusTagType != null ? s.PlayerStatusTagType.Title : null;
 
+                var ncDetails = (s.Comment ?? "").Trim();
+                if (typeTitle.Length > 0 && ncDetails.StartsWith(typeTitle + " - ", StringComparison.OrdinalIgnoreCase)) ncDetails = ncDetails.Substring(typeTitle.Length + 3).Trim();
+                var ncTitle = (s.Subject ?? "").Trim();
+                if (ncTitle.Length > 0 && ncDetails.IndexOf(ncTitle, StringComparison.OrdinalIgnoreCase) >= 0) ncTitle = "";
                 State.Statuses.Add(new NewsCardInput
                 {
                     NewsId = s.Id,
@@ -310,8 +314,8 @@ namespace RotoMonster.Pages
                     CurrentStatusTypeText = typeTitle,
                     CurrentStatusTypeTag = tagTitle,
                     CurrentStatusNewsTitle = s.Subject,
-                    NewsTitle = s.Subject,
-                    NewsDetails = s.Comment,
+                    NewsTitle = ncTitle.Length > 0 ? ncTitle : null,
+                    NewsDetails = ncDetails.Length > 0 ? ncDetails : null,
                     SourceURL = s.SourceUrl,
                     TimeSinceCreated = now - s.DateAdded,
                     UserCanEdit = true,

@@ -27,7 +27,9 @@
 
     <div class="rm-injp-sub">Every player with a current status &middot; <span id="injpCount">@Model.Rows.Count</span> players</div>
 
+
     <div class="rm-injp-wrap">
+    <div class="rm-injp-newsstrip"><partial name="_PlayerNewsColumn" model="Model.News" /></div>
 
     <div class="modern-filter-container rm-injp-panel">
         <div class="rm-filter-section modern-filter-row" data-title="Find">
@@ -70,6 +72,7 @@
         }
     </div>
 
+    <div class="rm-injp-main">
     <div class="rm-sc-card rm-injp-card rm-injp-v2">
         <table class="rm-injp-table" id="injpTable">
             <thead id="rm-tour-injp-head">
@@ -135,6 +138,7 @@
             </tbody>
         </table>
         <div class="rm-injp-none" id="injpNone" hidden>No players match these filters.</div>
+    </div>
     </div>
 
     </div>

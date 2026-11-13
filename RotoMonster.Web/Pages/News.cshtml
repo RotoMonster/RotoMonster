@@ -1,0 +1,62 @@
+@page
+@model RotoMonster.Pages.NewsModel
+
+<div class="container-fluid px-4 rm-newsp">
+    <div class="rm-injp-sub">Latest player news and statuses &middot; <span id="newspCount">@Model.News.Cards.Count</span> players</div>
+
+    <div class="modern-filter-container rm-injp-panel rm-newsp-panel">
+        <div class="rm-filter-section modern-filter-row" data-title="Status">
+            <div class="rm-injp-chips" id="newspStatus">
+                <button type="button" class="rm-injp-chip rm-injp-chip--on" data-value="">All</button>
+                <button type="button" class="rm-injp-chip" data-value="out" style="--cc:#e8590c">Out / IR</button>
+                <button type="button" class="rm-injp-chip" data-value="doubtful" style="--cc:#f59e0b">Doubtful</button>
+                <button type="button" class="rm-injp-chip" data-value="questionable" style="--cc:#0ea5e9">Questionable</button>
+            </div>
+        </div>
+        @if (Model.HasMine)
+        {
+            <div class="rm-filter-section modern-filter-row" data-title="Display">
+                <label class="rm-injp-toggle" for="newspMine">
+                    <input type="checkbox" id="newspMine" />
+                    <span class="rm-injp-sw"></span>
+                    <span>Only my players</span>
+                </label>
+            </div>
+        }
+    </div>
+
+    <partial name="_PlayerNewsColumn" model="Model.News" />
+    <div class="rm-news-col-empty" id="newspNone" hidden>No news matches these filters.</div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.rm-newsp .rm-nc-age'));
+    var chips = document.getElementById('newspStatus');
+    var mine = document.getElementById('newspMine');
+    var count = document.getElementById('newspCount');
+    var none = document.getElementById('newspNone');
+    var group = '';
+    function apply() {
+        var shown = 0;
+        cards.forEach(function (c) {
+            var ok = (!group || c.dataset.group === group) && (!mine || !mine.checked || c.dataset.mine === '1');
+            c.hidden = !ok;
+            if (ok) shown++;
+        });
+        count.textContent = shown;
+        none.hidden = shown > 0 || cards.length === 0;
+    }
+    chips.addEventListener('click', function (e) {
+        var btn = e.target.closest('.rm-injp-chip');
+        if (!btn) return;
+        chips.querySelectorAll('.rm-injp-chip').forEach(function (b) { b.classList.toggle('rm-injp-chip--on', b === btn); });
+        group = btn.dataset.value;
+        apply();
+    });
+    if (mine) mine.addEventListener('change', apply);
+    apply();
+})();
+</script>
+}

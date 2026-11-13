@@ -32,6 +32,7 @@ namespace RotoMonster.Pages
         public Sport Sport { get; set; }
         public List<InjuryRow> Rows { get; set; } = new List<InjuryRow>();
         public bool HasMine { get; set; }
+        public PlayerNewsColumnModel News { get; set; } = new PlayerNewsColumnModel();
 
         public InjuriesModel(IConfiguration config, IRMData db, IRMSharedData sharedDb, UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor, ILogger<PageModel> logger)
             : base(config, db, sharedDb, userManager, contextAccessor, logger)
@@ -106,6 +107,13 @@ namespace RotoMonster.Pages
             }
 
             Rows = Rows.OrderByDescending(r => r.Own ?? -1).ThenBy(r => r.MinutesAgo).ToList();
+
+            var dark = Request.Cookies["monster-theme"] == "dark";
+            News.Strip = true;
+            News.SeeAllUrl = "/News";
+            News.Cards = Rows.OrderBy(r => r.MinutesAgo).Take(40)
+                .Select(r => PlayerNewsCards.FromStatus(r.PlayerStatus, r.DisplayPlayer, db.Sport, r.Own, r.Mine > 0, dark))
+                .ToList();
         }
 
         private static string CleanInjury(string subject)

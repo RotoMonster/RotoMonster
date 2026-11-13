@@ -132,7 +132,7 @@
                     <div class="rm-nb-lead-top"><span class="rm-nb-teamtag" style="--tc:@TeamColor(l.Team)">@l.Team.Code</span><span class="rm-nb-pos" style="color:var(--pos-@(pos.Trim().ToLower()))">@pos</span></div>
                     <a class="rm-nb-name" asp-page="/Players" asp-route-playerId="@l.Dp.SeasonPlayer.Player.Id" asp-route-l="@(l.Ptm.SelectedUserLeague != null ? l.Ptm.SelectedUserLeague.Id : 0)">@l.Dp.SeasonPlayer.Player.FirstName @l.Dp.SeasonPlayer.Player.LastName</a>
                     <div class="rm-nb-lead-bottom">
-                        <span class="rm-nb-pts">@l.Dp.ValuePlayer.LeagueValue.ToString("0.00")</span>
+                        <span class="rm-nb-pts rm-nb-ptv" style="@(string.IsNullOrEmpty(l.Dp.ValuePlayer.LeagueValueColor) ? "" : "--vc:#" + l.Dp.ValuePlayer.LeagueValueColor)">@l.Dp.ValuePlayer.LeagueValue.ToString("0.00")</span>
                         @if (l.Dp.OwnershipPlayer != null)
                         {
                             <span class="rm-nb-pills">
@@ -183,7 +183,7 @@
                                     <span class="rm-nb-n @(c == "0" || c == "0/0" || c == "0.00" || c == "–" ? "rm-nb-z" : "")">@c</span>
                                 }
                                 @{ var pts = r.Dp.ValuePlayer != null ? r.Dp.ValuePlayer.LeagueValue : 0; }
-                                @{ var ptsBg = r.Dp.ValuePlayer != null && Math.Abs(pts) >= 0.005 && !string.IsNullOrEmpty(r.Dp.ValuePlayer.LeagueValueColor) ? "background-color:#" + r.Dp.ValuePlayer.LeagueValueColor : ""; }
+                                @{ var ptsBg = r.Dp.ValuePlayer != null && Math.Abs(pts) >= 0.005 && !string.IsNullOrEmpty(r.Dp.ValuePlayer.LeagueValueColor) ? "--vc:#" + r.Dp.ValuePlayer.LeagueValueColor : ""; }
                                 <span class="rm-nb-n"><span class="rm-nb-pts-cell @(Math.Abs(pts) < 0.005 ? "rm-nb-z" : pts < 0 ? "rm-nb-ptv" : "rm-nb-ptv")" style="@ptsBg">@pts.ToString("0.00")</span></span>
                             </div>
                         }
