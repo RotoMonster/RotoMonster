@@ -159,7 +159,7 @@
                                             }
                                             else
                                             {
-                                                <div class="rm-pp-rg-pts" style="@(string.IsNullOrEmpty(rg.Color) ? "" : "--vc:#" + rg.Color)">@rg.Points</div>
+                                                <div class="rm-pp-rg-pts" style="@(string.IsNullOrEmpty(rg.Color) ? "" : RotoMonster.Pages.RmColor.Vars("vc", rg.Color))">@rg.Points</div>
                                                 <div class="rm-pp-rg-line">@rg.Line</div>
                                             }
                                         </div>
@@ -174,7 +174,7 @@
                                 <div class="rm-pp-games">
                                     @foreach (var ug in Model.UpcomingGames)
                                     {
-                                        <div class="rm-pp-game @(ug.IsBye ? "rm-pp-game--bye" : "")" style="@(ug.IsBye || string.IsNullOrEmpty(ug.EaseColor) ? "" : "--ease:#" + ug.EaseColor)">
+                                        <div class="rm-pp-game @(ug.IsBye ? "rm-pp-game--bye" : "")" style="@(ug.IsBye || string.IsNullOrEmpty(ug.EaseColor) ? "" : RotoMonster.Pages.RmColor.Vars("ease", ug.EaseColor))">
                                             <span class="rm-pp-game-opp">@ug.Opponent</span>
                                             <span class="rm-pp-game-when">@ug.When</span>
                                         </div>

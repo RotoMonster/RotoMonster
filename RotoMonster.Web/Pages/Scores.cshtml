@@ -192,7 +192,7 @@
                         }
                     </div>
 
-                    @if (Model.Sport != null && Model.Sport.IsNFL)
+                    @if (Model.Sport != null && (Model.Sport.IsNFL || Model.Sport.Title == "NHL"))
                     {
                         <partial name="_NflBoxScore" model="Model" />
                     }

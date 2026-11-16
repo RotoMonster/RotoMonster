@@ -5609,9 +5609,7 @@ td.rm-mbar-cell,
 .rm-tv-age .time-since-badge .time-since { color: var(--color-text-secondary) !important; }
 .rm-tv-age .tweet-card.card-age-shade { border-color: var(--tweet-card-border) !important; }
 
-.rm-nb .rm-nb-ptv[style*="--vc"] { background: none !important; padding: 0 !important; box-shadow: none !important; color: oklch(from var(--vc) 0.5 calc(c * 3.2) h) !important; font-weight: 700; }
 
-.rm-tv-age .rm-tv-age-bar.rm-sport, .rm-tv-age .rm-tv-age-bar { background: var(--brand-primary, #f5c542) !important; }
 
 .rm-nc-age { position: relative; }
 .rm-nc-age .news-card { box-shadow: none !important; border-color: var(--tweet-card-border, rgba(148,163,184,.25)) !important; }
@@ -5669,7 +5667,6 @@ td.rm-mbar-cell,
 .rm-pp-rg-opp { font-weight: 700; }
 .rm-pp-rg-when { font-size: 12px; color: var(--color-text-secondary, #64748b); white-space: nowrap; }
 .rm-pp-rg-pts { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-.rm-pp-rg-pts[style*="--vc"] { color: oklch(from var(--vc) 0.5 calc(c * 3.2) h); }
 .rm-pp-rg-line { font-size: 12px; color: var(--color-text-secondary, #64748b); line-height: 1.35; }
 .rm-pp-rg--dnp .rm-pp-rg-pts { color: var(--color-text-secondary, #64748b); font-size: 1.1rem; }
 .rm-pp-news .rm-news-col { margin-top: 4px; }
@@ -5686,14 +5683,11 @@ a.rm-news-row-time:hover { text-decoration: underline; }
 .rm-news-row--new .rm-news-row-time { color: var(--brand-primary, #3b82f6); }
 .rm-pp-upcoming .rm-pp-games { display: flex !important; gap: 10px !important; flex-wrap: nowrap !important; }
 .rm-pp-upcoming .rm-pp-game { flex: 1 1 0 !important; min-width: 0 !important; display: flex !important; flex-direction: column !important; align-items: flex-start !important; gap: 4px !important; padding: 12px 14px !important; border-radius: 12px !important; border: 1px solid var(--tweet-card-border, rgba(148,163,184,.3)) !important; background: transparent !important; color: inherit !important; box-shadow: none !important; }
-.rm-pp-upcoming .rm-pp-game[style*="--ease"] { background: color-mix(in srgb, var(--ease) 14%, transparent) !important; border-color: color-mix(in srgb, var(--ease) 65%, transparent) !important; }
 .rm-pp-upcoming .rm-pp-game-opp { font-weight: 700 !important; font-size: 1.05rem !important; }
 .rm-pp-upcoming .rm-pp-game-when { font-size: 12px !important; color: var(--color-text-secondary, #64748b) !important; }
 .rm-pp-upcoming .rm-pp-game--bye { border-style: dashed !important; opacity: .7; }
 @media (max-width: 700px) { .rm-pp-upcoming .rm-pp-games { overflow-x: auto; scroll-snap-type: x mandatory; } .rm-pp-upcoming .rm-pp-game { flex: 0 0 30% !important; scroll-snap-align: start; } }
 
-.rm-pp-upcoming .rm-pp-game[style*="--ease"] { background: oklch(from var(--ease) 0.62 calc(c * 2.4) h / 0.1) !important; border-color: oklch(from var(--ease) 0.6 calc(c * 2.4) h / 0.5) !important; }
-.rm-pp-upcoming .rm-pp-game[style*="--ease"] .rm-pp-game-opp { color: oklch(from var(--ease) 0.45 calc(c * 2.4) h) !important; }
 .rm-pp-row:not(.rm-pp-row--single) { align-items: stretch; }
 .rm-pp-row:not(.rm-pp-row--single) > .rm-pp-news { display: flex; flex-direction: column; box-sizing: border-box; }
 .rm-pp-news > .rm-news-col { flex: 1; display: flex; flex-direction: column; }
@@ -5701,3 +5695,9 @@ a.rm-news-row-time:hover { text-decoration: underline; }
 .rm-pp-news .rm-nc-age { flex: 1; display: flex; flex-direction: column; }
 .rm-pp-news .rm-nc-age .news-card { flex: 1; box-sizing: border-box; }
 @media (max-width: 1200px) { .rm-pp-news .rm-nc-age, .rm-pp-news .rm-news-col-cards, .rm-pp-news > .rm-news-col { flex: none; } }
+
+.rm-pp-upcoming .rm-pp-game[style*="--ease"] { background: var(--ease-lbg) !important; border-color: var(--ease-lbd) !important; }
+.rm-pp-upcoming .rm-pp-game[style*="--ease"] .rm-pp-game-opp { color: var(--ease-l) !important; }
+
+.rm-nb .rm-nb-ptv[style*="--vc"] { display: inline-block; background: var(--vc) !important; color: #0f172a !important; padding: 2px 8px !important; border-radius: 6px; box-shadow: none !important; font-weight: 700; }
+.rm-pp-rg-pts[style*="--vc"] { align-self: flex-start; background: var(--vc); color: #0f172a; padding: 2px 10px; border-radius: 8px; }

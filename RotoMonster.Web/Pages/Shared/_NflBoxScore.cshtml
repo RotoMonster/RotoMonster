@@ -15,6 +15,12 @@
             return Dp.StatPlayer.Get(Ptm.DisplayPerValue, c.Id);
         }
 
+        public double VI(int id)
+        {
+            if (Dp.StatPlayer == null) return 0;
+            return Dp.StatPlayer.Get(Ptm.DisplayPerValue, id);
+        }
+
         public double VC(RotoMonster.Core.Category c)
         {
             if (Dp.StatPlayer == null || c == null) return 0;
@@ -30,16 +36,19 @@
     }
 
     static string N(double v) => Math.Abs(v - Math.Round(v)) < 0.001 ? Math.Round(v).ToString("0") : v.ToString("0.#");
+    static string Pm(double v) => v > 0.001 ? "+" + N(v) : N(v);
 }
 @{
     var bsm = Model.BoxScoreModel;
     var game = bsm.Game;
     var teams = game.GetTeams().Where(t => t != null).ToList();
+    var nbIsNhl = Model.Sport != null && Model.Sport.Title == "NHL";
+    var nbSport = nbIsNhl ? "nhl" : "nfl";
 
     string TeamColor(RotoMonster.Core.Team team)
     {
         if (team == null) return "var(--brand-primary)";
-        return "var(--team-nfl-" + (team.Code ?? "").Trim().ToLower() + ", var(--brand-primary))";
+        return "var(--team-" + nbSport + "-" + (team.Code ?? "").Trim().ToLower() + ", var(--brand-primary))";
     }
 
     var cats = new Dictionary<int, Dictionary<string, RotoMonster.Core.Category>>();
@@ -94,7 +103,31 @@
             r => new List<string> { N(r.V("REC")), N(r.V("TARG")), N(r.V("RXYRD")), N(r.V("RXAIRY")), N(r.V("RXTD")) }));
     }
 
-    foreach (var pt in bsm.PlayerTypes.Where(pt => offense == null || pt.Id != offense.Id))
+    if (nbIsNhl)
+    {
+        var skater = bsm.PlayerTypes.FirstOrDefault(pt => pt.Id == 1);
+        var goalie = bsm.PlayerTypes.FirstOrDefault(pt => pt.Id == 2);
+        if (skater != null)
+        {
+            Func<NbRow, bool> isSk = r => r.PlayerType.Id == skater.Id;
+            sections.Add(Make("Scoring", new List<string> { "G", "A", "P", "PPP", "+/-" },
+                r => isSk(r) && (r.VI(1) + r.VI(2) + r.VI(4)) > 0, r => (r.VI(1) + r.VI(2)) * 100 + r.VI(1),
+                r => new List<string> { N(r.VI(1)), N(r.VI(2)), N(r.VI(1) + r.VI(2)), N(r.VI(4)), Pm(r.VI(3)) }));
+            Func<NbRow, bool> isD = r => r.Dp.Positions != null && r.Dp.Positions.Any(x => x != null && (x.Abbreviation ?? "").Trim().ToUpperInvariant() == "D");
+            Func<NbRow, List<string>> skCells = r => new List<string> { N(r.VI(5)), N(r.VI(6)), N(r.VI(27)), Pm(r.VI(3)), Math.Round(r.VI(10)).ToString("0") };
+            var skHeads = new List<string> { "SOG", "HIT", "BS", "+/-", "Min" };
+            sections.Add(Make("Forwards", skHeads, r => isSk(r) && !isD(r) && r.VI(10) > 0, r => r.VI(5) * 1000 + r.VI(10), skCells));
+            sections.Add(Make("Defense", skHeads, r => isSk(r) && isD(r) && r.VI(10) > 0, r => r.VI(10), skCells));
+        }
+        if (goalie != null)
+        {
+            sections.Add(Make("Goalies", new List<string> { "SV/SA", "GA", "SV%", "W", "Min" },
+                r => r.PlayerType.Id == goalie.Id && (r.VI(72) > 0 || r.VI(57) > 0), r => r.VI(57),
+                r => new List<string> { N(r.VI(56)) + "/" + N(r.VI(72)), N(r.VI(52)), r.VI(72) > 0 ? (r.VI(56) / r.VI(72)).ToString(".000") : "-", N(r.VI(50)), Math.Round(r.VI(57)).ToString("0") }));
+        }
+    }
+
+    foreach (var pt in bsm.PlayerTypes.Where(pt => !nbIsNhl && (offense == null || pt.Id != offense.Id)))
     {
         var typeRows = rows.Where(r => r.PlayerType.Id == pt.Id).ToList();
         var shown = typeRows.SelectMany(r => r.Ptm.UserDisplayCategories ?? new List<RotoMonster.Core.UserDisplayCategory>())
@@ -118,6 +151,7 @@
         .OrderByDescending(r => r.Dp.ValuePlayer.LeagueValue)
         .Take(6)
         .ToList();
+
 }
 
 <div class="rm-nb">
@@ -132,7 +166,7 @@
                     <div class="rm-nb-lead-top"><span class="rm-nb-teamtag" style="--tc:@TeamColor(l.Team)">@l.Team.Code</span><span class="rm-nb-pos" style="color:var(--pos-@(pos.Trim().ToLower()))">@pos</span></div>
                     <a class="rm-nb-name" asp-page="/Players" asp-route-playerId="@l.Dp.SeasonPlayer.Player.Id" asp-route-l="@(l.Ptm.SelectedUserLeague != null ? l.Ptm.SelectedUserLeague.Id : 0)">@l.Dp.SeasonPlayer.Player.FirstName @l.Dp.SeasonPlayer.Player.LastName</a>
                     <div class="rm-nb-lead-bottom">
-                        <span class="rm-nb-pts rm-nb-ptv" style="@(string.IsNullOrEmpty(l.Dp.ValuePlayer.LeagueValueColor) ? "" : "--vc:#" + l.Dp.ValuePlayer.LeagueValueColor)">@l.Dp.ValuePlayer.LeagueValue.ToString("0.00")</span>
+                        <span class="rm-nb-pts rm-nb-ptv" style="@(string.IsNullOrEmpty(l.Dp.ValuePlayer.LeagueValueColor) ? "" : RotoMonster.Pages.RmColor.Vars("vc", l.Dp.ValuePlayer.LeagueValueColor))">@l.Dp.ValuePlayer.LeagueValue.ToString("0.00").Replace("-0.00", "0.00")</span>
                         @if (l.Dp.OwnershipPlayer != null)
                         {
                             <span class="rm-nb-pills">
@@ -183,8 +217,8 @@
                                     <span class="rm-nb-n @(c == "0" || c == "0/0" || c == "0.00" || c == "–" ? "rm-nb-z" : "")">@c</span>
                                 }
                                 @{ var pts = r.Dp.ValuePlayer != null ? r.Dp.ValuePlayer.LeagueValue : 0; }
-                                @{ var ptsBg = r.Dp.ValuePlayer != null && Math.Abs(pts) >= 0.005 && !string.IsNullOrEmpty(r.Dp.ValuePlayer.LeagueValueColor) ? "--vc:#" + r.Dp.ValuePlayer.LeagueValueColor : ""; }
-                                <span class="rm-nb-n"><span class="rm-nb-pts-cell @(Math.Abs(pts) < 0.005 ? "rm-nb-z" : pts < 0 ? "rm-nb-ptv" : "rm-nb-ptv")" style="@ptsBg">@pts.ToString("0.00")</span></span>
+                                @{ var ptsBg = r.Dp.ValuePlayer != null && Math.Abs(pts) >= 0.005 && !string.IsNullOrEmpty(r.Dp.ValuePlayer.LeagueValueColor) ? RotoMonster.Pages.RmColor.Vars("vc", r.Dp.ValuePlayer.LeagueValueColor) : ""; }
+                                <span class="rm-nb-n"><span class="rm-nb-pts-cell @(Math.Abs(pts) < 0.005 ? "rm-nb-z" : pts < 0 ? "rm-nb-ptv" : "rm-nb-ptv")" style="@ptsBg">@pts.ToString("0.00").Replace("-0.00", "0.00")</span></span>
                             </div>
                         }
                         @if (teamRows.Count == 0)
