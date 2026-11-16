@@ -15,6 +15,17 @@
         <button type="button" class="btn btn-sm rm-at-b" id="tv-reset">Reset</button>
         <div class="rm-tv-group">
             <button type="button" class="btn btn-sm rm-at-b" id="tv-clear">Clear</button>
+            <button type="button" class="btn btn-sm rm-at-b" id="tv-toggle-all">Hide All</button>
+            <script>
+(function () {
+    var btn = document.getElementById('tv-toggle-all');
+    if (!btn) return;
+    function get() { try { return localStorage.getItem('rm-tv-hide-all') === '1'; } catch (e) { return false; } }
+    function apply(h) { document.body.classList.toggle('rm-tv-hide-all', h); btn.textContent = h ? 'Show All' : 'Hide All'; btn.classList.toggle('rm-tv-on', h); }
+    apply(get());
+    btn.addEventListener('click', function () { var h = !document.body.classList.contains('rm-tv-hide-all'); try { localStorage.setItem('rm-tv-hide-all', h ? '1' : '0'); } catch (e) {} apply(h); });
+})();
+</script>
             <button type="button" class="btn btn-sm rm-at-b@(Model.State.Paused ? " rm-tv-on" : "")" id="tv-pause">@(Model.State.Paused ? "Resume" : "Pause")</button>
         </div>
     </div>

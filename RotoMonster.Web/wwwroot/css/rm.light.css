@@ -5603,7 +5603,7 @@ td.rm-mbar-cell,
 .rm-sgp .schedule-grid-team-games.rm-sg-opp { font-size: .68rem; font-weight: 600; white-space: nowrap; letter-spacing: -.2px; }
 
 .rm-tv-age { position: relative; }
-.rm-tv-age-bar { position: absolute; left: 2px; top: 2px; height: 4px; background: #f5c542; border-top-left-radius: 8px; z-index: 2; pointer-events: none; }
+.rm-tv-age-bar { position: absolute; left: 2px; top: 2px; height: 4px; background: #ffff00; border-top-left-radius: 8px; z-index: 2; pointer-events: none; }
 
 .rm-tv-age .time-since-badge { background: none !important; padding: 0; }
 .rm-tv-age .time-since-badge .time-since { color: var(--color-text-secondary) !important; }
@@ -5701,3 +5701,5 @@ a.rm-news-row-time:hover { text-decoration: underline; }
 
 .rm-nb .rm-nb-ptv[style*="--vc"] { display: inline-block; background: var(--vc) !important; color: #0f172a !important; padding: 2px 8px !important; border-radius: 6px; box-shadow: none !important; font-weight: 700; }
 .rm-pp-rg-pts[style*="--vc"] { align-self: flex-start; background: var(--vc); color: #0f172a; padding: 2px 10px; border-radius: 8px; }
+.rm-tv-hide-all .rm-tv-col[data-col="all"] { display: none !important; }
+@media (min-width: 901px) { .rm-tv-hide-all .rm-tv-columns { grid-template-columns: none !important; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); } }
