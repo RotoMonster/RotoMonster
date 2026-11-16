@@ -34,6 +34,19 @@ namespace RotoMonster.Pages
         public List<RotoMonster.Services.FeedTweet> PlayerTweets { get; set; } = new List<RotoMonster.Services.FeedTweet>();
         public List<UpcomingGame> UpcomingGames { get; set; } = new List<UpcomingGame>();
         public List<RecentGame> RecentGames { get; set; } = new List<RecentGame>();
+        public RotoMonsterUI.StatBarChartInput PointsChart { get; set; }
+        public List<ValueBar> ValueBars { get; set; } = new List<ValueBar>();
+        public double ValueAvg { get; set; }
+
+        public class ValueBar
+        {
+            public string Opp { get; set; }
+            public string Date { get; set; }
+            public double Value { get; set; }
+            public string Color { get; set; }
+            public string Day { get; set; }
+            public string Line { get; set; }
+        }
         public PlayerNewsColumnModel StatusNews { get; set; } = new PlayerNewsColumnModel { Title = null };
 
         public class RecentGame
@@ -73,7 +86,7 @@ namespace RotoMonster.Pages
                     PlayerTweets = tweets
                         .Where(t => t.Players != null && t.Players.Any(p => p.PlayerId == Player.Id))
                         .OrderByDescending(t => t.CreatedDate)
-                        .Take(5)
+                        .Take(3)
                         .ToList();
                 }
             }
@@ -89,7 +102,7 @@ namespace RotoMonster.Pages
                 var sport = db.Sport;
                 var today = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Game.DisplayZone).Date;
                 var ease = OpponentEaseScaled(season);
-                var games = db.GetGames(season, today, today.AddDays(sport.IsNFL ? 42 : 14))
+                var games = db.GetGames(season, today.AddDays(-7), today.AddDays(sport.IsNFL ? 49 : 14))
                     .Where(g => g.IsPostponed != true && g.AwayTeam != null && g.HomeTeam != null && (g.AwayTeamId == team.Id || g.HomeTeamId == team.Id))
                     .OrderBy(g => g.GameDate)
                     .ToList();
@@ -99,6 +112,9 @@ namespace RotoMonster.Pages
                     var start = today;
                     while (start.DayOfWeek != DayOfWeek.Tuesday)
                         start = start.AddDays(-1);
+                    var first = games.FirstOrDefault(x => x.GameDate.Date >= start && x.GameDate.Date < start.AddDays(7));
+                    if ((first != null && first.GameDate.Date < today) || (first == null && today > start.AddDays(5)))
+                        start = start.AddDays(7);
                     for (int w = 0; w < 5; w++)
                     {
                         var ws = start.AddDays(7 * w);
@@ -112,12 +128,88 @@ namespace RotoMonster.Pages
                 }
                 else
                 {
-                    UpcomingGames = games.Take(6).Select(g => MakeUpcoming(g, team, ease)).ToList();
+                    UpcomingGames = games.Where(g => g.GameDate.Date >= today).Take(6).Select(g => MakeUpcoming(g, team, ease)).ToList();
                 }
             }
             catch (Exception ex)
             {
                 logger?.LogWarning(ex, "Player schedule failed");
+            }
+        }
+
+        private void FillValueBars()
+        {
+            try
+            {
+                if (GameLogGames == null) return;
+                var cats = (HistoryTableModel.UserDisplayCategories ?? new List<UserDisplayCategory>())
+                    .Select(u => u.Category)
+                    .Where(c => c != null && c.Id != HistoryTableModel.GamesCategoryId && !string.IsNullOrWhiteSpace(c.Abbreviation))
+                    .ToList();
+                var played = GameLogGames
+                    .Where(x => !x.IsBreak && x.Game != null && x.StatPlayer != null && x.ValuePlayer != null && x.PlayerGameMissed == null)
+                    .OrderBy(x => x.Game.GameDate)
+                    .ToList();
+                if (played.Count == 0) return;
+                ValueAvg = played.Average(x => x.ValuePlayer.LeagueValue);
+                ValueBars = played
+                    .Skip(Math.Max(0, played.Count - 16))
+                    .Select(x =>
+                    {
+                        var parts = new List<string>();
+                        foreach (var c in cats)
+                        {
+                            var v = x.StatPlayer.Get(HistoryTableModel.DisplayPerValue, c.Id);
+                            if (Math.Abs(v) < 0.005) continue;
+                            var fmt = c.CategoryPerValues != null && GameLogPerValue != null ? c.CategoryPerValues.Where(df => df.PerValueId == GameLogPerValue.Id).Select(df => df.DisplayFormat).FirstOrDefault() : null;
+                            parts.Add(string.Format("{0:" + (string.IsNullOrEmpty(fmt) ? "0.##" : fmt) + "}", v).Trim() + " " + c.Abbreviation.Trim());
+                            if (parts.Count == 4) break;
+                        }
+                        return new ValueBar
+                        {
+                            Opp = x.StatPlayer.Team != null ? x.Game.GetOpponentText(x.StatPlayer.Team) : "",
+                            Date = x.Game.GameDate.ToString("M/d"),
+                            Day = x.Game.GameDate.ToString("ddd M/d"),
+                            Value = x.ValuePlayer.LeagueValue,
+                            Color = x.ValuePlayer.LeagueValueColor,
+                            Line = string.Join(" \u00b7 ", parts)
+                        };
+                    })
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                logger?.LogWarning(ex, "Player value bars failed");
+            }
+        }
+
+        private void FillPointsChart()
+        {
+            try
+            {
+                if (GameLogGames == null) return;
+                var pts = GameLogGames
+                    .Where(x => !x.IsBreak && x.Game != null && x.StatPlayer != null && x.ValuePlayer != null && x.PlayerGameMissed == null)
+                    .OrderBy(x => x.Game.GameDate)
+                    .Select(x => new RotoMonsterUI.ChartPoint
+                    {
+                        X = ((x.StatPlayer.Team != null ? x.Game.GetOpponentText(x.StatPlayer.Team) : "") + " " + x.Game.GameDate.ToString("M/d")).Trim(),
+                        Y = Math.Round(x.ValuePlayer.LeagueValue, 2)
+                    })
+                    .ToList();
+                if (pts.Count < 2) return;
+                PointsChart = new RotoMonsterUI.StatBarChartInput
+                {
+                    Id = "ppPointsChart",
+                    XAxisLabel = db.Sport.IsNFL ? "Week" : "Game",
+                    YAxisLabel = "Value",
+                    Height = 260,
+                    Series = new List<RotoMonsterUI.ChartSeries> { new RotoMonsterUI.ChartSeries { Name = "Value", Points = pts } }
+                };
+            }
+            catch (Exception ex)
+            {
+                logger?.LogWarning(ex, "Player chart failed");
             }
         }
 
@@ -419,6 +511,8 @@ namespace RotoMonster.Pages
                         GameLogGames.RemoveAt(0);
 
                     FillRecentGames();
+                    FillPointsChart();
+                    FillValueBars();
                     await FillStatusNewsAsync();
 
                     return Page();
