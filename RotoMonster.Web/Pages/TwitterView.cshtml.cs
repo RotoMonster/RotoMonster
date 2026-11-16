@@ -571,6 +571,23 @@ namespace RotoMonster.Pages
                 input.NewsDetails = result.NewsDetails;
                 input.SourceURL = result.SourceURL;
                 input.IsUnofficial = result.IsUnofficial;
+                if (result.NewsLevel.HasValue)
+                    input.NewsLevel = result.NewsLevel.Value;
+
+                if (result.PlayerSelectionChanged && result.SelectedPlayerId.HasValue)
+                {
+                    var pid = result.SelectedPlayerId.Value;
+                    RotoMonster.Core.PlayerStatus cur;
+                    if (_activeStatuses.TryGetValue(pid, out cur) && cur.PlayerStatusType != null)
+                    {
+                        if (string.IsNullOrEmpty(input.StatusTypeText)) input.StatusTypeText = cur.PlayerStatusType.Title;
+                        if (string.IsNullOrEmpty(input.StatusTypeTag) && cur.PlayerStatusTagType != null) input.StatusTypeTag = cur.PlayerStatusTagType.Title;
+                        if (string.IsNullOrEmpty(input.NewsTitle)) input.NewsTitle = cur.Subject;
+                    }
+                    double own;
+                    var o = Ownership().TryGetValue(pid, out own) ? own : 0;
+                    input.NewsLevel = o <= 0 ? NewsLevel.Low : o < 50 ? NewsLevel.Medium : NewsLevel.High;
+                }
             }
 
             return input;
