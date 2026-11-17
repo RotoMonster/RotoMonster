@@ -5761,3 +5761,5 @@ a.rm-news-row-time:hover { text-decoration: underline; }
 .rm-vb-col:hover .rm-vb-bar, .rm-vb-col:focus .rm-vb-bar { background: var(--vc, rgba(148,163,184,.4)); opacity: 1; box-shadow: 0 0 0 2px var(--brand-primary, #f59e0b); }
 .rm-vb-val { background: none; color: var(--color-text-primary, inherit); padding: 0; transform: translate(-50%, -4px); }
 .rm-pp-metric { margin-left: 6px; font-size: .8em; font-weight: 500; color: var(--color-text-secondary, #64748b); }
+.card-age-barred { position: relative; }
+.card-age-bar { position: absolute; left: 0; top: 0; height: 4px; background: var(--card-age-bar-color, #ffff00); border-top-left-radius: inherit; z-index: 3; pointer-events: none; }

@@ -47,15 +47,10 @@
     <div class="rm-news-col-cards">
         @foreach (var card in Model.Cards)
         {
-            var ageMin = card.TimeSinceCreated.HasValue ? card.TimeSinceCreated.Value.TotalMinutes : 9999;
-            var agePct = Math.Max(0, Math.Min(100, 100 - ageMin / Model.AgeWindowMinutes * 100));
+            card.AgeShadeSeconds = (int)(Model.AgeWindowMinutes * 60);
             string grp;
             Model.Groups.TryGetValue(card.NewsId, out grp);
             <div class="rm-tv-age rm-nc-age" data-group="@(grp ?? "")" data-mine="@(card.IsMyPlayer ? "1" : "0")">
-                @if (agePct > 0)
-                {
-                    <span class="rm-tv-age-bar" style="width:calc((100% - 4px) * @((agePct / 100).ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)))"></span>
-                }
                 @Html.Raw(new NewsCard(card).RenderTest())
             </div>
         }
