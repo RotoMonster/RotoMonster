@@ -24,7 +24,7 @@
             @foreach (var card in Model.Cards)
             {
                 var span = card.TimeSinceCreated ?? TimeSpan.Zero;
-                var ago = span.TotalMinutes < 60 ? Math.Max(1, (int)span.TotalMinutes) + "m" : span.TotalHours < 24 ? (int)span.TotalHours + "h" : span.TotalDays < 14 ? span.TotalDays.ToString("0.#") + "d" : (DateTime.Now - span).ToString("M/d");
+                var ago = span.TotalMinutes < 60 ? Math.Max(1, (int)span.TotalMinutes) + "m" : span.TotalHours < 24 ? (int)span.TotalHours + "h" : span.TotalDays < 14 ? span.TotalDays.ToString("0.#") + "d" : (DateTime.Now - span).ToString((DateTime.Now - span).Year == DateTime.Now.Year ? "M/d" : "M/d/yy");
                 var text = string.Join(" - ", new[] { card.NewsTitle, card.NewsDetails }.Where(x => !string.IsNullOrWhiteSpace(x)));
                 var color = string.IsNullOrEmpty(card.StatusTypeColorCode) ? "#64748b" : (card.StatusTypeColorCode.StartsWith("#") ? card.StatusTypeColorCode : "#" + card.StatusTypeColorCode);
                 <div class="rm-news-row @(span.TotalMinutes < Model.AgeWindowMinutes ? "rm-news-row--new" : "")">

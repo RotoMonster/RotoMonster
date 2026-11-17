@@ -45,11 +45,11 @@
                 <div class="rm-pp-facts">
                     @if (Model.Player.Height > 0)
                     {
-                        <span class="rm-pp-fact"><span class="rm-pp-fact-label">Ht</span><partial name="_PlayerHeight" model="Model.Player.Height" /></span>
+                        <span class="rm-pp-fact"><span class="rm-pp-fact-label">Ht</span><partial name="_PlayerHeight" model="Model.Player.Height" /><span class="rm-pp-metric">@((Convert.ToDouble(Model.Player.Height) * 0.0254).ToString("0.00")) m</span></span>
                     }
                     @if (Model.Player.Weight > 0)
                     {
-                        <span class="rm-pp-fact"><span class="rm-pp-fact-label">Wt</span><partial name="_PlayerWeight" model="Model.Player.Weight" /></span>
+                        <span class="rm-pp-fact"><span class="rm-pp-fact-label">Wt</span><partial name="_PlayerWeight" model="Model.Player.Weight" /><span class="rm-pp-metric">@((Convert.ToDouble(Model.Player.Weight) * 0.453592).ToString("0.0")) kg</span></span>
                     }
                     @if (Model.Player.Birthdate.Year > 1900)
                     {

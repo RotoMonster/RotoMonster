@@ -5760,3 +5760,4 @@ a.rm-news-row-time:hover { text-decoration: underline; }
 .rm-vb-bar { background: var(--vc, rgba(148,163,184,.4)); opacity: .9; transition: opacity .15s, box-shadow .15s; }
 .rm-vb-col:hover .rm-vb-bar, .rm-vb-col:focus .rm-vb-bar { background: var(--vc, rgba(148,163,184,.4)); opacity: 1; box-shadow: 0 0 0 2px var(--brand-primary, #f59e0b); }
 .rm-vb-val { background: none; color: var(--color-text-primary, inherit); padding: 0; transform: translate(-50%, -4px); }
+.rm-pp-metric { margin-left: 6px; font-size: .8em; font-weight: 500; color: var(--color-text-secondary, #64748b); }
