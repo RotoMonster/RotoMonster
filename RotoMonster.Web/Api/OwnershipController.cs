@@ -44,6 +44,7 @@ namespace RotoMonster.Api
             public int LeagueCount { get; set; } = 100;
             public int PauseSeconds { get; set; } = 3;
             public int WaiverChecks { get; set; } = 300;
+            public bool AllNoWaiverLeagues { get; set; }
         }
 
         public class LeagueResult
@@ -96,12 +97,13 @@ namespace RotoMonster.Api
                 var wanted = Math.Max(1, request.LeagueCount);
                 var pause = TimeSpan.FromSeconds(Math.Max(0, request.PauseSeconds));
                 var waiverChecks = Math.Max(0, request.WaiverChecks);
+                var allGroups = request.AllNoWaiverLeagues;
 
                 _ = Task.Run(async () =>
                 {
                     try
                     {
-                        _lastRuns[key] = await RunAsync(code, wanted, pause, waiverChecks).ConfigureAwait(false);
+                        _lastRuns[key] = await RunAsync(code, wanted, pause, waiverChecks, allGroups).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -172,7 +174,7 @@ namespace RotoMonster.Api
             };
         }
 
-        private async Task<RunSummary> RunAsync(string code, int wanted, TimeSpan pause, int waiverChecks)
+        private async Task<RunSummary> RunAsync(string code, int wanted, TimeSpan pause, int waiverChecks, bool allGroups = false)
         {
             var summary = new RunSummary { StartedAt = DateTime.UtcNow, CategoriesCode = code };
 
@@ -279,7 +281,7 @@ namespace RotoMonster.Api
             foreach (var candidate in candidates)
             {
                 if (processed.Count >= wanted) break;
-                if (groupOf != null && processed.Count > 0 && groupOf[candidate.Id] != groupOf[processed[0].Id]) break;
+                if (!allGroups && groupOf != null && processed.Count > 0 && groupOf[candidate.Id] != groupOf[processed[0].Id]) break;
 
                 var result = new LeagueResult
                 {
