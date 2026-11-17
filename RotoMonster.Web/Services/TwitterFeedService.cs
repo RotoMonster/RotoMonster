@@ -50,6 +50,7 @@ namespace RotoMonster.Services
         public bool IsBlueVerified { get; set; }
         public bool IsNews { get; set; }
         public bool IsTop { get; set; }
+        public bool CantBeSource { get; set; }
         public int? Followers { get; set; }
         public string AiText { get; set; }
         public string TweetUrl { get; set; }

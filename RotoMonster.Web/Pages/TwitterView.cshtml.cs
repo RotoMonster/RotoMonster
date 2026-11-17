@@ -192,8 +192,8 @@ namespace RotoMonster.Pages
                 DateAdded = now,
                 Subject = Trim(result.NewsTitle),
                 Comment = Trim(result.NewsDetails),
-                Source = "@" + tweet.ScreenUsername,
-                SourceUrl = Trim(result.SourceURL) ?? TweetUrl(tweet)
+                Source = tweet.CantBeSource ? null : "@" + tweet.ScreenUsername,
+                SourceUrl = Trim(result.SourceURL) ?? (tweet.CantBeSource ? null : TweetUrl(tweet))
             });
             await _db.SaveChangesAsync(ct);
             return null;
@@ -536,6 +536,7 @@ namespace RotoMonster.Pages
                 TimeSinceCreated = DateTime.UtcNow - t.CreatedDate,
                 ProfileImageUrl = t.ImageUrl,
                 IsVerified = t.IsVerified || t.IsBlueVerified,
+                CantBeSource = t.CantBeSource,
                 Text = t.Text,
                 HideMedia = true,
                 AiText = t.AiText,
