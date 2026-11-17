@@ -44,7 +44,7 @@ namespace RotoMonster.Api
             public int LeagueCount { get; set; } = 100;
             public int PauseSeconds { get; set; } = 3;
             public int WaiverChecks { get; set; } = 300;
-            public bool AllNoWaiverLeagues { get; set; }
+            public bool AllNoWaiverLeagues { get; set; } = true;
         }
 
         public class LeagueResult
