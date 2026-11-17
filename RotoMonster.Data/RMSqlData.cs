@@ -3832,13 +3832,18 @@ namespace RotoMonster.Data
 
         public List<int> GetUserLeagueIdsWithNoWaivers(Season season)
         {
+            return GetUserLeagueIdGroupsWithNoWaivers(season).FirstOrDefault() ?? new List<int>();
+        }
+
+        public List<List<int>> GetUserLeagueIdGroupsWithNoWaivers(Season season)
+        {
             var leagues = WaiverCandidateLeagues(season)
                 .Where(ul => ul.WaiverTime == 0)
                 .Select(ul => new { ul.Id, ul.ProviderLeagueId, ul.NumberOfTeams, ul.PlayersPerTeam })
                 .ToList();
 
             if (leagues.Count == 0)
-                return new List<int>();
+                return new List<List<int>>();
 
             var ids = leagues.Select(l => l.Id).ToList();
             var scoring = db.UserLeaguePlayerTypes.AsNoTracking()
@@ -3852,8 +3857,7 @@ namespace RotoMonster.Data
                 .GroupBy(l => l.NumberOfTeams + "|" + l.PlayersPerTeam + "|" + (scoring.TryGetValue(l.Id, out var s) ? s : ""))
                 .OrderByDescending(g => g.Select(l => l.ProviderLeagueId).Distinct().Count())
                 .ThenBy(g => g.Key, StringComparer.Ordinal)
-                .First()
-                .Select(l => l.Id)
+                .Select(g => g.Select(l => l.Id).ToList())
                 .ToList();
         }
 

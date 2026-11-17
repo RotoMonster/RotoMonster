@@ -179,6 +179,7 @@ namespace RotoMonster.Api
             List<UserLeague> candidates;
             Season season;
             Dictionary<int, int> typeMap = null;
+            Dictionary<int, int> groupOf = null;
             var isWaivers = string.Equals(code, WaiversCode, StringComparison.OrdinalIgnoreCase) || string.Equals(code, "nowaiver", StringComparison.OrdinalIgnoreCase);
 
             if (isWaivers)
@@ -225,13 +226,23 @@ namespace RotoMonster.Api
                 using (var scope = _scopeFactory.CreateScope())
                 {
                     var db = scope.ServiceProvider.GetRequiredService<IRMData>();
-                    candidates = db.GetUserLeagueIdsWithNoWaivers(season)
-                        .Select(id => db.GetUserLeague(id))
-                        .Where(ul => ul != null)
-                        .GroupBy(ul => ul.ProviderLeagueId)
-                        .Select(g => g.First())
-                        .OrderBy(ul => ul.ProviderLeagueId, StringComparer.Ordinal)
-                        .ToList();
+                    candidates = new List<UserLeague>();
+                    groupOf = new Dictionary<int, int>();
+                    var seen = new HashSet<string>();
+                    var groups = db.GetUserLeagueIdGroupsWithNoWaivers(season);
+                    for (var gi = 0; gi < groups.Count; gi++)
+                    {
+                        var inGroup = groups[gi]
+                            .Select(id => db.GetUserLeague(id))
+                            .Where(ul => ul != null && seen.Add(ul.ProviderLeagueId))
+                            .OrderBy(ul => ul.ProviderLeagueId, StringComparer.Ordinal)
+                            .ToList();
+                        foreach (var ul in inGroup)
+                        {
+                            groupOf[ul.Id] = gi;
+                            candidates.Add(ul);
+                        }
+                    }
                 }
 
                 summary.NoWaiverLeagues = candidates.Count;
@@ -268,6 +279,7 @@ namespace RotoMonster.Api
             foreach (var candidate in candidates)
             {
                 if (processed.Count >= wanted) break;
+                if (groupOf != null && processed.Count > 0 && groupOf[candidate.Id] != groupOf[processed[0].Id]) break;
 
                 var result = new LeagueResult
                 {
