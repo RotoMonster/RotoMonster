@@ -9,6 +9,8 @@ namespace RotoMonster.Core
         public Dictionary<int, double> Averages = new Dictionary<int, double>();
         public Dictionary<int, double> AverageAs = new Dictionary<int, double>();
         public Dictionary<int, double> Stdevs = new Dictionary<int, double>();
+        public Dictionary<string, double> PosAverages = new Dictionary<string, double>();
+        public Dictionary<string, double> PosStdevs = new Dictionary<string, double>();
 
         public double PointsAverageValue { get; set; }
         public double CategoryAverageValue { get; set; }

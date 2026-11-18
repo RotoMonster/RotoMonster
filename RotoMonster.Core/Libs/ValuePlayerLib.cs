@@ -167,6 +167,28 @@ namespace RotoMonster.Core
                 outValueAverages.CategoryAverageValue = colorAvg;
                 outValueAverages.PointsMinValue = topValuePlayers.Min(v => v.LeagueValue);
                 outValueAverages.PointsMaxValue = topValuePlayers.Max(v => v.LeagueValue);
+                foreach (var cs in categorySettings)
+                {
+                    var catVals = topValuePlayers.Select(v => v.Get(cs.Category.Id, 0)).Where(v => v != 0).ToList();
+                    if (catVals.Count < 2)
+                        continue;
+                    double catAvg = catVals.Average();
+                    outValueAverages.Averages[cs.Category.Id] = catAvg;
+                    outValueAverages.Stdevs[cs.Category.Id] = Math.Sqrt(catVals.Sum(v => Math.Pow(v - catAvg, 2)) / (catVals.Count - 1));
+                    var byPos = topValuePlayers
+                        .Where(v => v.Get(cs.Category.Id, 0) != 0 && PositionId(v).HasValue)
+                        .GroupBy(v => PositionId(v).Value);
+                    foreach (var g in byPos)
+                    {
+                        var posVals = g.Select(v => v.Get(cs.Category.Id, 0)).ToList();
+                        if (posVals.Count < 2)
+                            continue;
+                        double posAvg = posVals.Average();
+                        string key = cs.Category.Id + ":" + g.Key;
+                        outValueAverages.PosAverages[key] = posAvg;
+                        outValueAverages.PosStdevs[key] = Math.Sqrt(posVals.Sum(v => Math.Pow(v - posAvg, 2)) / (posVals.Count - 1));
+                    }
+                }
 
                 FillPointsValuePlayersAndColors(valuePlayers, outValueAverages, categorySettings);
 
@@ -221,6 +243,14 @@ namespace RotoMonster.Core
             return valuePlayer;
         }
 
+        static int? PositionId(ValuePlayer v)
+        {
+            var dps = v.StatPlayer?.Player?.PlayerDefaultPositions;
+            if (dps == null || dps.Count == 0 || dps.Any(p => p.Position == null))
+                return null;
+            return v.StatPlayer.Player.DefaultPosition?.Id;
+        }
+
         public void FillPointsValuePlayersAndColors(List<ValuePlayer> valuePlayers, ValueAverages valueAverages, List<CategorySetting> categorySettings)
         {
             double range = valueAverages.PointsMaxValue - valueAverages.PointsMinValue;
@@ -235,11 +265,22 @@ namespace RotoMonster.Core
                     else
                         c = colorLib.GetRedRangeColorStyle(-1 * colorTmp, 0, 100, true);
                     vp.LeagueValueColor = c;
+                    var posId = PositionId(vp);
                     foreach (var cs in categorySettings)
                     {
                         double val = vp.Get(cs.Category.Id, 0);
-                        double colorVal = (val - valueAverages.CategoryAverageValue) / valueAverages.CategoryAverageValue;
-                        vp.SetC(cs.Category.Id, vp.GetValueColor(colorVal));
+                        double cAvg, cStdev;
+                        string key = posId.HasValue ? cs.Category.Id + ":" + posId.Value : null;
+                        if (val == 0)
+                            vp.SetC(cs.Category.Id, vp.GetValueColor(0));
+                        else if (key != null && valueAverages.PosAverages.TryGetValue(key, out cAvg) && valueAverages.PosStdevs.TryGetValue(key, out cStdev) && cStdev > 0)
+                            vp.SetC(cs.Category.Id, vp.GetValueColor((val - cAvg) / cStdev));
+                        else if (key != null && valueAverages.PosAverages.Count > 0)
+                            vp.SetC(cs.Category.Id, vp.GetValueColor(0));
+                        else if (valueAverages.Averages.TryGetValue(cs.Category.Id, out cAvg) && valueAverages.Stdevs.TryGetValue(cs.Category.Id, out cStdev) && cStdev > 0)
+                            vp.SetC(cs.Category.Id, vp.GetValueColor((val - cAvg) / cStdev));
+                        else
+                            vp.SetC(cs.Category.Id, vp.GetValueColor((val - valueAverages.CategoryAverageValue) / valueAverages.CategoryAverageValue));
                     }
                 }
             }

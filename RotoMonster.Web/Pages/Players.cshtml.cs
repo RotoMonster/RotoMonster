@@ -264,9 +264,10 @@ namespace RotoMonster.Pages
             {
                 var ctx = HttpContext.RequestServices.GetService(typeof(RMDBContext)) as RMDBContext;
                 if (ctx == null || Player == null || SeasonPlayer == null) return;
+                var cutoff = DateTime.UtcNow.AddDays(-180);
                 var rows = await ctx.PlayerStatuses.AsNoTracking()
                     .Include(s => s.PlayerStatusType)
-                    .Where(s => s.PlayerId == Player.Id && s.DateDeleted == null)
+                    .Where(s => s.PlayerId == Player.Id && s.DateDeleted == null && s.DateAdded >= cutoff)
                     .OrderByDescending(s => s.DateAdded)
                     .Take(2)
                     .ToListAsync();
