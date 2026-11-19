@@ -466,11 +466,13 @@ namespace RotoMonster.Pages
                     // game log
                     var gamePerValue = (from pv in db.GetPerValues(SeasonPlayer.PlayerTypeId) where pv.CategoryId == db.GetGamesCategory(SeasonPlayer.PlayerTypeId).Id select pv).FirstOrDefault();
                     var valueAverages = new ValueAverages();
+                    var avgSeason = pastSeason1 ?? season;
+                    var avgSeasonEnd = avgSeason.EndDate > avgSeason.StartDate ? avgSeason.EndDate : avgSeason.UpdatedDate;
                     var lastSeasonValuePlayers = db.GetValuePlayers(
                         SeasonPlayer.PlayerType,
-                        pastSeason1,
-                        pastSeason1.StartDate,
-                        pastSeason1.EndDate,
+                        avgSeason,
+                        avgSeason.StartDate,
+                        avgSeasonEnd,
                         0,
                         SelectedUserLeague.GetCategorySettings(SeasonPlayer.PlayerType),
                         SelectedUserLeague.ScoringSystem,
@@ -479,6 +481,22 @@ namespace RotoMonster.Pages
                         true,
                         out valueAverages
                         );
+                    if ((valueAverages == null || valueAverages.Averages.Count == 0) && avgSeason != season)
+                    {
+                        db.GetValuePlayers(
+                            SeasonPlayer.PlayerType,
+                            season,
+                            season.StartDate,
+                            season.UpdatedDate,
+                            0,
+                            SelectedUserLeague.GetCategorySettings(SeasonPlayer.PlayerType),
+                            SelectedUserLeague.ScoringSystem,
+                            gamePerValue,
+                            SelectedUserLeague.NumberOfTeams * SelectedUserLeague.PlayersPerTeam,
+                            true,
+                            out valueAverages
+                            );
+                    }
 
                     GameLogPerValue = (from pv in db.GetPerValues(SeasonPlayer.PlayerTypeId) where pv.CategoryId == null select pv).FirstOrDefault();
 
