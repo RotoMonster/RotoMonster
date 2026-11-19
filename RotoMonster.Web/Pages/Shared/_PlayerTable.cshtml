@@ -981,7 +981,7 @@
                     {
                         var displayFormat = (from df in dc.Category.CategoryPerValues where df.PerValueId == Model.DisplayPerValue.Id select df.DisplayFormat).FirstOrDefault();
                         var statColor = Model.ColorStats && dp.ValuePlayer != null ? colorLib.GetStatColor(dp.ValuePlayer.GetStatColor(dc.Category.Id)) : "";
-                        var statText = String.Format("{0:" + displayFormat + "}", dp.StatPlayer.Get(Model.DisplayPerValue, dc.Category.Id));
+                        var statText = Model.FormatStat(dc.Category, displayFormat, dp.StatPlayer.Get(Model.DisplayPerValue, dc.Category.Id));
                         @if (string.IsNullOrEmpty(statColor))
                         {
                             <td class="tdr">@statText</td>
@@ -1009,7 +1009,7 @@
                         {
                             var displayFormat = (from df in cs.Category.CategoryPerValues where df.PerValueId == Model.DisplayPerValue.Id select df.DisplayFormat).FirstOrDefault();
                             var statColor = Model.ColorStats ? colorLib.GetStatColor(dp.ValuePlayer.GetStatColor(cs.Category.Id)) : "";
-                            var statText = String.Format("{0:" + displayFormat + "}", dp.StatPlayer.Get(Model.DisplayPerValue, cs.Category.Id));
+                            var statText = Model.FormatStat(cs.Category, displayFormat, dp.StatPlayer.Get(Model.DisplayPerValue, cs.Category.Id));
                             @if (string.IsNullOrEmpty(statColor))
                             {
                                 <td class="tdr @borderCss">@statText</td>
@@ -1032,7 +1032,7 @@
                     {
                         var displayFormat = (from df in dc.Category.CategoryPerValues where df.PerValueId == Model.DisplayPerValue.Id select df.DisplayFormat).FirstOrDefault();
                         var statColor = Model.ColorStats ? colorLib.GetStatColor(dp.ValuePlayer.GetStatColor(dc.Category.Id)) : "";
-                        var statText = String.Format("{0:" + displayFormat + "}", dp.StatPlayer.Get(Model.DisplayPerValue, dc.Category.Id));
+                        var statText = Model.FormatStat(dc.Category, displayFormat, dp.StatPlayer.Get(Model.DisplayPerValue, dc.Category.Id));
                         @if (string.IsNullOrEmpty(statColor))
                         {
                             <td class="tdr">@statText</td>

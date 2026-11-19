@@ -9,6 +9,18 @@ namespace RotoMonster.Models.Shared
 {
     public class PlayerTableModel
     {
+        public bool MinutesAsClock { get; set; } = false;
+
+        public string FormatStat(Category category, string displayFormat, double value)
+        {
+            if (MinutesAsClock && category != null && (category.Abbreviation ?? "").Trim().ToUpperInvariant() == "MIN")
+            {
+                var seconds = (int)Math.Round(value * 60);
+                return (seconds / 60) + ":" + (seconds % 60).ToString("00");
+            }
+            return String.Format("{0:" + displayFormat + "}", value);
+        }
+
         public Sport Sport { get; set; }
         public List<Position> AllPositions { get; set; }
         public List<DisplayPlayer> DisplayPlayers { get; set; }

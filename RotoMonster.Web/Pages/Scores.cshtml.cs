@@ -198,8 +198,9 @@ namespace RotoMonster.Pages
                         playerTableModel.DisplayPerValue = db.GetTotalPerValue(playerType.Id);
                         playerTableModel.UserDisplayCategories = await db.GetUserDisplayCategoriesAsync(UserId, userLeague, playerType);
                         playerTableModel.GamesCategoryId = db.GetGamesCategory(playerType.Id).Id;
-                        playerTableModel.BeforeCategories = new List<DisplayCategory>();
-                        playerTableModel.AfterCategories = new List<DisplayCategory>();
+                        playerTableModel.BeforeCategories = db.GetBeforeDisplayCategories(playerType);
+                        playerTableModel.AfterCategories = db.GetAfterDisplayCategories(playerType);
+                        playerTableModel.MinutesAsClock = true;
                         playerTableModel.DisplayPlayers = new List<DisplayPlayer>();
                         playerTableModel.ValuePerValues.Add(db.GetPerGamePerValue(playerType.Id));
                         playerTableModel.ColorStats = false;
