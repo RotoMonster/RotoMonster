@@ -369,7 +369,7 @@
                                                         <span class="rm-vb-grid @(Math.Abs(tv) < 1e-9 ? "rm-vb-grid--zero" : "")" style="bottom:@pct(tv)%"></span>
                                                     }
                                                     <span class="rm-vb-avg" style="bottom:@pct(Model.ValueAvg)%"></span>
-                                                    <span class="rm-vb-bar" style="bottom:@pct(b0)%;height:calc(@pct(b1)% - @pct(b0)%);@vcs"></span>
+                                                    <span class="rm-vb-bar @(vb.Value < 0 ? "rm-vb-bar--neg" : "")" style="bottom:@pct(b0)%;height:calc(@pct(b1)% - @pct(b0)%);@vcs"></span>
                                                     <span class="rm-vb-val" style="bottom:@pct(b1)%;@vcs">@vb.Value.ToString("0.0")</span>
                                                     <div class="rm-vb-tip" style="bottom:@pct(b1)%">
                                                         <div class="rm-vb-tip-head"><strong>@vb.Opp</strong><span>@vb.Day</span></div>

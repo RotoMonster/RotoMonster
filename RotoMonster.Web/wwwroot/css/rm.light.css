@@ -5782,3 +5782,6 @@ a.rm-news-row-time:hover { text-decoration: underline; }
 .rm-dc-pp-item { display: inline-flex; align-items: baseline; gap: 2px; padding: 0 4px; border-radius: 4px; font-size: .62rem; font-weight: 700; line-height: 1.5; background: color-mix(in srgb, currentColor 14%, transparent); }
 .rm-dc-pp-item b { font-weight: 600; color: var(--color-text-secondary); }
 /* end rm-dc-pp */
+
+.rm-vb-bar { border-radius: 10px 10px 2px 2px; }
+.rm-vb-bar--neg { border-radius: 2px 2px 10px 10px; }
