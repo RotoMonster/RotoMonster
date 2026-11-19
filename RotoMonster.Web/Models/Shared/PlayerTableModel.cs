@@ -13,7 +13,12 @@ namespace RotoMonster.Models.Shared
 
         public string FormatStat(Category category, string displayFormat, double value)
         {
-            if (MinutesAsClock && category != null && (category.Abbreviation ?? "").Trim().ToUpperInvariant() == "MIN")
+            return MinutesAsClock ? FormatStatClock(category, displayFormat, value) : String.Format("{0:" + displayFormat + "}", value);
+        }
+
+        public static string FormatStatClock(Category category, string displayFormat, double value)
+        {
+            if (category != null && (category.Abbreviation ?? "").Trim().ToUpperInvariant() == "MIN")
             {
                 var seconds = (int)Math.Round(value * 60);
                 return (seconds / 60) + ":" + (seconds % 60).ToString("00");

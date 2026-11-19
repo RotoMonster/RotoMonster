@@ -245,7 +245,7 @@
                                             @foreach (var dc in Model.HistoryTableModel.BeforeCategories)
                                             {
                                                 var displayFormat = (from df in dc.Category.CategoryPerValues where df.PerValueId == Model.GameLogPerValue.Id select df.DisplayFormat).FirstOrDefault();
-                                                <td class="tdr">@String.Format("{0:" + displayFormat + "}", gameLog.StatPlayer.Get(Model.HistoryTableModel.DisplayPerValue, dc.Category.Id))</td>
+                                                <td class="tdr">@RotoMonster.Models.Shared.PlayerTableModel.FormatStatClock(dc.Category, displayFormat, gameLog.StatPlayer.Get(Model.HistoryTableModel.DisplayPerValue, dc.Category.Id))</td>
                                             }
 
                                             @if (Model.HistoryTableModel.UserDisplayCategories != null)
@@ -253,14 +253,14 @@
                                                 @foreach (var cs in Model.HistoryTableModel.UserDisplayCategories)
                                                 {
                                                     var displayFormat = (from df in cs.Category.CategoryPerValues where df.PerValueId == Model.GameLogPerValue.Id select df.DisplayFormat).FirstOrDefault();
-                                                    <td class="tdr">@String.Format("{0:" + displayFormat + "}", gameLog.StatPlayer.Get(Model.HistoryTableModel.DisplayPerValue, cs.Category.Id))</td>
+                                                    <td class="tdr">@RotoMonster.Models.Shared.PlayerTableModel.FormatStatClock(cs.Category, displayFormat, gameLog.StatPlayer.Get(Model.HistoryTableModel.DisplayPerValue, cs.Category.Id))</td>
                                                 }
                                             }
 
                                             @foreach (var dc in Model.HistoryTableModel.AfterCategories)
                                             {
                                                 var displayFormat = (from df in dc.Category.CategoryPerValues where df.PerValueId == Model.GameLogPerValue.Id select df.DisplayFormat).FirstOrDefault();
-                                                <td class="tdr">@String.Format("{0:" + displayFormat + "}", gameLog.StatPlayer.Get(Model.HistoryTableModel.DisplayPerValue, dc.Category.Id))</td>
+                                                <td class="tdr">@RotoMonster.Models.Shared.PlayerTableModel.FormatStatClock(dc.Category, displayFormat, gameLog.StatPlayer.Get(Model.HistoryTableModel.DisplayPerValue, dc.Category.Id))</td>
                                             }
                                         }
                                         else
