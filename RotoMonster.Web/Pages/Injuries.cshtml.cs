@@ -91,7 +91,7 @@ namespace RotoMonster.Pages
                     TeamCode = sp.Team.Code,
                     PositionCodes = string.Join(" ", dp.Positions.Select(p => (p.Abbreviation ?? "").Trim().ToLowerInvariant())),
                     Group = group,
-                    Injury = CleanInjury(ps.Subject),
+                    Injury = CleanInjury(ps.Subject, ps.Comment, ps.PlayerStatusType.Title),
                     MinutesAgo = ps.TimeSince.TotalMinutes,
                     Own = op != null ? op.OwnershipPercent : (double?)null,
                     Start = op != null ? op.ActivePercent : (double?)null,
@@ -116,11 +116,21 @@ namespace RotoMonster.Pages
                 .ToList();
         }
 
-        private static string CleanInjury(string subject)
+        private static string CleanInjury(string subject, string comment, string typeTitle)
         {
             var s = (subject ?? "").Trim();
             if (s.Length == 0 || s.Equals("unknown", StringComparison.OrdinalIgnoreCase))
-                return "\u2014";
+            {
+                var c = (comment ?? "").Trim();
+                var tt = (typeTitle ?? "").Trim();
+                if (tt.Length > 0 && c.StartsWith(tt + " - ", StringComparison.OrdinalIgnoreCase))
+                    c = c.Substring(tt.Length + 3).Trim();
+                if (c.Length == 0 || c.Equals("unknown", StringComparison.OrdinalIgnoreCase))
+                    return "\u2014";
+                if (c.Equals("b2b", StringComparison.OrdinalIgnoreCase))
+                    return "Back-to-back";
+                return char.ToUpperInvariant(c[0]) + c.Substring(1);
+            }
             return string.Join("/", s.Split('/').Select(p => p.Trim()).Where(p => p.Length > 0).Select(p => char.ToUpperInvariant(p[0]) + p.Substring(1)));
         }
     }
