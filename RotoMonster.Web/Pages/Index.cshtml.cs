@@ -158,7 +158,7 @@ namespace RotoMonster.Pages
                 }
             }
 
-            var recentPlayerStatuses = (from ps in playerStatuses where ps.TimeSince.TotalHours < 24 orderby ps.DateAdded descending select ps).ToList();
+            var recentPlayerStatuses = (from ps in playerStatuses where ps.TimeSince.TotalHours < 24 && (ps.PlayerStatusType == null || (ps.PlayerStatusType.Title ?? "").IndexOf("Goalie", StringComparison.OrdinalIgnoreCase) < 0) orderby ps.DateAdded descending select ps).ToList();
             if (recentPlayerStatuses.Count > 0)
             {
                 InjuryDisplayPlayers = new List<DisplayPlayer>();

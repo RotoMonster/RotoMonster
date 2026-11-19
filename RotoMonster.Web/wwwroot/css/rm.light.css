@@ -5768,9 +5768,9 @@ a.rm-news-row-time:hover { text-decoration: underline; }
 .rm-gl-dnp-why { margin-left: 8px; font-size: 13px; }
 
 /* rm-lu-name-nowrap */
-.rm-lu-row:not(.rm-dc-row) .rm-lu-name { flex-wrap: nowrap; }
+.rm-lu-row:not(.rm-dc-row) .rm-lu-name { flex-wrap: wrap; }
 .rm-lu-row:not(.rm-dc-row) .rm-lu-name > * { flex: none; }
-.rm-lu-row:not(.rm-dc-row) .rm-lu-name > a { flex: 0 1 auto; min-width: 0; }
+.rm-lu-row:not(.rm-dc-row) .rm-lu-name > a { flex: 1 1 0; min-width: 5.5em; overflow-wrap: normal; word-break: normal; }
 /* end rm-lu-name-nowrap */
 
 /* rm-dc-pp */

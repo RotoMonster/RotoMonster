@@ -163,6 +163,9 @@ namespace RotoMonster
             if (rootPath.Length > 0)
                 app.UsePathBase(rootPath);
 
+            var uiAccessor = services.GetService<IHttpContextAccessor>();
+            RotoMonsterUIUrls.PlayerUrl = id => (uiAccessor?.HttpContext?.Request.PathBase.Value ?? rootPath).TrimEnd('/') + "/Players?playerId=" + id;
+
             if (true || env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

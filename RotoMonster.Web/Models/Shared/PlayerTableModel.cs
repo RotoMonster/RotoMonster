@@ -18,7 +18,8 @@ namespace RotoMonster.Models.Shared
 
         public static string FormatStatClock(Category category, string displayFormat, double value)
         {
-            if (category != null && (category.Abbreviation ?? "").Trim().ToUpperInvariant() == "MIN")
+            var abbr = category != null ? (category.Abbreviation ?? "").Trim().ToUpperInvariant() : "";
+            if (abbr == "MIN" || abbr.StartsWith("MIN("))
             {
                 var seconds = (int)Math.Round(value * 60);
                 return (seconds / 60) + ":" + (seconds % 60).ToString("00");

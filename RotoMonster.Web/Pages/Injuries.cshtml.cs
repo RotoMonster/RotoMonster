@@ -63,7 +63,7 @@ namespace RotoMonster.Pages
                 .GroupBy(o => o.PlayerId).ToDictionary(g => g.Key, g => g.First());
 
             var statuses = await db.GetActivePlayerStatusesAsync();
-            foreach (var ps in statuses.GroupBy(s => s.PlayerId).Select(g => g.OrderByDescending(s => s.DateAdded).First()))
+            foreach (var ps in statuses.Where(s => s.PlayerStatusType == null || (s.PlayerStatusType.Title ?? "").IndexOf("Goalie", StringComparison.OrdinalIgnoreCase) < 0).GroupBy(s => s.PlayerId).Select(g => g.OrderByDescending(s => s.DateAdded).First()))
             {
                 if (ps.PlayerStatusType == null)
                     continue;

@@ -37,6 +37,7 @@
 
     static string N(double v) => Math.Abs(v - Math.Round(v)) < 0.001 ? Math.Round(v).ToString("0") : v.ToString("0.#");
     static string Pm(double v) => v > 0.001 ? "+" + N(v) : N(v);
+    static string Clock(double v) { var s = (int)Math.Round(v * 60); return (s / 60) + ":" + (s % 60).ToString("00"); }
 }
 @{
     var bsm = Model.BoxScoreModel;
@@ -114,7 +115,7 @@
                 r => isSk(r) && (r.VI(1) + r.VI(2) + r.VI(4)) > 0, r => (r.VI(1) + r.VI(2)) * 100 + r.VI(1),
                 r => new List<string> { N(r.VI(1)), N(r.VI(2)), N(r.VI(1) + r.VI(2)), N(r.VI(4)), Pm(r.VI(3)) }));
             Func<NbRow, bool> isD = r => r.Dp.Positions != null && r.Dp.Positions.Any(x => x != null && (x.Abbreviation ?? "").Trim().ToUpperInvariant() == "D");
-            Func<NbRow, List<string>> skCells = r => new List<string> { N(r.VI(5)), N(r.VI(6)), N(r.VI(27)), Pm(r.VI(3)), Math.Round(r.VI(10)).ToString("0") };
+            Func<NbRow, List<string>> skCells = r => new List<string> { N(r.VI(5)), N(r.VI(6)), N(r.VI(27)), Pm(r.VI(3)), Clock(r.VI(10)) };
             var skHeads = new List<string> { "SOG", "HIT", "BS", "+/-", "Min" };
             sections.Add(Make("Forwards", skHeads, r => isSk(r) && !isD(r) && r.VI(10) > 0, r => r.VI(5) * 1000 + r.VI(10), skCells));
             sections.Add(Make("Defense", skHeads, r => isSk(r) && isD(r) && r.VI(10) > 0, r => r.VI(10), skCells));
@@ -123,7 +124,7 @@
         {
             sections.Add(Make("Goalies", new List<string> { "SV/SA", "GA", "SV%", "W", "Min" },
                 r => r.PlayerType.Id == goalie.Id && (r.VI(72) > 0 || r.VI(57) > 0), r => r.VI(57),
-                r => new List<string> { N(r.VI(56)) + "/" + N(r.VI(72)), N(r.VI(52)), r.VI(72) > 0 ? (r.VI(56) / r.VI(72)).ToString(".000") : "-", N(r.VI(50)), Math.Round(r.VI(57)).ToString("0") }));
+                r => new List<string> { N(r.VI(56)) + "/" + N(r.VI(72)), N(r.VI(52)), r.VI(72) > 0 ? (r.VI(56) / r.VI(72)).ToString(".000") : "-", N(r.VI(50)), Clock(r.VI(57)) }));
         }
     }
 
