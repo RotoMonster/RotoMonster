@@ -86,6 +86,20 @@
                                             {
                                                 <span class="rm-dc-elig">@string.Join(" \u00b7 ", dp.Positions.Where(x => x != null).Select(x => (x.Abbreviation ?? "").Trim()))</span>
                                             }
+                                            @if (Model.ShowPositionPercents && dp.PlayerPositionPercents != null)
+                                            {
+                                                var pps = dp.PlayerPositionPercents.Where(x => x.Position != null && x.DisplayPercent > 0).OrderByDescending(x => x.Percent).ToList();
+                                                if (pps.Count > 0)
+                                                {
+                                                    <span class="rm-dc-pp" title="Time played at each position">
+                                                        @foreach (var pp in pps)
+                                                        {
+                                                            var ab = (pp.Position.Abbreviation ?? "").Trim();
+                                                            <span class="rm-dc-pp-item pos-@ab.ToLower()">@ab<b>@pp.DisplayPercent</b></span>
+                                                        }
+                                                    </span>
+                                                }
+                                            }
                                             <partial name="_PlayerStatus" model="dp.PlayerStatus" />
                                             <span class="rm-dc-injahead"><partial name="_HigherDepthInjuredDisplayPlayers" model="dp.HigherDepthInjuredDisplayPlayers" /></span>
                                         </span>
@@ -108,12 +122,6 @@
                                             }
                                         </span>
                                     </div>
-                                    @if (Model.ShowPositionPercents && dp.PlayerPositionPercents != null && dp.PlayerPositionPercents.Count > 0)
-                                    {
-                                        <div class="rm-dc-pospct">
-                                            <partial name="_PlayerPositionPercents" model="new PlayerPositionPercentsModel() { AllPositions = Model.AllPositions, PlayerPositionPercents = dp.PlayerPositionPercents }" />
-                                        </div>
-                                    }
                                 }
                             </div>
                         </div>
