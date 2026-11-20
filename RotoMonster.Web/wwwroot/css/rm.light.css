@@ -5857,3 +5857,8 @@ a.rm-news-row-time:hover { text-decoration: underline; }
 .rm-xv-g { margin-left: 4px; font-size: .72em; font-weight: 600; opacity: .7; }
 
 .rm-lo.bm-tooltip-trigger { cursor: pointer; }
+
+.rm-pt-scroll::-webkit-scrollbar, .rm-pt-hbar::-webkit-scrollbar { height: 10px; }
+.rm-pt-scroll::-webkit-scrollbar-track, .rm-pt-hbar::-webkit-scrollbar-track { background: transparent; }
+.rm-pt-scroll::-webkit-scrollbar-thumb, .rm-pt-hbar::-webkit-scrollbar-thumb { background: #8a94a6; border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+.rm-pt-scroll::-webkit-scrollbar-thumb:hover, .rm-pt-hbar::-webkit-scrollbar-thumb:hover { background: var(--color-text-secondary); background-clip: padding-box; }

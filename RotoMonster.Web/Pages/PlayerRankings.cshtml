@@ -479,7 +479,13 @@
                     var cells = rows.map(function (r) { return r.cells[i]; }).filter(Boolean);
                     var vals = cells.map(function (c) { return num(c.querySelector('.pct-badge, .value-badge, .rm-badge') || c); });
                     if (kind === 'extra') {
-                        cells.forEach(function (c, j) { c.style.backgroundColor = ''; c.classList.toggle('rm-pt-z', vals[j] !== null && Math.abs(vals[j]) < 0.005); });
+                        cells.forEach(function (c, j) {
+                            c.style.backgroundColor = '';
+                            var zero = vals[j] !== null && Math.abs(vals[j]) < 0.005;
+                            c.classList.toggle('rm-pt-z', zero);
+                            var xb = c.querySelector('.value-badge');
+                            if (xb && xb.dataset.bg && !zero) { xb.classList.add('rm-pt-orig'); xb.style.backgroundColor = xb.dataset.bg; }
+                        });
                         if (cells.every(function (c) { return c.textContent.trim() === ''; })) hideCol(th, cells);
                         return;
                     }
