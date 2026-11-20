@@ -512,9 +512,6 @@ namespace RotoMonster.Data
 
         public async Task<List<DisplayColumn>> GetDisplayColumnsAsync(string userId)
         {
-            if (userId == null)
-                return new List<DisplayColumn>();
-
             var displayColumns = new List<DisplayColumn>();
 
             var columns = await (from c in db.UserOptionTypes
@@ -523,7 +520,7 @@ namespace RotoMonster.Data
                                  orderby c.DisplayOrder
                                  select c).ToListAsync();
 
-            var userSettings = await (from u in db.UserOptions where u.UserId == userId select u).ToListAsync();
+            var userSettings = userId == null ? new List<UserOption>() : await (from u in db.UserOptions where u.UserId == userId select u).ToListAsync();
 
             foreach (var column in columns)
             {

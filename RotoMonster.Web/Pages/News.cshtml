@@ -1,10 +1,24 @@
 @page
 @model RotoMonster.Pages.NewsModel
 
-<div class="container-fluid px-4 rm-newsp">
-    <div class="rm-injp-sub">Latest player news and statuses &middot; <span id="newspCount">@Model.News.Cards.Count</span> players</div>
+<div class="container-fluid px-4 rm-newsp rm-nf">
+    <div class="rm-injp-sub">Latest player news and statuses &middot; <span id="newspCount">@Model.Rows.Count</span> players</div>
 
     <div class="modern-filter-container rm-injp-panel rm-newsp-panel">
+        <div class="rm-filter-section modern-filter-row" data-title="Find">
+            <input type="search" id="newspSearch" class="rm-injp-search" placeholder="Search players or team" aria-label="Search players" autocomplete="off" />
+        </div>
+        @if (Model.Days.Count > 1)
+        {
+            <div class="rm-filter-section modern-filter-row" data-title="When">
+                <div class="rm-injp-chips" id="newspDay">
+                    <button type="button" class="rm-injp-chip rm-injp-chip--on" data-value="">All</button>
+                    <button type="button" class="rm-injp-chip" data-value="1">Today</button>
+                    <button type="button" class="rm-injp-chip" data-value="3">3 Days</button>
+                    <button type="button" class="rm-injp-chip" data-value="7">1 Week</button>
+                </div>
+            </div>
+        }
         <div class="rm-filter-section modern-filter-row" data-title="Status">
             <div class="rm-injp-chips" id="newspStatus">
                 <button type="button" class="rm-injp-chip rm-injp-chip--on" data-value="">All</button>
@@ -25,28 +39,66 @@
         }
     </div>
 
-    <partial name="_PlayerNewsColumn" model="Model.News" />
-    <div class="rm-news-col-empty" id="newspNone" hidden>No news matches these filters.</div>
+    @if (Model.MyRows.Count > 0)
+    {
+        <section class="rm-nf-mine">
+            <div class="rm-nf-mine-head">
+                <span class="rm-nf-mine-title">Your players</span>
+                <span class="rm-nf-mine-count">@Model.MyRows.Count with news</span>
+            </div>
+            @foreach (var r in Model.MyRows)
+            {
+                <partial name="_NewsFeedRow" model="r" />
+            }
+        </section>
+    }
+
+    @foreach (var d in Model.Days)
+    {
+        <section class="rm-nf-day" data-day="@d.Label">
+            <div class="rm-nf-day-head">
+                <span class="rm-nf-day-label">@d.Label</span>
+                <span class="rm-nf-day-sub">@d.Sub</span>
+            </div>
+            @foreach (var r in d.Rows)
+            {
+                <partial name="_NewsFeedRow" model="r" />
+            }
+        </section>
+    }
+
+    <div class="rm-news-col-empty" id="newspNone" hidden="@(Model.Rows.Count > 0)">@(Model.Rows.Count == 0 ? "No player news right now." : "No news matches these filters.")</div>
 </div>
 
 @section Scripts {
 <script>
 (function () {
-    var cards = Array.prototype.slice.call(document.querySelectorAll('.rm-newsp .rm-nc-age'));
     var chips = document.getElementById('newspStatus');
     var mine = document.getElementById('newspMine');
     var count = document.getElementById('newspCount');
     var none = document.getElementById('newspNone');
     var group = '';
+    var dayPick = '';
+    var dayChips = document.getElementById('newspDay');
+    var search = document.getElementById('newspSearch');
     function apply() {
         var shown = 0;
-        cards.forEach(function (c) {
-            var ok = (!group || c.dataset.group === group) && (!mine || !mine.checked || c.dataset.mine === '1');
-            c.hidden = !ok;
-            if (ok) shown++;
+        document.querySelectorAll('.rm-nf-day').forEach(function (day) {
+            var any = false;
+            day.querySelectorAll('.rm-nf-row').forEach(function (r) {
+                var q = search ? search.value.trim().toLowerCase() : '';
+                var ok = (!dayPick || parseFloat(r.dataset.days) <= parseFloat(dayPick)) && (!group || r.dataset.group === group) && (!mine || !mine.checked || r.dataset.mine === '1') && (!q || r.dataset.name.indexOf(q) >= 0);
+                r.hidden = !ok;
+                if (ok) { any = true; shown++; }
+            });
+            day.hidden = !any;
+        });
+        document.querySelectorAll('.rm-nf-mine .rm-nf-row').forEach(function (r) {
+            var q2 = search ? search.value.trim().toLowerCase() : '';
+            r.hidden = (!!group && r.dataset.group !== group) || (!!q2 && r.dataset.name.indexOf(q2) < 0);
         });
         count.textContent = shown;
-        none.hidden = shown > 0 || cards.length === 0;
+        if (document.querySelectorAll('.rm-nf-row').length > 0) none.hidden = shown > 0;
     }
     chips.addEventListener('click', function (e) {
         var btn = e.target.closest('.rm-injp-chip');
@@ -56,6 +108,14 @@
         apply();
     });
     if (mine) mine.addEventListener('change', apply);
+    if (dayChips) dayChips.addEventListener('click', function (e) {
+        var btn = e.target.closest('.rm-injp-chip');
+        if (!btn) return;
+        dayChips.querySelectorAll('.rm-injp-chip').forEach(function (b) { b.classList.toggle('rm-injp-chip--on', b === btn); });
+        dayPick = btn.dataset.value;
+        apply();
+    });
+    if (search) search.addEventListener('input', apply);
     apply();
 })();
 </script>

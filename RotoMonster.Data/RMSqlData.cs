@@ -3876,7 +3876,7 @@ namespace RotoMonster.Data
         public void SetUserLeagueWaiverTime(Season season, string providerLeagueId, int waiverTime)
         {
             var leagues = (from ul in db.UserLeagues
-                           where ul.SeasonId == season.Id && ul.FantasyProviderId == 1 && ul.ProviderLeagueId == providerLeagueId
+                           where ul.SeasonId == season.Id && (ul.FantasyProviderId == 1 || ul.FantasyProviderId == 2) && ul.ProviderLeagueId == providerLeagueId
                            select ul).ToList();
 
             foreach (var ul in leagues)
@@ -3889,7 +3889,7 @@ namespace RotoMonster.Data
         {
             return from ul in db.UserLeagues.AsNoTracking()
                    where ul.SeasonId == season.Id
-                      && ul.FantasyProviderId == 1
+                      && (ul.FantasyProviderId == 1 || ul.FantasyProviderId == 2)
                       && ul.ProviderLeagueId != null && ul.ProviderLeagueId != ""
                    select ul;
         }
@@ -5251,13 +5251,10 @@ namespace RotoMonster.Data
 
         public List<DisplayColumn> GetDisplayColumns(string userId)
         {
-            if (userId == null)
-                return new List<DisplayColumn>();
-
             var displayColumns = new List<DisplayColumn>();
 
             var columns = (from c in db.UserOptionTypes where c.OptionGroup == "DisplayColumn" where c.IsEnabled orderby c.DisplayOrder select c).ToList();
-            var userSettings = (from u in db.UserOptions where u.UserId == userId select u).ToList();
+            var userSettings = userId == null ? new List<UserOption>() : (from u in db.UserOptions where u.UserId == userId select u).ToList();
 
             foreach (var column in columns)
             {

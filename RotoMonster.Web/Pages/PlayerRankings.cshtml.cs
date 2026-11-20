@@ -1182,7 +1182,7 @@ namespace RotoMonster.Pages
             PlayerTableModel.ShowDefaultAdp = defaultAdpPlayers != null && defaultAdpPlayers.Count > 0;
             PlayerTableModel.NextPick = NextPick;
             PlayerTableModel.Draft = draft;
-            PlayerTableModel.ShowMonsterBot = monsterBotPlayers != null;
+            PlayerTableModel.ShowMonsterBot = false;
             PlayerTableModel.ShowEase = db.Sport.IsNFL;
             PlayerTableModel.DateSelects = DateSelects;
             PlayerTableModel.StreamSelects = StreamSelects;
@@ -1190,6 +1190,23 @@ namespace RotoMonster.Pages
             PlayerTableModel.ShowTeam = false;
             PlayerTableModel.ShowPositions = false;
             PlayerTableModel.ShowInjuries = false;
+            if (!string.IsNullOrEmpty(UserId) && PlayerTableModel.UserDisplayColumns.IsSelected("League Ownership"))
+            {
+                foreach (var trackedLeague in await db.GetTrackedUserLeaguesAsync(UserId))
+                {
+                    if (!trackedLeague.TrackLeague)
+                        continue;
+                    var info = new RotoMonster.Models.Shared.LeagueOwnershipInfo { Title = trackedLeague.DisplayTitle };
+                    foreach (var tp in await db.GetUserLeagueTeamPlayersAsync(trackedLeague))
+                    {
+                        info.Rostered.Add(tp.PlayerId);
+                        if (tp.UserLeagueTeam != null && tp.UserLeagueTeam.ProviderId == trackedLeague.MyProviderTeamId)
+                            info.Mine.Add(tp.PlayerId);
+                    }
+                    PlayerTableModel.LeagueOwnershipLeagues.Add(info);
+                }
+                PlayerTableModel.ShowLeagueOwnership = PlayerTableModel.LeagueOwnershipLeagues.Count > 0;
+            }
 
             //if (selectedDates != null && selectedDates.Count > 0)
             //{

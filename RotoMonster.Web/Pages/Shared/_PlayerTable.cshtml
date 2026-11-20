@@ -153,6 +153,17 @@
 <div class="bm-tooltip-content" id="@tipId9" role="tooltip">Start Percent</div>
 </span>
                         </th>
+
+                        @if (Model.ShowLeagueOwnership)
+                        {
+                            var tipIdAll = Context.NextTooltipId();
+                            <th class="text-nowrap tdc" data-pt="all">
+                                <span class="bm-tooltip-wrap">
+                                    <span class="bm-tooltip-trigger bm-tooltip-trigger--hover text-white" data-bm-tooltip="@tipIdAll">All</span>
+                                    <div class="bm-tooltip-content" id="@tipIdAll" role="tooltip">Your leagues: green is on your team, blue is available</div>
+                                </span>
+                            </th>
+                        }
                     }
 
                     @if (!Model.Sport.IsNFL && Model.ShowIR)
@@ -616,6 +627,22 @@
                         else
                         {
                             <td />
+                        }
+
+                        @if (Model.ShowLeagueOwnership)
+                        {
+                            var loYours = Model.LeagueOwnershipLeagues.Where(x => x.Mine.Contains(dp.SeasonPlayer.PlayerId)).Select(x => x.Title).ToList();
+                            var loAvail = Model.LeagueOwnershipLeagues.Where(x => !x.Rostered.Contains(dp.SeasonPlayer.PlayerId)).Select(x => x.Title).ToList();
+                            <td class="tdc text-nowrap rm-lo-cell">
+                                @if (loYours.Count > 0)
+                                {
+                                    <span class="rm-lo rm-lo--mine" title="Yours in: @string.Join(", ", loYours)">@loYours.Count</span>
+                                }
+                                @if (loAvail.Count > 0)
+                                {
+                                    <span class="rm-lo rm-lo--avail" title="Available in: @string.Join(", ", loAvail)">@loAvail.Count</span>
+                                }
+                            </td>
                         }
                     }
 

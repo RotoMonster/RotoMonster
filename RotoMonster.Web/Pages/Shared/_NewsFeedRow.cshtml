@@ -1,0 +1,43 @@
+@model RotoMonster.Pages.NewsFeedRow
+@{
+    var colorLib = new RotoMonster.Core.Libs.ColorLib();
+    var stType = Model.PlayerStatus.PlayerStatusType;
+    var stTip = ViewContext.HttpContext.NextTooltipId();
+    var stText = string.IsNullOrWhiteSpace(Model.PlayerStatus.Comment) ? Model.Status : Model.PlayerStatus.Comment.Trim();
+}
+
+<div class="rm-nf-row" data-days="@Model.PlayerStatus.TimeSince.TotalDays.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" data-name="@((Model.Name + " " + Model.Team).ToLowerInvariant())" data-group="@Model.Group" data-mine="@(Model.Mine ? "1" : "0")">
+    <div class="rm-nf-time">@Model.Time</div>
+    <div class="rm-nf-status">
+        <span class="bm-tooltip-wrap"><span class="badge rm-injp-status bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@stTip" style="@colorLib.GetPlayerStatusTypeStyle(stType)">@Model.Status</span><div class="bm-tooltip-content" id="@stTip" role="tooltip">@stText</div></span>
+    </div>
+    <div class="rm-nf-own-btn own-cell text-white"><partial name="_DisplayPlayerOwn" model="Model.DisplayPlayer" /></div>
+    <div class="rm-nf-main">
+        <div class="rm-nf-who rm-injp-player">
+            <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=Model.DisplayPlayer}" />
+        </div>
+        @if (!string.IsNullOrEmpty(Model.Details) || Model.Return != null)
+        {
+            <div class="rm-nf-details">
+                @Model.Details
+                @if (Model.Return != null)
+                {
+                    <span class="rm-nf-return">Return @Model.Return</span>
+                }
+            </div>
+        }
+    </div>
+    <div class="rm-nf-change">@Model.Change</div>
+    <div class="rm-nf-pct">
+        @if (Model.Own.HasValue)
+        {
+            var ownTip = ViewContext.HttpContext.NextTooltipId();
+            <span class="bm-tooltip-wrap"><span class="rm-badge rm-inj-pct bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@ownTip" style="background-color:#@colorLib.OwnershipGetPercentColor(Model.Own.Value)">@Model.Own.Value.ToString("0")</span><div class="bm-tooltip-content" id="@ownTip" role="tooltip">Rostered in @Model.Own.Value.ToString("0")% of leagues</div></span>
+        }
+        @if (Model.Start.HasValue)
+        {
+            var actTip = ViewContext.HttpContext.NextTooltipId();
+            <span class="bm-tooltip-wrap"><span class="rm-badge rm-inj-pct bm-tooltip-trigger bm-tooltip-trigger--hover" data-bm-tooltip="@actTip" style="background-color:#@colorLib.ActiveGetPercentColor(Model.Start.Value)">@Model.Start.Value.ToString("0")</span><div class="bm-tooltip-content" id="@actTip" role="tooltip">Started in @Model.Start.Value.ToString("0")% of leagues</div></span>
+        }
+    </div>
+</div>

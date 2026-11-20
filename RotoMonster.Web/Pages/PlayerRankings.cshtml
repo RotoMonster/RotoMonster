@@ -74,10 +74,10 @@
                             <tr>
                                 <th>#</th>
                                 <th class="rm-oa-team">Team</th>
-                                <th>Avg</th>
+                                <th>Own</th>
                                 @foreach (var pt in Model.ShowPlayerTypes)
                                 {
-                                    <th>@pt.DisplayTitle</th>
+                                    <th>@(string.IsNullOrWhiteSpace(pt.DisplayTitle) ? "Active" : pt.DisplayTitle + " Active")</th>
                                 }
                             </tr>
                         </thead>
@@ -104,7 +104,7 @@
                                             <td title="@ptAnalysis.PlayerCount @(ptAnalysis.PlayerCount == 1 ? "player" : "players")">
                                                 @if (ptAnalysis.PlayerCount > 0)
                                                 {
-                                                    <span class="rm-oa-chip" style="background-color:#@colorLib.OwnershipGetPercentColor(ptAnalysis.AverageOwnershipPercent)">@String.Format("{0:##0.0}%", ptAnalysis.AverageOwnershipPercent)</span>
+                                                    <span class="rm-oa-chip" style="background-color:#@colorLib.ActiveGetPercentColor(ptAnalysis.AverageActivePercent)">@String.Format("{0:##0.0}%", ptAnalysis.AverageActivePercent)</span>
                                                     <span class="rm-oa-count">@ptAnalysis.PlayerCount</span>
                                                 }
                                                 else

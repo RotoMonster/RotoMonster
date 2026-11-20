@@ -7,8 +7,18 @@ using RotoMonster.Core;
 
 namespace RotoMonster.Models.Shared
 {
+    public class LeagueOwnershipInfo
+    {
+        public string Title { get; set; }
+        public HashSet<int> Rostered { get; set; } = new HashSet<int>();
+        public HashSet<int> Mine { get; set; } = new HashSet<int>();
+    }
+
     public class PlayerTableModel
     {
+        public bool ShowLeagueOwnership { get; set; } = false;
+        public List<LeagueOwnershipInfo> LeagueOwnershipLeagues { get; set; } = new List<LeagueOwnershipInfo>();
+
         public bool MinutesAsClock { get; set; } = false;
 
         public string FormatStat(Category category, string displayFormat, double value)

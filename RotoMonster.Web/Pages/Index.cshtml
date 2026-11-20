@@ -27,15 +27,6 @@
             });
         }, true);
     </script>
-    @{
-        int monsterBotPlayerCount = 0;
-        foreach (var view in Model.UserLeagueViews)
-            monsterBotPlayerCount += (view.MonsterBotPlayers != null ? view.MonsterBotPlayers.Count : 0);
-        if (monsterBotPlayerCount > 0)
-        {
-            <div class="alert alert-warning container text-center"><partial name="_MonsterBotIcon" /> Check MonsterBot Recommendations (@monsterBotPlayerCount)</div>
-        }
-    }
 
     <div class="mb-2 ms-1 rm-front-actions">
         @if (Model.UserLeagueViews.Count > 0)
@@ -46,7 +37,7 @@
             .WithTitle("Home")
             .WithPurpose("Your home page pulls together your leagues, today's games and the latest injuries, so you can check everything in one place.")
             .AddSection("Your leagues", "<p>Each league you import gets its own card with your team, your roster and how your players are doing.</p><p>The gear icon opens the league's settings and the refresh icon pulls your latest roster. Rosters also refresh on their own every few hours.</p>")
-            .AddSection("MonsterBot", "<p><strong>MonsterBot Rating</strong> shows how your roster stacks up by average own and start percent.</p><p><strong>MonsterBot Recommendations</strong> are moves worth making, and <strong>Top Free Agents</strong> are the best players available in that league. The banner at the top tells you when there are recommendations to check.</p>")
+            .AddSection("MonsterBot", "<p><strong>MonsterBot Rating</strong> shows how your roster stacks up by average own and start percent.</p><p><strong>Top Free Agents</strong> are the best players available in that league.</p>")
             .AddSection("Scores", "<p>The scores box shows the day's games with live scores. Click <strong>Box score</strong> on any game for the full stats.</p>")
             .AddSection("Recent injuries", "<p>The latest injury news, with your players first. <strong>All injuries</strong> opens the full list.</p>")
             .AddSection("Waiver trends and scoring log", "<p><strong>Waiver Trends</strong> shows the players being added the most right now. The <strong>Scoring Log</strong> shows big games from your players as they happen.</p>")
@@ -331,7 +322,7 @@
                 <div class="rm-front-empty">
                     <div class="rm-front-empty-icon">+</div>
                     <h2 class="rm-front-empty-title">Add your first league</h2>
-                    <p class="rm-front-empty-text">Import your fantasy leagues to see your rosters, today's games and MonsterBot recommendations here.</p>
+                    <p class="rm-front-empty-text">Import your fantasy leagues to see your rosters and today's games here.</p>
                     <a class="btn btn-primary" asp-page="./UserLeagues/Import">Add Leagues</a>
                 </div>
             }
@@ -502,21 +493,6 @@
                                         <div class="bm-tooltip-content" id="@tipAct" role="tooltip">Average start %</div>
                                         </span>
                                         @analysisPlayerType.PlayerType.DisplayTitle
-                                    </div>
-                                }
-                            </div>
-                        }
-
-                        @if (ulv.MonsterBotPlayers != null && ulv.MonsterBotPlayers.Count > 0)
-                        {
-                            <div class="mt-2 alert alert-light border-danger small mb-0">
-                                <partial name="_MonsterBotIcon" />
-                                MonsterBot Recommendations
-                                @foreach (var mbp in ulv.MonsterBotPlayers)
-                                {
-                                    <div class="ms-2">
-                                        <partial name="_MonsterBotPlayer" model="mbp" />
-                                        <partial name="_PlayerLinkExtra" model="new RotoMonster.Models.Shared.PlayerLinkModel() {DisplayPlayer=mbp.DisplayPlayer,SelectedUserLeague=ulv.UserLeague}" />
                                     </div>
                                 }
                             </div>
