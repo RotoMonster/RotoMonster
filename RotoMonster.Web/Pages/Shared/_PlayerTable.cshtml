@@ -4,6 +4,9 @@
 @{
     RotoMonster.Core.Libs.ColorLib colorLib = new Core.Libs.ColorLib();
     bool isUser = (Model.UserId != null);
+    var posVVals = (Model.DisplayPlayers ?? new List<RotoMonster.Core.DisplayPlayer>()).Where(x => x.PositionValuePlayer != null).Select(x => x.PositionValuePlayer.PositionValue).ToList();
+    double posVAvg = posVVals.Count > 0 ? posVVals.Average() : 0;
+    double posVRange = posVVals.Count > 0 ? posVVals.Max() - posVVals.Min() : 0;
 }
 
 <div class="@(Model.Modern ? "rm-pt-scroll" : "container-fuild ms-0 p-0")">
@@ -243,7 +246,7 @@
 
                 @if (!Model.IsPlayerHistory && Model.ShowPositionalValue)
                 {
-                    <th class="text-nowrap">
+                    <th class="text-nowrap" data-pt="val">
                         @{ var tipId14 = Context.NextTooltipId(); }
 <span class="bm-tooltip-wrap">
 <button class="bm-tooltip-trigger bm-tooltip-trigger--hover btn btn-sm btn-link text-white p-0 m-0"
@@ -726,7 +729,20 @@
                 {
                     @if (dp.PositionValuePlayer != null)
                     {
-                        <td class="tdr text-nowrap"><partial name="_DisplayPositionValuePlayer" model="dp.PositionValuePlayer" /></td>
+                        var pvp = dp.PositionValuePlayer;
+                        double pvTmp = posVRange == 0 ? 0 : (pvp.PositionValue - posVAvg) / posVRange * 100;
+                        string pvColor = pvTmp >= 0 ? colorLib.GetGreenRangeColorStyle(pvTmp, 0, 100, true) : colorLib.GetRedRangeColorStyle(-1 * pvTmp, 0, 100, true);
+                        <td class="tdr text-nowrap rm-posv-cell">
+                            <span class="rm-posv-pos">
+                                @if (pvp.IsStartable)
+                                {
+                                    var pvTip = Context.NextTooltipId();
+                                    <span class="bm-tooltip-wrap"><span class="bm-tooltip-trigger small" data-bm-tooltip="@pvTip">@Html.Raw(new Icon(new IconInput { Type = IconType.Success, Size = 16 }).Render())</span><div class="bm-tooltip-content" id="@pvTip" role="tooltip">Top Player at @pvp.MostValuablePosition.Abbreviation</div></span>
+                                }
+                                <small><partial name="_ColoredPosition" model="pvp.MostValuablePosition" /></small>
+                            </span>
+                            <span class="value-badge rm-posv-badge" style="background-color:#@pvColor;">@String.Format("{0:#####0.00}", pvp.PositionValue)</span>
+                        </td>
                     }
                     else
                     {
