@@ -5853,3 +5853,7 @@ a.rm-news-row-time:hover { text-decoration: underline; }
 .rm-nf-who a:hover { text-decoration: underline; }
 .rm-nf-who { font-size: 0.85rem; }
 /* end rm-nf v3 */
+
+.rm-xv-g { margin-left: 4px; font-size: .72em; font-weight: 600; opacity: .7; }
+
+.rm-lo.bm-tooltip-trigger { cursor: pointer; }

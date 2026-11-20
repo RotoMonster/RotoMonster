@@ -636,11 +636,13 @@
                             <td class="tdc text-nowrap rm-lo-cell">
                                 @if (loYours.Count > 0)
                                 {
-                                    <span class="rm-lo rm-lo--mine" title="Yours in: @string.Join(", ", loYours)">@loYours.Count</span>
+                                    var loTip1 = Context.NextTooltipId();
+                                    <span class="bm-tooltip-wrap"><span class="rm-lo rm-lo--mine bm-tooltip-trigger" data-bm-tooltip="@loTip1">@loYours.Count</span><div class="bm-tooltip-content" id="@loTip1" role="tooltip"><strong>On your team in</strong>@foreach (var lt in loYours) {<div>@lt</div>}</div></span>
                                 }
                                 @if (loAvail.Count > 0)
                                 {
-                                    <span class="rm-lo rm-lo--avail" title="Available in: @string.Join(", ", loAvail)">@loAvail.Count</span>
+                                    var loTip2 = Context.NextTooltipId();
+                                    <span class="bm-tooltip-wrap"><span class="rm-lo rm-lo--avail bm-tooltip-trigger" data-bm-tooltip="@loTip2">@loAvail.Count</span><div class="bm-tooltip-content" id="@loTip2" role="tooltip"><strong>Available in</strong>@foreach (var lt in loAvail) {<div>@lt</div>}</div></span>
                                 }
                             </td>
                         }
@@ -688,10 +690,7 @@
                     {
                         if (dp.ExtraValuePlayer1 != null)
                         {
-                            <td class="tdr text-nowrap" style="background-color:#@dp.ExtraValuePlayer1.LeagueValueColor;">
-                                <partial name="_DisplayValuePlayer"
-                                         model="new RotoMonster.Models.Shared.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer1,ShowGames=!Model.Sport.IsNFL }" />
-                            </td>
+                            <td class="tdr text-nowrap value-badge-cell"><span class="value-badge rm-xv-badge" style="background-color:#@dp.ExtraValuePlayer1.LeagueValueColor;">@String.Format("{0:#####0.00}", dp.ExtraValuePlayer1.LeagueValue)@if (!Model.Sport.IsNFL) {<small class="rm-xv-g">@String.Format("{0:#####0}g", dp.ExtraValuePlayer1.StatPlayer.Games)</small>}</span></td>
                         }
                         else
                         {
@@ -703,9 +702,7 @@
                     {
                         if (dp.ExtraValuePlayer2 != null)
                         {
-                            <td class="tdr text-nowrap" style="background-color:#@dp.ExtraValuePlayer2.LeagueValueColor;">
-                                <partial name="_DisplayValuePlayer" model="new RotoMonster.Models.Shared.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer2,ShowGames=!Model.Sport.IsNFL }" />
-                            </td>
+                            <td class="tdr text-nowrap value-badge-cell"><span class="value-badge rm-xv-badge" style="background-color:#@dp.ExtraValuePlayer2.LeagueValueColor;">@String.Format("{0:#####0.00}", dp.ExtraValuePlayer2.LeagueValue)@if (!Model.Sport.IsNFL) {<small class="rm-xv-g">@String.Format("{0:#####0}g", dp.ExtraValuePlayer2.StatPlayer.Games)</small>}</span></td>
                         }
                         else
                         {
@@ -716,10 +713,7 @@
                     {
                         if (dp.ExtraValuePlayer3 != null)
                         {
-                            <td class="tdr text-nowrap" style="background-color:#@dp.ExtraValuePlayer3.LeagueValueColor;">
-                                <partial name="_DisplayValuePlayer"
-                                         model="new RotoMonster.Models.Shared.ValuePlayerModel() {ValuePlayer=dp.ExtraValuePlayer3}" />
-                            </td>
+                            <td class="tdr text-nowrap value-badge-cell"><span class="value-badge rm-xv-badge" style="background-color:#@dp.ExtraValuePlayer3.LeagueValueColor;">@String.Format("{0:#####0.00}", dp.ExtraValuePlayer3.LeagueValue)</span></td>
                         }
                         else
                         {
